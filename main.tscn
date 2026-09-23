@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://dk04kttvnnvlw"]
+
+[ext_resource type="PackedScene" uid="uid://csxemfio1bwh0" path="res://assets/garden_fountain_toothless.glb" id="1_garden"]
+[ext_resource type="Script" path="res://scripts/lobby.gd" id="2_lobby"]
+
+[sub_resource type="Environment" id="Environment_preview"]
+background_mode = 1
+background_color = Color(0.15, 0.17, 0.19, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.8, 0.85, 0.9, 1)
+ambient_light_energy = 0.55
+tonemap_mode = 2
+
+[node name="GardenLobby" type="Node3D" unique_id=545750448]
+script = ExtResource("2_lobby")
+
+[node name="GardenFountain" parent="." unique_id=2084744776 instance=ExtResource("1_garden")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0043854713, 0.021293402, 0.007475853)
+
+[node name="Camera" type="Camera3D" parent="." unique_id=1601007076]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 14, 18)
+current = true
+fov = 55.0
+far = 150.0
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=63540258]
+transform = Transform3D(0.934699, 0.19371226, -0.2980157, 0.12349484, 0.6092192, 0.7833269, 0.3332969, -0.7689783, 0.54551405, 0, 0, 0)
+light_energy = 0.75
+shadow_enabled = true
+
+[node name="World" type="WorldEnvironment" parent="." unique_id=28298275]
+environment = SubResource("Environment_preview")

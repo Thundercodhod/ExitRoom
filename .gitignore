@@ -1,0 +1,18 @@
+# Godot-generated cache and import metadata
+.godot/
+*.import
+*.log
+
+# Local captures used while checking the game
+preview-lobby-roam.png
+
+# Keep only models used by the playable project. Other source models and
+# textures extracted from GLBs stay local and can be imported again.
+3Dmodel_import/*
+!3Dmodel_import/original_backrooms.glb
+!3Dmodel_import/backrooms_rigged_hazmat.glb
+assets/*
+!assets/garden_fountain_toothless.glb
+
+# Local, unneeded font copy
+fonts/
