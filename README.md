@@ -1,6 +1,6 @@
 # ExitRoom
 
-เกมต้นแบบมุมมองบุคคลที่ได้แรงบันดาลใจมาจากเกม EscapeBackroom
+เกมต้นแบบมุมมองบุคคลที่ 3 ได้แรงบันดาลใจมาจากเกม EscapeBackroom
 
 ![Garden lobby](preview-lobby.png)
 
