@@ -4,6 +4,7 @@ const PlayerScript = preload("res://scripts/player.gd")
 const START_SIGN := Vector3(5.2, 0.0, -6.3)
 
 var playing := false
+var was_captured := false
 var player: CharacterBody3D
 var font: Font
 var overlay: Control
@@ -15,7 +16,9 @@ var wide_camera: Camera3D
 
 func _ready() -> void:
 	setup_inputs()
-	font = ThemeDB.fallback_font
+	# Bundled Thai font: web builds have no OS fonts to fall back on.
+	font = load("res://NotoSansThai.ttf")
+	font.fallbacks = [ThemeDB.fallback_font]
 	wide_camera = $Camera
 	wide_camera.look_at(Vector3(0, 2.1, 0), Vector3.UP)
 	wide_camera.fov = 48.0
@@ -233,5 +236,10 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(_delta: float) -> void:
+	# Web: the browser eats Esc and drops pointer lock itself, so pause when capture is lost.
+	var captured := Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+	if playing and was_captured and not captured:
+		show_menu("GARDEN LOBBY", "พักที่สวนก่อนเริ่มด่านแรก", false)
+	was_captured = captured
 	if is_instance_valid(player):
 		prompt.text = "E  เริ่มด่าน 1 / BACKROOMS" if playing and player.global_position.distance_to(START_SIGN) < 2.2 else ""

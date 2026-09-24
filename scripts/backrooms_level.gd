@@ -5,6 +5,7 @@ const SPAWN := Vector3(9.5, 0.12, -9.5)
 const EXIT := Vector3(-10.5, 0.0, 10.5)
 
 var playing := false
+var was_captured := false
 var player: CharacterBody3D
 var font: Font
 var overlay: Control
@@ -17,7 +18,9 @@ var ambience: AudioStreamPlayer
 
 func _ready() -> void:
 	setup_inputs()
-	font = ThemeDB.fallback_font
+	# Bundled Thai font: web builds have no OS fonts to fall back on.
+	font = load("res://NotoSansThai.ttf")
+	font.fallbacks = [ThemeDB.fallback_font]
 	setup_environment()
 	setup_collisions()
 	setup_lights()
@@ -244,6 +247,11 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(delta: float) -> void:
+	# Web: the browser eats Esc and drops pointer lock itself, so pause when capture is lost.
+	var captured := Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+	if playing and was_captured and not captured:
+		show_intro()
+	was_captured = captured
 	elapsed += delta
 	if is_instance_valid(flicker_light):
 		flicker_light.light_energy = 2.1 + (0.55 if sin(elapsed * 17.0) > 0.96 else 0.0)

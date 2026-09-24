@@ -16,3 +16,6 @@ assets/*
 
 # Local, unneeded font copy
 fonts/
+
+# Web export output
+build/
