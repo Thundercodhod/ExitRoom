@@ -38,6 +38,8 @@
 
 บรรยากาศใหม่ใช้หมอกและแสงเย็นในหมู่บ้าน สวน และโรงเรียน ส่วน Backrooms ปรับวัสดุผนัง/พื้นของ GLB ที่เดิมไม่รับแสงให้เกิดเงาจริง พร้อมไฟเพดานบางดวงกะพริบ ทุกด่านมีเสียงพื้นหลังเบา ๆ และขอบภาพมืดเล็กน้อยเพื่อเน้นทางที่ไฟฉายส่อง
 
+ภาพทุกฉากผ่าน shader `assets/shaders/retro_horror.gdshader` เพื่อให้เป็นพิกเซลย้อนยุค เบลอเล็กน้อย มีเกรนและเงาอมฟ้า ส่วน HUD และเมนูยังคมชัด ปรับความหยาบด้วย `pixel_height` (ค่าเริ่มต้น 270; เพิ่มเพื่อให้ละเอียดขึ้น) ความเบลอด้วย `softness` และความสว่างด้วย `exposure` ได้จากค่าเริ่มต้นในไฟล์ shader
+
 เท็กซ์เจอร์ฉากเปิด 1K ใช้ภาพ CC0 จาก Poly Haven ได้แก่ [Worn Plaster Wall](https://polyhaven.com/a/worn_plaster_wall), [Worn Concrete Floor](https://polyhaven.com/a/worn_concrete_floor), [Weathered Planks](https://polyhaven.com/a/weathered_planks) และ [Asphalt 06](https://polyhaven.com/a/asphalt_06) การวางฉากเริ่มต้นสร้างด้วย `tools/build_prologue.gd` และสามารถแก้ชิ้นส่วนโดยตรงใน Godot ได้
 
 ## เพิ่มโมเดล `.glb`

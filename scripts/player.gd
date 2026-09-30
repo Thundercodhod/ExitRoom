@@ -91,16 +91,15 @@ func _ready() -> void:
 	add_child(atmosphere_audio)
 	atmosphere_audio.play()
 	var darkness := CanvasLayer.new()
-	darkness.name = "PeripheralDarkness"
+	darkness.name = "RetroHorrorLook"
 	darkness.layer = 1
 	add_child(darkness)
 	var vignette := ColorRect.new()
 	vignette.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	vignette.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var vignette_shader := Shader.new()
-	vignette_shader.code = "shader_type canvas_item; void fragment() { vec2 p = (UV - vec2(0.5)) * vec2(2.0, 1.65); float edge = smoothstep(0.35, 1.12, length(p)); COLOR = vec4(0.008, 0.012, 0.02, edge * 0.46); }"
 	var vignette_material := ShaderMaterial.new()
-	vignette_material.shader = vignette_shader
+	# Draw before the scene HUD, so only the world receives the retro effect.
+	vignette_material.shader = preload("res://assets/shaders/retro_horror.gdshader")
 	vignette.material = vignette_material
 	darkness.add_child(vignette)
 
