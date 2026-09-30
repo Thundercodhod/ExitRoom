@@ -19,8 +19,11 @@ var school_button: Button
 func _ready() -> void:
 	setup_inputs()
 	# Bundled Thai font: web builds have no OS fonts to fall back on.
-	font = load("res://NotoSansThai.ttf")
-	font.fallbacks = [ThemeDB.fallback_font]
+	font = load("res://NotoSansThai.ttf") as Font
+	if font == null:
+		font = ThemeDB.fallback_font
+	else:
+		font.fallbacks = [ThemeDB.fallback_font]
 	wide_camera = $Camera
 	wide_camera.look_at(Vector3(0, 2.1, 0), Vector3.UP)
 	wide_camera.fov = 48.0

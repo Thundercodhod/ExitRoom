@@ -20,8 +20,11 @@ var atmosphere_clock := 0.0
 
 func _ready() -> void:
 	setup_inputs()
-	font = load("res://NotoSansThai.ttf")
-	font.fallbacks = [ThemeDB.fallback_font]
+	font = load("res://NotoSansThai.ttf") as Font
+	if font == null:
+		font = ThemeDB.fallback_font
+	else:
+		font.fallbacks = [ThemeDB.fallback_font]
 	player = CharacterBody3D.new()
 	player.name = "SchoolPlayerHazmatDemo"
 	player.set_script(PlayerScript)

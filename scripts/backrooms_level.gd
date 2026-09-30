@@ -18,8 +18,11 @@ var elapsed := 0.0
 func _ready() -> void:
 	setup_inputs()
 	# Bundled Thai font: web builds have no OS fonts to fall back on.
-	font = load("res://NotoSansThai.ttf")
-	font.fallbacks = [ThemeDB.fallback_font]
+	font = load("res://NotoSansThai.ttf") as Font
+	if font == null:
+		font = ThemeDB.fallback_font
+	else:
+		font.fallbacks = [ThemeDB.fallback_font]
 	setup_environment()
 	prepare_backrooms_materials()
 	setup_collisions()
