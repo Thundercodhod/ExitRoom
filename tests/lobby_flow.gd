@@ -50,5 +50,6 @@ func run() -> void:
 	await frames(3)
 	check(current_scene.name == "GardenLobby", "Exit returns to the garden lobby")
 	check(current_scene.menu_title.text.contains("สำเร็จ"), "Lobby acknowledges level completion")
+	check(not current_scene.school_button.disabled, "The abandoned school unlocks after Backrooms")
 	print("EXITROOM_TEST_FAILURES=", failures)
 	quit(1 if failures else 0)

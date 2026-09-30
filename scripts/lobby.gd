@@ -2,6 +2,7 @@ extends Node3D
 
 const PlayerScript = preload("res://scripts/player.gd")
 const START_SIGN := Vector3(5.2, 0.0, -6.3)
+const SCHOOL_SIGN := Vector3(-5.2, 0.0, -6.3)
 
 var playing := false
 var was_captured := false
@@ -12,6 +13,7 @@ var menu_title: Label
 var menu_copy: Label
 var prompt: Label
 var wide_camera: Camera3D
+var school_button: Button
 
 
 func _ready() -> void:
@@ -24,6 +26,7 @@ func _ready() -> void:
 	wide_camera.fov = 48.0
 	setup_collisions()
 	setup_start_sign()
+	setup_school_sign()
 	player = CharacterBody3D.new()
 	player.name = "LobbyPlayerHazmatDemo"
 	player.set_script(PlayerScript)
@@ -32,12 +35,26 @@ func _ready() -> void:
 	add_child(player)
 	player.pivot.rotation.y = 2.75
 	player.body_visual.rotation.y = 2.75 - PI
+	player.torch.light_energy = 1.7
+	var fountain_glow := OmniLight3D.new()
+	fountain_glow.name = "FountainMoonGlow"
+	fountain_glow.position = Vector3(0, 3.2, 0)
+	fountain_glow.light_color = Color(0.45, 0.61, 0.78)
+	fountain_glow.light_energy = 0.42
+	fountain_glow.omni_range = 6.0
+	add_child(fountain_glow)
 	player.camera.current = false
 	wide_camera.current = true
 	setup_ui()
-	if get_tree().root.has_meta("backrooms_complete"):
+	if get_tree().root.has_meta("school_complete"):
+		get_tree().root.remove_meta("school_complete")
+		show_menu("โรงเรียนร้าง", "พบสมุดของเมย์และเปิดคำให้การแล้ว\nสวนยังมีประตูอีกหลายบานที่รอให้เปิด", true)
+	elif get_tree().root.has_meta("from_prologue"):
+		get_tree().root.remove_meta("from_prologue")
+		show_menu("สวนที่ไม่ควรอยู่ที่นี่", "เสียงน้ำพุที่ได้ยินหลังบ้านพาคุณมาถึงสวนแห่งนี้\nเดินสำรวจน้ำพุ แล้วตามหาทางไป Backrooms", true)
+	elif get_tree().root.has_meta("backrooms_complete"):
 		get_tree().root.remove_meta("backrooms_complete")
-		show_menu("ด่านแรกสำเร็จ", "คุณออกจาก Backrooms และกลับมาที่สวนแล้ว\nกดเริ่มด่าน 1 เพื่อเล่นอีกครั้ง หรือเดินเล่นใน lobby", true)
+		show_menu("ด่านแรกสำเร็จ", "คุณออกจาก Backrooms และกลับมาที่สวนแล้ว\nประตูโรงเรียนร้างทางซ้ายของสวนเปิดแล้ว", true)
 	else:
 		show_menu("EXIT ROOM  /  GARDEN LOBBY", "สวนสำหรับรอเริ่มเกม\nเดินชมสวนและน้ำพุ หรือเริ่มด่านแรกใน Backrooms\n\nHazmat เป็นตัวละครชั่วคราวระหว่างรอโมเดลจริง", true)
 
@@ -137,6 +154,28 @@ func setup_start_sign() -> void:
 	sign_root.add_child(light)
 
 
+func setup_school_sign() -> void:
+	var sign_root := Node3D.new()
+	sign_root.name = "SchoolLevelMarker"
+	sign_root.position = SCHOOL_SIGN
+	add_child(sign_root)
+	var dark := stone_material(Color(0.13, 0.17, 0.19))
+	var blue := stone_material(Color(0.35, 0.72, 0.80), 0.45)
+	add_marker_box(sign_root, Vector3(0, 1.05, 0), Vector3(1.35, 0.60, 0.10), dark)
+	for x in [-0.57, 0.57]:
+		add_marker_box(sign_root, Vector3(x, 0.49, 0), Vector3(0.08, 0.98, 0.10), dark)
+	add_marker_box(sign_root, Vector3(0, 1.37, -0.06), Vector3(1.43, 0.05, 0.06), blue)
+	var title := Label3D.new()
+	title.text = "LEVEL 02\nSCHOOL"
+	title.font = font
+	title.font_size = 32
+	title.pixel_size = 0.0038
+	title.modulate = Color(0.70, 0.94, 1.0)
+	title.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	title.position = Vector3(0, 1.05, -0.12)
+	sign_root.add_child(title)
+
+
 func styled_label(text: String, size: int, color: Color) -> Label:
 	var label := Label.new()
 	label.text = text
@@ -157,7 +196,7 @@ func setup_ui() -> void:
 	prompt.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
 	prompt.position = Vector2(-185, -76)
 	ui.add_child(prompt)
-	var hint := styled_label("WASD เดิน  •  เมาส์ หมุนกล้อง  •  E เริ่มด่าน  •  F ไฟฉาย  •  Esc เมนู", 15, Color(0.95, 0.92, 0.8))
+	var hint := styled_label("WASD เดิน  •  Space กระโดด  •  E เข้าด่าน  •  F ไฟฉาย  •  Esc เมนู", 15, Color(0.95, 0.92, 0.8))
 	hint.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 	hint.position = Vector2(26, -40)
 	ui.add_child(hint)
@@ -197,6 +236,13 @@ func setup_ui() -> void:
 	start.add_theme_font_override("font", font)
 	start.pressed.connect(start_level_one)
 	content.add_child(start)
+	school_button = Button.new()
+	school_button.text = "เข้าโรงเรียนร้าง  /  SCHOOL"
+	school_button.custom_minimum_size.y = 50
+	school_button.add_theme_font_override("font", font)
+	school_button.disabled = not get_tree().root.has_meta("school_unlocked")
+	school_button.pressed.connect(start_school)
+	content.add_child(school_button)
 	roam.grab_focus.call_deferred()
 
 
@@ -225,6 +271,14 @@ func start_level_one() -> void:
 	get_tree().change_scene_to_file("res://backrooms_level.tscn")
 
 
+func start_school() -> void:
+	if not get_tree().root.has_meta("school_unlocked"):
+		return
+	playing = false
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	get_tree().change_scene_to_file("res://abandoned_school.tscn")
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("pause_game"):
 		if playing:
@@ -233,6 +287,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			begin_roaming()
 	if event.is_action_pressed("interact") and playing and player.global_position.distance_to(START_SIGN) < 2.2:
 		start_level_one()
+	elif event.is_action_pressed("interact") and playing and player.global_position.distance_to(SCHOOL_SIGN) < 2.2:
+		start_school()
 
 
 func _process(_delta: float) -> void:
@@ -242,4 +298,8 @@ func _process(_delta: float) -> void:
 		show_menu("GARDEN LOBBY", "พักที่สวนก่อนเริ่มด่านแรก", false)
 	was_captured = captured
 	if is_instance_valid(player):
-		prompt.text = "E  เริ่มด่าน 1 / BACKROOMS" if playing and player.global_position.distance_to(START_SIGN) < 2.2 else ""
+		prompt.text = ""
+		if playing and player.global_position.distance_to(START_SIGN) < 2.2:
+			prompt.text = "E  เริ่มด่าน 1 / BACKROOMS"
+		elif playing and player.global_position.distance_to(SCHOOL_SIGN) < 2.2:
+			prompt.text = "E  เข้าโรงเรียนร้าง" if get_tree().root.has_meta("school_unlocked") else "ผ่าน Backrooms เพื่อเปิดด่านนี้"

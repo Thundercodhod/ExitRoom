@@ -1,0 +1,33 @@
+{
+  "source": "low-poly_furnished_abandoned_house.glb",
+  "output": "assets/abandoned_house_playable.glb",
+  "original_wall_bounds_blender": {
+    "min": [
+      -8.018797874450684,
+      -10.991169929504395,
+      -0.00028881075559183955
+    ],
+    "max": [
+      7.869749069213867,
+      0.8170288801193237,
+      2.4997119903564453
+    ]
+  },
+  "entrance_godot_center": [
+    0.0,
+    1.08,
+    -0.7
+  ],
+  "kitchen_godot_center": [
+    0.0,
+    1.08,
+    6.54
+  ],
+  "doorway_dimensions": [
+    1.8,
+    2.24,
+    0.85
+  ],
+  "wall_polygons_after": 1633,
+  "changes": "Join wall surfaces retaining material slots, weld shared seams, cut front doorway and widen kitchen doorway. Original file unchanged."
+}

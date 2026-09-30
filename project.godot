@@ -11,8 +11,8 @@ config_version=5
 [application]
 
 config/name="ExitRoom"
-config/description="Garden lobby and Backrooms level one with a temporary Hazmat player."
-run/main_scene="res://main.tscn"
+config/description="Story prologue, garden lobby and Backrooms level one with a temporary Hazmat player."
+run/main_scene="res://prologue_village.tscn"
 config/features=PackedStringArray("4.7")
 
 [display]

@@ -13,7 +13,6 @@ var prompt: Label
 var status: Label
 var flicker_light: OmniLight3D
 var elapsed := 0.0
-var ambience: AudioStreamPlayer
 
 
 func _ready() -> void:
@@ -22,6 +21,7 @@ func _ready() -> void:
 	font = load("res://NotoSansThai.ttf")
 	font.fallbacks = [ThemeDB.fallback_font]
 	setup_environment()
+	prepare_backrooms_materials()
 	setup_collisions()
 	setup_lights()
 	setup_exit()
@@ -33,7 +33,6 @@ func _ready() -> void:
 	add_child(player)
 	player.pivot.rotation.y = 2.35
 	player.body_visual.rotation.y = 2.35 - PI
-	setup_audio()
 	setup_ui()
 	if get_tree().root.has_meta("from_lobby"):
 		get_tree().root.remove_meta("from_lobby")
@@ -59,12 +58,36 @@ func setup_environment() -> void:
 	world.name = "YellowFluorescentAtmosphere"
 	var environment := Environment.new()
 	environment.background_mode = Environment.BG_COLOR
-	environment.background_color = Color(0.19, 0.18, 0.11)
+	environment.background_color = Color(0.07, 0.065, 0.04)
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	environment.ambient_light_color = Color(0.8, 0.76, 0.54)
-	environment.ambient_light_energy = 1.05
+	environment.ambient_light_energy = 0.12
+	environment.fog_enabled = true
+	environment.fog_light_color = Color(0.16, 0.14, 0.07)
+	environment.fog_density = 0.018
 	world.environment = environment
 	add_child(world)
+
+
+func prepare_backrooms_materials() -> void:
+	# The supplied GLB marks every surface as unlit. Give its textured walls,
+	# ceiling and carpet normal lighting so the corridor can fall into shadow.
+	var lit_materials := {}
+	for node in $OriginalBackrooms.find_children("*", "MeshInstance3D", true, false):
+		var mesh := node as MeshInstance3D
+		for surface in mesh.mesh.get_surface_count():
+			var source := mesh.get_active_material(surface) as BaseMaterial3D
+			if source == null:
+				continue
+			var key := source.get_instance_id()
+			if not lit_materials.has(key):
+				var material := source.duplicate() as BaseMaterial3D
+				if source.resource_name == "Ceiling_Lights":
+					material.albedo_color = Color(0.44, 0.41, 0.30)
+				else:
+					material.shading_mode = BaseMaterial3D.SHADING_MODE_PER_PIXEL
+				lit_materials[key] = material
+			mesh.set_surface_override_material(surface, lit_materials[key])
 
 
 func setup_collisions() -> void:
@@ -94,7 +117,7 @@ func setup_lights() -> void:
 			lamp.name = "Fluorescent %s %s" % [x, z]
 			lamp.position = Vector3(x, 2.37, z)
 			lamp.light_color = Color(1.0, 0.91, 0.66)
-			lamp.light_energy = 2.1
+			lamp.light_energy = 0.72 if int(x + z) % 12 == 0 else 0.48
 			lamp.omni_range = 7.0
 			lamp.shadow_enabled = false
 			add_child(lamp)
@@ -150,14 +173,6 @@ func setup_exit() -> void:
 	exit_root.add_child(glow)
 
 
-func setup_audio() -> void:
-	ambience = AudioStreamPlayer.new()
-	ambience.stream = load("res://audio/drone.wav")
-	ambience.volume_db = -22
-	add_child(ambience)
-	ambience.play()
-
-
 func styled_label(text: String, size: int, color: Color) -> Label:
 	var label := Label.new()
 	label.text = text
@@ -186,7 +201,7 @@ func setup_ui() -> void:
 	prompt.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
 	prompt.position = Vector2(-170, -80)
 	ui.add_child(prompt)
-	var hint := styled_label("WASD เดิน  •  เมาส์ หมุนกล้อง  •  Shift วิ่ง  •  F ไฟฉาย  •  Esc พัก", 15, Color(0.82, 0.8, 0.62))
+	var hint := styled_label("WASD เดิน  •  Space กระโดด  •  Shift วิ่ง  •  F ไฟฉาย  •  Esc พัก", 15, Color(0.82, 0.8, 0.62))
 	hint.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 	hint.position = Vector2(26, -40)
 	ui.add_child(hint)
@@ -243,6 +258,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		playing = false
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		get_tree().root.set_meta("backrooms_complete", true)
+		get_tree().root.set_meta("school_unlocked", true)
 		get_tree().change_scene_to_file("res://main.tscn")
 
 
@@ -254,6 +270,6 @@ func _process(delta: float) -> void:
 	was_captured = captured
 	elapsed += delta
 	if is_instance_valid(flicker_light):
-		flicker_light.light_energy = 2.1 + (0.55 if sin(elapsed * 17.0) > 0.96 else 0.0)
+		flicker_light.light_energy = 0.72 if sin(elapsed * 3.7) > -0.94 else 0.07
 	if is_instance_valid(player):
 		prompt.text = "E  ออกจาก Backrooms / กลับสวน" if player.global_position.distance_to(EXIT) < 1.8 and playing else ""
