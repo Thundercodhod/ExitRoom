@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://addons/psx_vehicles/models/road_model.glb" id="1"]
+
+[sub_resource type="BoxShape3D" id="box0"]
+size = Vector3(6.0000, 0.0050, 4.0000)
+
+[node name="road" instance=ExtResource("1")]
+
+[node name="Collision" type="StaticBody3D" parent="road"]
+
+[node name="Box" type="CollisionShape3D" parent="road/Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0123, -0.0000)
+shape = SubResource("box0")
