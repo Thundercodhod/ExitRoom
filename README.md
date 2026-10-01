@@ -57,3 +57,21 @@
 วัสดุสำหรับบ้านข้างทางและชิ้นประกอบอื่นใช้ Poly Haven (CC0): [Worn Mossy Plasterwall](https://polyhaven.com/a/worn_mossy_plasterwall), [Painted Plaster Wall](https://polyhaven.com/a/painted_plaster_wall), [Plastered Wall 02](https://polyhaven.com/a/plastered_wall_02), [Concrete Floor](https://polyhaven.com/a/concrete_floor), [Weathered Planks](https://polyhaven.com/a/weathered_planks). วัสดุเหล่านี้บางส่วนใช้ Godot shader และต้อง bake หากส่งออกนอก Godot อ่านเครดิตโมเดลบ้านและรายละเอียดการดัดแปลงใน `ASSET_CREDITS.md`
 
 ตรวจการเล่นด้วย `tests/player_traversal.gd`, `tests/prologue_flow.gd`, `tests/school_flow.gd` และ `tests/lobby_flow.gd` ครอบคลุมการก้าวข้ามพื้น 22 ซม. การกระโดด การชนกำแพง เดินเข้าครัวจริง จุดเก็บของ และการเปลี่ยนด่าน
+# ExitRoom
+
+เกม Godot เดิมของโปรเจกต์นี้อยู่ในโฟลเดอร์นี้ เปิดไฟล์ `project.godot` ด้วย Godot 4 แล้วกด Play หรือใช้ `Play.cmd`.
+
+## โปรเจกต์ที่เกี่ยวข้อง
+
+`Room407` เป็นเกมทดลองอีกโปรเจกต์หนึ่ง ไม่ใช่ scene ต่อจาก ExitRoom และไม่ควรรวม scene หรือสคริปต์เข้าด้วยกัน:
+
+- ExitRoom: `GodotGame/Game3D/Godot/ExitRoom/project.godot`
+- ROOM 407: `GodotGame/Game3D/Godot/Room407/project.godot`
+
+ถ้าเปิดจาก GitHub clone ให้เปิดแต่ละโฟลเดอร์เป็นโปรเจกต์แยกใน Godot; การเปลี่ยนเกมทำโดยเปิดโปรเจกต์อีกโฟลเดอร์ ไม่ใช่เปลี่ยน `main_scene` ข้ามกัน
+
+## หมายเหตุสำหรับ GitHub
+
+ไฟล์ `.godot`, `.import`, log, preview ชั่วคราว และ asset ต้นฉบับบางส่วนถูกกันออกจาก Git แล้ว ไฟล์โมเดลที่มีสิทธิ์จำกัดหรือยังไม่มีข้อมูลผู้สร้างไม่ควรอัปโหลดเป็น raw asset ใน repository สาธารณะ ให้ใส่ไว้ในโฟลเดอร์ local ตาม `ASSET_CREDITS.md` แทน
+
+ExitRoom เดิมยังใช้ฉากเริ่มต้นเดิม ส่วน ROOM 407 มี README และวิธีเปิดเล่นอยู่ในโฟลเดอร์ของมัน
