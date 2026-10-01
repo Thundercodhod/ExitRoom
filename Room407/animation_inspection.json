@@ -1,0 +1,818 @@
+{
+  "Breathing Idle.fbx": {
+    "objects": [
+      {
+        "name": "Arm_Left",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.21452847123146057,
+          0.7106629610061646,
+          0.3006797134876251
+        ]
+      },
+      {
+        "name": "Arm_Right",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.21532124280929565,
+          0.7056466341018677,
+          0.3307938873767853
+        ]
+      },
+      {
+        "name": "Body",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.40672165155410767,
+          1.4125617742538452,
+          0.2946721017360687
+        ]
+      },
+      {
+        "name": "Boots",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.17508836090564728,
+          0.09652825444936752,
+          0.259328693151474
+        ]
+      },
+      {
+        "name": "Boots.001",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.16060984134674072,
+          0.09618038684129715,
+          0.25934311747550964
+        ]
+      },
+      {
+        "name": "Head",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.17269620299339294,
+          0.28335341811180115,
+          0.2253994345664978
+        ]
+      },
+      {
+        "name": "rig",
+        "type": "ARMATURE",
+        "bones": [
+          "pelvis",
+          "spine",
+          "chest",
+          "neck",
+          "head",
+          "head_end",
+          "shoulder_left",
+          "upper_arm_left",
+          "forearm_left",
+          "hand_left",
+          "thumb.01.L",
+          "thumb.02.L",
+          "thumb.02.L_end",
+          "f_middle.01.L",
+          "f_middle.01.L_end",
+          "shoulder_right",
+          "upper_arm_right",
+          "forearm_right",
+          "hand_right",
+          "thumb.01.R",
+          "thumb.02.R",
+          "thumb.02.R_end",
+          "f_middle.01.R",
+          "f_middle.01.R_end",
+          "thigh_left",
+          "shin.L",
+          "foot_left",
+          "foot_left_end",
+          "thigh_right",
+          "shin.R",
+          "foot_right",
+          "foot_right_end"
+        ],
+        "dim": [
+          0.7406103610992432,
+          0.672118067741394,
+          1.8879972696304321
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "name": "rig|mixamo.com|Layer0",
+        "frames": [
+          1.0,
+          299.0
+        ]
+      }
+    ],
+    "images": [
+      {
+        "name": "alpha_texture",
+        "path": "C:\\Users\\thuns\\Documents\\Game Dev\\GodotGame\\Game3D\\Godot\\ExitRoom\\animation\\MaleCharacter.fbm\\MaleCharacter_Texture.png",
+        "packed": false,
+        "size": [
+          0,
+          0
+        ]
+      },
+      {
+        "name": "MaleCharacter_Texture.png",
+        "path": "C:\\Users\\Yugg0XG\\Desktop\\Male Character PS1_PSX\\MaleCharacter.fbm\\MaleCharacter_Texture.png",
+        "packed": false,
+        "size": [
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "Crouched To Standing.fbx": {
+    "objects": [
+      {
+        "name": "Arm_Left",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.35410407185554504,
+          0.36387133598327637,
+          0.5256644487380981
+        ]
+      },
+      {
+        "name": "Arm_Right",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.25347304344177246,
+          0.39107149839401245,
+          0.5618943572044373
+        ]
+      },
+      {
+        "name": "Body",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.6467953324317932,
+          0.8902775645256042,
+          0.612633466720581
+        ]
+      },
+      {
+        "name": "Boots",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.1503867506980896,
+          0.12634193897247314,
+          0.26770004630088806
+        ]
+      },
+      {
+        "name": "Boots.001",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.16759566962718964,
+          0.13338136672973633,
+          0.2660996913909912
+        ]
+      },
+      {
+        "name": "Head",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.17511454224586487,
+          0.28521430492401123,
+          0.2785313129425049
+        ]
+      },
+      {
+        "name": "rig",
+        "type": "ARMATURE",
+        "bones": [
+          "pelvis",
+          "spine",
+          "chest",
+          "neck",
+          "head",
+          "head_end",
+          "shoulder_left",
+          "upper_arm_left",
+          "forearm_left",
+          "hand_left",
+          "thumb.01.L",
+          "thumb.02.L",
+          "thumb.02.L_end",
+          "f_middle.01.L",
+          "f_middle.01.L_end",
+          "shoulder_right",
+          "upper_arm_right",
+          "forearm_right",
+          "hand_right",
+          "thumb.01.R",
+          "thumb.02.R",
+          "thumb.02.R_end",
+          "f_middle.01.R",
+          "f_middle.01.R_end",
+          "thigh_left",
+          "shin.L",
+          "foot_left",
+          "foot_left_end",
+          "thigh_right",
+          "shin.R",
+          "foot_right",
+          "foot_right_end"
+        ],
+        "dim": [
+          0.7232222557067871,
+          0.9152203798294067,
+          0.9312790036201477
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "name": "rig|mixamo.com|Layer0",
+        "frames": [
+          1.0,
+          20.0
+        ]
+      }
+    ],
+    "images": [
+      {
+        "name": "alpha_texture",
+        "path": "C:\\Users\\thuns\\Documents\\Game Dev\\GodotGame\\Game3D\\Godot\\ExitRoom\\animation\\MaleCharacter.fbm\\MaleCharacter_Texture.png",
+        "packed": false,
+        "size": [
+          0,
+          0
+        ]
+      },
+      {
+        "name": "MaleCharacter_Texture.png",
+        "path": "C:\\Users\\Yugg0XG\\Desktop\\Male Character PS1_PSX\\MaleCharacter.fbm\\MaleCharacter_Texture.png",
+        "packed": false,
+        "size": [
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "Running.fbx": {
+    "objects": [
+      {
+        "name": "Arm_Left",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.2399429827928543,
+          0.545005738735199,
+          0.33114033937454224
+        ]
+      },
+      {
+        "name": "Arm_Right",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.3313469886779785,
+          0.33548805117607117,
+          0.4830551743507385
+        ]
+      },
+      {
+        "name": "Body",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.5052708387374878,
+          1.358704924583435,
+          0.5378106832504272
+        ]
+      },
+      {
+        "name": "Boots",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.11813948303461075,
+          0.11256890743970871,
+          0.26071634888648987
+        ]
+      },
+      {
+        "name": "Boots.001",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.1452273726463318,
+          0.26028260588645935,
+          0.10317739844322205
+        ]
+      },
+      {
+        "name": "Head",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.17706438899040222,
+          0.28172287344932556,
+          0.22079740464687347
+        ]
+      },
+      {
+        "name": "rig",
+        "type": "ARMATURE",
+        "bones": [
+          "pelvis",
+          "spine",
+          "chest",
+          "neck",
+          "head",
+          "head_end",
+          "shoulder_left",
+          "upper_arm_left",
+          "forearm_left",
+          "hand_left",
+          "thumb.01.L",
+          "thumb.02.L",
+          "thumb.02.L_end",
+          "f_middle.01.L",
+          "f_middle.01.L_end",
+          "shoulder_right",
+          "upper_arm_right",
+          "forearm_right",
+          "hand_right",
+          "thumb.01.R",
+          "thumb.02.R",
+          "thumb.02.R_end",
+          "f_middle.01.R",
+          "f_middle.01.R_end",
+          "thigh_left",
+          "shin.L",
+          "foot_left",
+          "foot_left_end",
+          "thigh_right",
+          "shin.R",
+          "foot_right",
+          "foot_right_end"
+        ],
+        "dim": [
+          0.6384647488594055,
+          0.942692756652832,
+          1.80661940574646
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "name": "rig|mixamo.com|Layer0",
+        "frames": [
+          1.0,
+          22.0
+        ]
+      }
+    ],
+    "images": [
+      {
+        "name": "alpha_texture",
+        "path": "C:\\Users\\thuns\\Documents\\Game Dev\\GodotGame\\Game3D\\Godot\\ExitRoom\\animation\\MaleCharacter.fbm\\MaleCharacter_Texture.png",
+        "packed": false,
+        "size": [
+          0,
+          0
+        ]
+      },
+      {
+        "name": "MaleCharacter_Texture.png",
+        "path": "C:\\Users\\Yugg0XG\\Desktop\\Male Character PS1_PSX\\MaleCharacter.fbm\\MaleCharacter_Texture.png",
+        "packed": false,
+        "size": [
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "Sitting Idle.fbx": {
+    "objects": [
+      {
+        "name": "Arm_Left",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.21351522207260132,
+          0.56658536195755,
+          0.4474119246006012
+        ]
+      },
+      {
+        "name": "Arm_Right",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.21390457451343536,
+          0.6102917194366455,
+          0.4394567906856537
+        ]
+      },
+      {
+        "name": "Body",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.48081645369529724,
+          1.062699317932129,
+          0.6278427839279175
+        ]
+      },
+      {
+        "name": "Boots",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.1687794327735901,
+          0.1274344027042389,
+          0.2563225328922272
+        ]
+      },
+      {
+        "name": "Boots.001",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.1292540431022644,
+          0.129497230052948,
+          0.24805210530757904
+        ]
+      },
+      {
+        "name": "Head",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.17437225580215454,
+          0.28896379470825195,
+          0.27524083852767944
+        ]
+      },
+      {
+        "name": "rig",
+        "type": "ARMATURE",
+        "bones": [
+          "pelvis",
+          "spine",
+          "chest",
+          "neck",
+          "head",
+          "head_end",
+          "shoulder_left",
+          "upper_arm_left",
+          "forearm_left",
+          "hand_left",
+          "thumb.01.L",
+          "thumb.02.L",
+          "thumb.02.L_end",
+          "f_middle.01.L",
+          "f_middle.01.L_end",
+          "shoulder_right",
+          "upper_arm_right",
+          "forearm_right",
+          "hand_right",
+          "thumb.01.R",
+          "thumb.02.R",
+          "thumb.02.R_end",
+          "f_middle.01.R",
+          "f_middle.01.R_end",
+          "thigh_left",
+          "shin.L",
+          "foot_left",
+          "foot_left_end",
+          "thigh_right",
+          "shin.R",
+          "foot_right",
+          "foot_right_end"
+        ],
+        "dim": [
+          0.6615692973136902,
+          1.0601937770843506,
+          1.5518462657928467
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "name": "rig|mixamo.com|Layer0",
+        "frames": [
+          1.0,
+          130.0
+        ]
+      }
+    ],
+    "images": [
+      {
+        "name": "alpha_texture",
+        "path": "C:\\Users\\thuns\\Documents\\Game Dev\\GodotGame\\Game3D\\Godot\\ExitRoom\\animation\\MaleCharacter.fbm\\MaleCharacter_Texture.png",
+        "packed": false,
+        "size": [
+          0,
+          0
+        ]
+      },
+      {
+        "name": "MaleCharacter_Texture.png",
+        "path": "C:\\Users\\Yugg0XG\\Desktop\\Male Character PS1_PSX\\MaleCharacter.fbm\\MaleCharacter_Texture.png",
+        "packed": false,
+        "size": [
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "Standing To Crouched.fbx": {
+    "objects": [
+      {
+        "name": "Arm_Left",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.3688265383243561,
+          0.6330773234367371,
+          0.2765282690525055
+        ]
+      },
+      {
+        "name": "Arm_Right",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.29604119062423706,
+          0.6732887029647827,
+          0.2252245545387268
+        ]
+      },
+      {
+        "name": "Body",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.5804613828659058,
+          1.3753631114959717,
+          0.5577656626701355
+        ]
+      },
+      {
+        "name": "Boots",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.1883317530155182,
+          0.1062561422586441,
+          0.2556697130203247
+        ]
+      },
+      {
+        "name": "Boots.001",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.11992059648036957,
+          0.10706225037574768,
+          0.2492373138666153
+        ]
+      },
+      {
+        "name": "Head",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.20076622068881989,
+          0.2895761728286743,
+          0.26764076948165894
+        ]
+      },
+      {
+        "name": "rig",
+        "type": "ARMATURE",
+        "bones": [
+          "pelvis",
+          "spine",
+          "chest",
+          "neck",
+          "head",
+          "head_end",
+          "shoulder_left",
+          "upper_arm_left",
+          "forearm_left",
+          "hand_left",
+          "thumb.01.L",
+          "thumb.02.L",
+          "thumb.02.L_end",
+          "f_middle.01.L",
+          "f_middle.01.L_end",
+          "shoulder_right",
+          "upper_arm_right",
+          "forearm_right",
+          "hand_right",
+          "thumb.01.R",
+          "thumb.02.R",
+          "thumb.02.R_end",
+          "f_middle.01.R",
+          "f_middle.01.R_end",
+          "thigh_left",
+          "shin.L",
+          "foot_left",
+          "foot_left_end",
+          "thigh_right",
+          "shin.R",
+          "foot_right",
+          "foot_right_end"
+        ],
+        "dim": [
+          1.0896872282028198,
+          0.9887453317642212,
+          1.8047127723693848
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "name": "rig|mixamo.com|Layer0",
+        "frames": [
+          1.0,
+          20.0
+        ]
+      }
+    ],
+    "images": [
+      {
+        "name": "alpha_texture",
+        "path": "C:\\Users\\thuns\\Documents\\Game Dev\\GodotGame\\Game3D\\Godot\\ExitRoom\\animation\\MaleCharacter.fbm\\MaleCharacter_Texture.png",
+        "packed": false,
+        "size": [
+          0,
+          0
+        ]
+      },
+      {
+        "name": "MaleCharacter_Texture.png",
+        "path": "C:\\Users\\Yugg0XG\\Desktop\\Male Character PS1_PSX\\MaleCharacter.fbm\\MaleCharacter_Texture.png",
+        "packed": false,
+        "size": [
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "Walking.fbx": {
+    "objects": [
+      {
+        "name": "Arm_Left",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.20935910940170288,
+          0.6682755351066589,
+          0.34677550196647644
+        ]
+      },
+      {
+        "name": "Arm_Right",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.181998610496521,
+          0.7280998229980469,
+          0.20736917853355408
+        ]
+      },
+      {
+        "name": "Body",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.41350889205932617,
+          1.4134712219238281,
+          0.38924407958984375
+        ]
+      },
+      {
+        "name": "Boots",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.12097576260566711,
+          0.09424836933612823,
+          0.25013113021850586
+        ]
+      },
+      {
+        "name": "Boots.001",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.14561262726783752,
+          0.19704779982566833,
+          0.22608302533626556
+        ]
+      },
+      {
+        "name": "Head",
+        "type": "MESH",
+        "bones": [],
+        "dim": [
+          0.1731523871421814,
+          0.28314489126205444,
+          0.2203308790922165
+        ]
+      },
+      {
+        "name": "rig",
+        "type": "ARMATURE",
+        "bones": [
+          "pelvis",
+          "spine",
+          "chest",
+          "neck",
+          "head",
+          "head_end",
+          "shoulder_left",
+          "upper_arm_left",
+          "forearm_left",
+          "hand_left",
+          "thumb.01.L",
+          "thumb.02.L",
+          "thumb.02.L_end",
+          "f_middle.01.L",
+          "f_middle.01.L_end",
+          "shoulder_right",
+          "upper_arm_right",
+          "forearm_right",
+          "hand_right",
+          "thumb.01.R",
+          "thumb.02.R",
+          "thumb.02.R_end",
+          "f_middle.01.R",
+          "f_middle.01.R_end",
+          "thigh_left",
+          "shin.L",
+          "foot_left",
+          "foot_left_end",
+          "thigh_right",
+          "shin.R",
+          "foot_right",
+          "foot_right_end"
+        ],
+        "dim": [
+          0.6171911954879761,
+          0.8048626780509949,
+          2.0074567794799805
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "name": "rig|mixamo.com|Layer0",
+        "frames": [
+          1.0,
+          32.0
+        ]
+      }
+    ],
+    "images": [
+      {
+        "name": "alpha_texture",
+        "path": "C:\\Users\\thuns\\Documents\\Game Dev\\GodotGame\\Game3D\\Godot\\ExitRoom\\animation\\MaleCharacter.fbm\\MaleCharacter_Texture.png",
+        "packed": false,
+        "size": [
+          0,
+          0
+        ]
+      },
+      {
+        "name": "MaleCharacter_Texture.png",
+        "path": "C:\\Users\\Yugg0XG\\Desktop\\Male Character PS1_PSX\\MaleCharacter.fbm\\MaleCharacter_Texture.png",
+        "packed": false,
+        "size": [
+          0,
+          0
+        ]
+      }
+    ]
+  }
+}

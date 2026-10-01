@@ -1,0 +1,1131 @@
+{
+  "Forgotten Bedroom - PS1 Style Asset Pack\\Assets\\Bed\\Bed.blend": {
+    "objects": [
+      {
+        "name": "Object",
+        "type": "MESH",
+        "dim": [
+          10.807255744934082,
+          17.351903915405273,
+          6.332708835601807
+        ],
+        "min": [
+          -5.346888065338135,
+          -7.3675642013549805,
+          0.2251034528017044
+        ],
+        "max": [
+          5.460367679595947,
+          9.984341621398926,
+          6.557815074920654
+        ],
+        "materials": [
+          "Matress.001",
+          "Bed_Frame.001",
+          "Pillows.001",
+          "Blanket.001"
+        ],
+        "bones": []
+      }
+    ],
+    "images": [
+      {
+        "name": "Render Result",
+        "size": [
+          0,
+          0
+        ],
+        "packed": false,
+        "path": ""
+      },
+      {
+        "name": "Viewer Node",
+        "size": [
+          256,
+          256
+        ],
+        "packed": false,
+        "path": ""
+      }
+    ],
+    "actions": []
+  },
+  "Forgotten Bedroom - PS1 Style Asset Pack\\Assets\\Bedside Table\\Bedside Table.blend": {
+    "objects": [
+      {
+        "name": "bedtable",
+        "type": "MESH",
+        "dim": [
+          2.60117244720459,
+          1.6796514987945557,
+          2.1050281524658203
+        ],
+        "min": [
+          -1.300614595413208,
+          -0.8865048885345459,
+          0.24504196643829346
+        ],
+        "max": [
+          1.3005579710006714,
+          0.7931466102600098,
+          2.3500702381134033
+        ],
+        "materials": [
+          "Fbx Default Material",
+          "Fbx Default Material"
+        ],
+        "bones": []
+      }
+    ],
+    "images": [
+      {
+        "name": "Render Result",
+        "size": [
+          0,
+          0
+        ],
+        "packed": false,
+        "path": ""
+      },
+      {
+        "name": "Viewer Node",
+        "size": [
+          256,
+          256
+        ],
+        "packed": false,
+        "path": ""
+      }
+    ],
+    "actions": []
+  },
+  "Forgotten Bedroom - PS1 Style Asset Pack\\Assets\\Ceiling Light\\Ceiling Light.blend": {
+    "objects": [
+      {
+        "name": "Ceiling_Light",
+        "type": "MESH",
+        "dim": [
+          2.0,
+          2.0,
+          0.4766674041748047
+        ],
+        "min": [
+          -1.0,
+          -1.0,
+          0.5233327150344849
+        ],
+        "max": [
+          1.0,
+          1.0,
+          1.0000001192092896
+        ],
+        "materials": [
+          "Fbx Default Material"
+        ],
+        "bones": []
+      }
+    ],
+    "images": [
+      {
+        "name": "Render Result",
+        "size": [
+          0,
+          0
+        ],
+        "packed": false,
+        "path": ""
+      },
+      {
+        "name": "Viewer Node",
+        "size": [
+          256,
+          256
+        ],
+        "packed": false,
+        "path": ""
+      }
+    ],
+    "actions": []
+  },
+  "Forgotten Bedroom - PS1 Style Asset Pack\\Assets\\Door\\Wooden_Door.blend": {
+    "objects": [
+      {
+        "name": "Door1",
+        "type": "MESH",
+        "dim": [
+          1.6278371810913086,
+          0.4961623251438141,
+          3.1181581020355225
+        ],
+        "min": [
+          -0.8166983723640442,
+          -0.2561038136482239,
+          0.04164708033204079
+        ],
+        "max": [
+          0.8111387491226196,
+          0.2400585114955902,
+          3.1598052978515625
+        ],
+        "materials": [
+          "Knobs",
+          "Doorwood"
+        ],
+        "bones": []
+      }
+    ],
+    "images": [
+      {
+        "name": "Render Result",
+        "size": [
+          0,
+          0
+        ],
+        "packed": false,
+        "path": ""
+      },
+      {
+        "name": "Viewer Node",
+        "size": [
+          256,
+          256
+        ],
+        "packed": false,
+        "path": ""
+      }
+    ],
+    "actions": []
+  },
+  "Forgotten Bedroom - PS1 Style Asset Pack\\Assets\\Lamp\\Lamp.blend": {
+    "objects": [
+      {
+        "name": "lamp",
+        "type": "MESH",
+        "dim": [
+          1.7007827758789062,
+          1.7007827758789062,
+          3.4337997436523438
+        ],
+        "min": [
+          -0.8503913879394531,
+          -0.8503912687301636,
+          -0.029276670888066292
+        ],
+        "max": [
+          0.8503913879394531,
+          0.8503914475440979,
+          3.4045228958129883
+        ],
+        "materials": [
+          "Fbx Default Material",
+          "Fbx Default Material"
+        ],
+        "bones": []
+      }
+    ],
+    "images": [
+      {
+        "name": "Render Result",
+        "size": [
+          0,
+          0
+        ],
+        "packed": false,
+        "path": ""
+      },
+      {
+        "name": "Viewer Node",
+        "size": [
+          256,
+          256
+        ],
+        "packed": false,
+        "path": ""
+      }
+    ],
+    "actions": []
+  },
+  "Forgotten Bedroom - PS1 Style Asset Pack\\Assets\\Light Switch\\LightSwitch.blend": {
+    "objects": [
+      {
+        "name": "Backplate",
+        "type": "MESH",
+        "dim": [
+          0.2546273469924927,
+          2.000000476837158,
+          3.000000476837158
+        ],
+        "min": [
+          -0.2767277956008911,
+          -1.000000238418579,
+          0.3130592107772827
+        ],
+        "max": [
+          -0.022100461646914482,
+          1.000000238418579,
+          3.3130595684051514
+        ],
+        "materials": [
+          "WorldGridMaterial"
+        ],
+        "bones": []
+      },
+      {
+        "name": "SwitchLEVER",
+        "type": "MESH",
+        "dim": [
+          0.35477253794670105,
+          0.595699667930603,
+          0.9603486657142639
+        ],
+        "min": [
+          -0.17545561492443085,
+          -0.4278498589992523,
+          1.319483757019043
+        ],
+        "max": [
+          0.1793169230222702,
+          0.1678498089313507,
+          2.279832363128662
+        ],
+        "materials": [],
+        "bones": []
+      }
+    ],
+    "images": [
+      {
+        "name": "Render Result",
+        "size": [
+          0,
+          0
+        ],
+        "packed": false,
+        "path": ""
+      },
+      {
+        "name": "Viewer Node",
+        "size": [
+          256,
+          256
+        ],
+        "packed": false,
+        "path": ""
+      }
+    ],
+    "actions": []
+  },
+  "Forgotten Bedroom - PS1 Style Asset Pack\\Assets\\Mr. TiddyWinkles\\tiddy.blend": {
+    "objects": [
+      {
+        "name": "Tiddy",
+        "type": "MESH",
+        "dim": [
+          1.8236855268478394,
+          0.863746702671051,
+          2.5556561946868896
+        ],
+        "min": [
+          -0.9095274806022644,
+          -0.6967414617538452,
+          -0.01765918731689453
+        ],
+        "max": [
+          0.9141581058502197,
+          0.16700530052185059,
+          2.537996768951416
+        ],
+        "materials": [
+          "Normal",
+          "Love",
+          "Happy",
+          "Shocked"
+        ],
+        "bones": []
+      }
+    ],
+    "images": [
+      {
+        "name": "Render Result",
+        "size": [
+          0,
+          0
+        ],
+        "packed": false,
+        "path": ""
+      },
+      {
+        "name": "Tiddy",
+        "size": [
+          1024,
+          1024
+        ],
+        "packed": false,
+        "path": "//TiddySHOCKED.png"
+      },
+      {
+        "name": "TiddyHAPPY.png",
+        "size": [
+          1024,
+          1024
+        ],
+        "packed": false,
+        "path": "//TiddyHAPPY.png"
+      },
+      {
+        "name": "TiddyLOVE.png",
+        "size": [
+          1024,
+          1024
+        ],
+        "packed": false,
+        "path": "//TiddyLOVE.png"
+      },
+      {
+        "name": "TiddyNORMAL.png",
+        "size": [
+          1024,
+          1024
+        ],
+        "packed": false,
+        "path": "//TiddyNORMAL.png"
+      },
+      {
+        "name": "Viewer Node",
+        "size": [
+          256,
+          256
+        ],
+        "packed": false,
+        "path": ""
+      }
+    ],
+    "actions": []
+  },
+  "Forgotten Bedroom - PS1 Style Asset Pack\\Assets\\Painting\\Paintings.blend": {
+    "objects": [
+      {
+        "name": "painting HORIZONTAL",
+        "type": "MESH",
+        "dim": [
+          3.080085277557373,
+          0.20463363826274872,
+          2.192922353744507
+        ],
+        "min": [
+          -3.136477470397949,
+          -0.7640924453735352,
+          1.3502380847930908
+        ],
+        "max": [
+          -0.05639195442199707,
+          -0.5594587922096252,
+          3.5431604385375977
+        ],
+        "materials": [
+          "Frame",
+          "Canvas"
+        ],
+        "bones": []
+      },
+      {
+        "name": "painting VERTICAL",
+        "type": "MESH",
+        "dim": [
+          2.1929221153259277,
+          0.20463363826274872,
+          3.0800857543945312
+        ],
+        "min": [
+          0.3020428419113159,
+          -0.7640924453735352,
+          0.9031878709793091
+        ],
+        "max": [
+          2.494965076446533,
+          -0.5594587922096252,
+          3.983273506164551
+        ],
+        "materials": [
+          "Frame.001",
+          "Canvas.001"
+        ],
+        "bones": []
+      }
+    ],
+    "images": [
+      {
+        "name": "Render Result",
+        "size": [
+          0,
+          0
+        ],
+        "packed": false,
+        "path": ""
+      },
+      {
+        "name": "Viewer Node",
+        "size": [
+          256,
+          256
+        ],
+        "packed": false,
+        "path": ""
+      }
+    ],
+    "actions": []
+  },
+  "Forgotten Bedroom - PS1 Style Asset Pack\\Assets\\Shelf\\Shelf.blend": {
+    "objects": [
+      {
+        "name": "shelf",
+        "type": "MESH",
+        "dim": [
+          2.0,
+          4.9796061515808105,
+          0.9873480796813965
+        ],
+        "min": [
+          -1.0,
+          -2.4149880409240723,
+          0.20425641536712646
+        ],
+        "max": [
+          1.0,
+          2.5646185874938965,
+          1.191604495048523
+        ],
+        "materials": [
+          "WorldGridMaterial"
+        ],
+        "bones": []
+      }
+    ],
+    "images": [
+      {
+        "name": "Render Result",
+        "size": [
+          0,
+          0
+        ],
+        "packed": false,
+        "path": ""
+      },
+      {
+        "name": "Viewer Node",
+        "size": [
+          256,
+          256
+        ],
+        "packed": false,
+        "path": ""
+      }
+    ],
+    "actions": []
+  },
+  "Forgotten Bedroom - PS1 Style Asset Pack\\Assets\\Stairs\\Stairs.blend": {
+    "objects": [
+      {
+        "name": "Stairs",
+        "type": "MESH",
+        "dim": [
+          7.130771160125732,
+          22.145633697509766,
+          9.03528881072998
+        ],
+        "min": [
+          -3.4332053661346436,
+          -10.81810188293457,
+          0.3240070343017578
+        ],
+        "max": [
+          3.697566270828247,
+          11.327533721923828,
+          9.359295845031738
+        ],
+        "materials": [
+          "StairsBars",
+          "StairsSteps"
+        ],
+        "bones": []
+      }
+    ],
+    "images": [
+      {
+        "name": "Render Result",
+        "size": [
+          0,
+          0
+        ],
+        "packed": false,
+        "path": ""
+      },
+      {
+        "name": "Viewer Node",
+        "size": [
+          256,
+          256
+        ],
+        "packed": false,
+        "path": ""
+      }
+    ],
+    "actions": []
+  },
+  "Forgotten Bedroom - PS1 Style Asset Pack\\Assets\\Wall Lamp Light\\WallLampLight.blend": {
+    "objects": [
+      {
+        "name": "WallLampLight",
+        "type": "MESH",
+        "dim": [
+          3.7840869426727295,
+          4.579077243804932,
+          3.7840874195098877
+        ],
+        "min": [
+          -1.989058017730713,
+          -1.8988275527954102,
+          0.49367260932922363
+        ],
+        "max": [
+          1.7950289249420166,
+          2.6802496910095215,
+          4.277760028839111
+        ],
+        "materials": [
+          "Body"
+        ],
+        "bones": []
+      }
+    ],
+    "images": [
+      {
+        "name": "Render Result",
+        "size": [
+          0,
+          0
+        ],
+        "packed": false,
+        "path": ""
+      },
+      {
+        "name": "Viewer Node",
+        "size": [
+          256,
+          256
+        ],
+        "packed": false,
+        "path": ""
+      }
+    ],
+    "actions": []
+  },
+  "Forgotten Bedroom - PS1 Style Asset Pack\\Assets\\Wardrobe Closet\\Wardrobe.blend": {
+    "objects": [
+      {
+        "name": "wardrobe",
+        "type": "MESH",
+        "dim": [
+          0.9747904539108276,
+          2.7652266025543213,
+          4.558445453643799
+        ],
+        "min": [
+          -0.5243028402328491,
+          -1.316422939300537,
+          0.10137104988098145
+        ],
+        "max": [
+          0.4504876732826233,
+          1.4488037824630737,
+          4.659816741943359
+        ],
+        "materials": [
+          "WorldGridMaterial"
+        ],
+        "bones": []
+      }
+    ],
+    "images": [
+      {
+        "name": "Render Result",
+        "size": [
+          0,
+          0
+        ],
+        "packed": false,
+        "path": ""
+      },
+      {
+        "name": "Viewer Node",
+        "size": [
+          256,
+          256
+        ],
+        "packed": false,
+        "path": ""
+      }
+    ],
+    "actions": []
+  },
+  "Forgotten Bedroom - PS1 Style Asset Pack\\Assets\\Wooden Drawer\\Wooden Drawer.blend": {
+    "objects": [
+      {
+        "name": "WoodenDrawer",
+        "type": "MESH",
+        "dim": [
+          1.663311243057251,
+          4.077536106109619,
+          4.2032012939453125
+        ],
+        "min": [
+          -0.7501674890518188,
+          -1.9875569343566895,
+          0.15136730670928955
+        ],
+        "max": [
+          0.9131437540054321,
+          2.0899791717529297,
+          4.3545684814453125
+        ],
+        "materials": [
+          "Fbx Default Material",
+          "Fbx Default Material",
+          "Fbx Default Material"
+        ],
+        "bones": []
+      }
+    ],
+    "images": [
+      {
+        "name": "Render Result",
+        "size": [
+          0,
+          0
+        ],
+        "packed": false,
+        "path": ""
+      },
+      {
+        "name": "Viewer Node",
+        "size": [
+          256,
+          256
+        ],
+        "packed": false,
+        "path": ""
+      }
+    ],
+    "actions": []
+  },
+  "Male Character PS1_PSX\\_Blender\\MaleCharacter.blend": {
+    "objects": [
+      {
+        "name": "Arm_Left",
+        "type": "MESH",
+        "dim": [
+          0.18477976322174072,
+          0.7412310242652893,
+          0.21565277874469757
+        ],
+        "min": [
+          0.1508082151412964,
+          -0.07218749821186066,
+          0.7120504975318909
+        ],
+        "max": [
+          0.3355879783630371,
+          0.1434653103351593,
+          1.4532815217971802
+        ],
+        "materials": [
+          "Character2_Material"
+        ],
+        "bones": []
+      },
+      {
+        "name": "Arm_Right",
+        "type": "MESH",
+        "dim": [
+          0.18477977812290192,
+          0.7412310838699341,
+          0.21565277874469757
+        ],
+        "min": [
+          -0.3355879783630371,
+          -0.07218749821186066,
+          0.7120505571365356
+        ],
+        "max": [
+          -0.1508082002401352,
+          0.1434653103351593,
+          1.4532816410064697
+        ],
+        "materials": [
+          "Character2_Material"
+        ],
+        "bones": []
+      },
+      {
+        "name": "Body",
+        "type": "MESH",
+        "dim": [
+          0.4494365155696869,
+          1.4168720245361328,
+          0.2892177999019623
+        ],
+        "min": [
+          -0.22471825778484344,
+          -0.12134192138910294,
+          0.07851134985685349
+        ],
+        "max": [
+          0.22471825778484344,
+          0.16787593066692352,
+          1.495383381843567
+        ],
+        "materials": [
+          "Character2_Material"
+        ],
+        "bones": []
+      },
+      {
+        "name": "Boots",
+        "type": "MESH",
+        "dim": [
+          0.12208376079797745,
+          0.09196869283914566,
+          0.2491110861301422
+        ],
+        "min": [
+          -0.21924088895320892,
+          -0.10941466689109802,
+          0.0006051292875781655
+        ],
+        "max": [
+          -0.09715712815523148,
+          0.1396964192390442,
+          0.09257382899522781
+        ],
+        "materials": [
+          "Character2_Material"
+        ],
+        "bones": []
+      },
+      {
+        "name": "Boots.001",
+        "type": "MESH",
+        "dim": [
+          0.12208373099565506,
+          0.09196871519088745,
+          0.2491110861301422
+        ],
+        "min": [
+          0.09715715795755386,
+          -0.10941466689109802,
+          0.0006051292875781655
+        ],
+        "max": [
+          0.21924088895320892,
+          0.1396964192390442,
+          0.0925738513469696
+        ],
+        "materials": [
+          "Character2_Material"
+        ],
+        "bones": []
+      },
+      {
+        "name": "Head",
+        "type": "MESH",
+        "dim": [
+          0.17321158945560455,
+          0.2830204963684082,
+          0.2220611572265625
+        ],
+        "min": [
+          -0.08651567250490189,
+          -0.12149148434400558,
+          1.443259835243225
+        ],
+        "max": [
+          0.08669591695070267,
+          0.10056968778371811,
+          1.7262803316116333
+        ],
+        "materials": [
+          "Character2_Material"
+        ],
+        "bones": []
+      },
+      {
+        "name": "rig",
+        "type": "ARMATURE",
+        "dim": [
+          0.6416139006614685,
+          0.3545759618282318,
+          1.6645407676696777
+        ],
+        "min": [
+          -0.32080695033073425,
+          -0.2668074667453766,
+          -0.062101855874061584
+        ],
+        "max": [
+          0.32080695033073425,
+          0.08776876330375671,
+          1.6024389266967773
+        ],
+        "materials": [],
+        "bones": [
+          "pelvis",
+          "spine",
+          "chest",
+          "neck",
+          "head",
+          "shoulder_left",
+          "upper_arm_left",
+          "forearm_left",
+          "hand_left",
+          "thumb.01.L",
+          "thumb.02.L",
+          "f_middle.01.L",
+          "shoulder_right",
+          "upper_arm_right",
+          "forearm_right",
+          "hand_right",
+          "thumb.01.R",
+          "thumb.02.R",
+          "f_middle.01.R",
+          "thigh_left",
+          "shin.L",
+          "foot_left",
+          "thigh_right",
+          "shin.R",
+          "foot_right"
+        ]
+      }
+    ],
+    "images": [
+      {
+        "name": "MaleCharacter_Texture.png",
+        "size": [
+          0,
+          0
+        ],
+        "packed": false,
+        "path": "//MaleCharacter_Texture.png"
+      },
+      {
+        "name": "man_tex.png",
+        "size": [
+          0,
+          0
+        ],
+        "packed": false,
+        "path": "//..\\man_tex_1.png"
+      },
+      {
+        "name": "man_tex.png.001",
+        "size": [
+          0,
+          0
+        ],
+        "packed": false,
+        "path": "//..\\man_tex.png"
+      },
+      {
+        "name": "man_tex.png.002",
+        "size": [
+          0,
+          0
+        ],
+        "packed": false,
+        "path": "//man_tex.png"
+      },
+      {
+        "name": "Render Result",
+        "size": [
+          0,
+          0
+        ],
+        "packed": false,
+        "path": ""
+      },
+      {
+        "name": "Viewer Node",
+        "size": [
+          256,
+          256
+        ],
+        "packed": false,
+        "path": ""
+      }
+    ],
+    "actions": []
+  },
+  "PSX Character.fbx": {
+    "objects": [
+      {
+        "name": "BaseManArms",
+        "type": "MESH",
+        "dim": [
+          0.6373574733734131,
+          1.7537598609924316,
+          0.5807811617851257
+        ],
+        "min": [
+          -0.32736408710479736,
+          -0.4625213146209717,
+          -0.0012893948005512357
+        ],
+        "max": [
+          0.3099933862686157,
+          0.11826013773679733,
+          1.75247061252594
+        ],
+        "materials": [
+          "BaseSkin"
+        ],
+        "bones": []
+      },
+      {
+        "name": "BaseManBodyRig",
+        "type": "ARMATURE",
+        "dim": [
+          0.7132284641265869,
+          2.724287271499634,
+          1.7437639236450195
+        ],
+        "min": [
+          -0.35661423206329346,
+          -1.721703052520752,
+          -0.00046705338172614574
+        ],
+        "max": [
+          0.35661423206329346,
+          1.002584457397461,
+          1.7432972192764282
+        ],
+        "materials": [],
+        "bones": [
+          "spine",
+          "spine.001",
+          "spine.002",
+          "spine.003",
+          "breast.L",
+          "spine.006",
+          "spine.007",
+          "shoulder.L",
+          "upper_arm.L",
+          "forearm.L",
+          "hand.L",
+          "f_index.01.L",
+          "f_index.02.L",
+          "f_index.03.L",
+          "thumb.01.L",
+          "thumb.02.L",
+          "f_middle.01.L",
+          "f_middle.02.L",
+          "f_middle.03.L",
+          "f_ring.01.L",
+          "f_ring.02.L",
+          "f_ring.03.L",
+          "f_pinky.01.L",
+          "f_pinky.02.L",
+          "f_pinky.03.L",
+          "IK_Arm.L",
+          "IK_Elbow.L",
+          "breast.R",
+          "shoulder.R",
+          "upper_arm.R",
+          "forearm.R",
+          "hand.R",
+          "f_index.01.R",
+          "f_index.02.R",
+          "f_index.03.R",
+          "thumb.01.R",
+          "thumb.02.R",
+          "f_middle.01.R",
+          "f_middle.02.R",
+          "f_middle.03.R",
+          "f_ring.01.R",
+          "f_ring.02.R",
+          "f_ring.03.R",
+          "f_pinky.01.R",
+          "f_pinky.02.R",
+          "f_pinky.03.R",
+          "IK_Arm.R",
+          "IK_Elbow.R",
+          "pelvis.L",
+          "thigh.L",
+          "shin.L",
+          "foot.L",
+          "toe.L",
+          "heel.02.L",
+          "pelvis.R",
+          "thigh.R",
+          "shin.R",
+          "foot.R",
+          "toe.R",
+          "heel.02.R",
+          "IK_Foor.L",
+          "IK_Knee.L",
+          "IK_Foor.R",
+          "IK_Knee.R"
+        ]
+      },
+      {
+        "name": "BaseManHead",
+        "type": "MESH",
+        "dim": [
+          0.15841710567474365,
+          0.24339355528354645,
+          0.19301366806030273
+        ],
+        "min": [
+          -0.07920854538679123,
+          -0.11076902598142624,
+          1.478600263595581
+        ],
+        "max": [
+          0.07920856773853302,
+          0.08224466443061829,
+          1.7219938039779663
+        ],
+        "materials": [
+          "BaseSkin"
+        ],
+        "bones": []
+      }
+    ],
+    "images": [
+      {
+        "name": "BaseSkin.001",
+        "size": [
+          512,
+          512
+        ],
+        "packed": true,
+        "path": "C:\\Users\\thuns\\Documents\\Game Dev\\GodotGame\\Game3D\\Godot\\ExitRoom\\PSX Character.fbm\\BaseSkin.png"
+      },
+      {
+        "name": "BaseSkin.002",
+        "size": [
+          512,
+          512
+        ],
+        "packed": true,
+        "path": "C:\\Users\\thuns\\Documents\\Game Dev\\GodotGame\\Game3D\\Godot\\ExitRoom\\PSX Character.fbm\\BaseSkin.png"
+      }
+    ],
+    "actions": [
+      "BaseManBodyRig|BaseManBodyRig|Arms_GlowStickShake",
+      "BaseManBodyRig|BaseManBodyRig|Arms_Hit",
+      "BaseManBodyRig|BaseManBodyRig|Arms_Idle",
+      "BaseManBodyRig|BaseManBodyRig|Arms_TorchIdle",
+      "BaseManBodyRig|BaseManBodyRig|CameraAction",
+      "BaseManBodyRig|BaseManBodyRig|T Pose",
+      "BaseManBodyRig|BaseManBodyRig|TPOSE"
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+.godot/
+*.import
+*.log
+tools/test-profile/
+tools/tmp/
+previews/
+# This project has not been published. Review individual asset licenses before uploading sources.

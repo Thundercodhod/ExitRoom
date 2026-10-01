@@ -1,0 +1,49 @@
+Vicious Potato Studios -  Asset Pack License
+============================================
+
+Thank you for downloading and using this asset pack created by Vicious Potato Studios.
+
+This asset pack is provided free of charge and may be used in personal, commercial, educational, and any other types of projects without requiring additional permission.
+
+You are free to:
+
+- Use these assets in any game, application, film, animation, artwork, or other creative project.
+- Modify, edit, adapt, or combine these assets with your own work.
+- Use these assets in both free and commercial releases.
+- Use these assets with any game engine or development platform.
+- Include these assets in projects released on any platform.
+
+The only requirement is:
+
+- You must provide credit to Vicious Potato Studios somewhere appropriate within your project.
+
+Examples of acceptable credit:
+
+"Assets provided by Vicious Potato Studios"
+or
+"3D Assets & UE5 Retro Shader by Vicious Potato Studios"
+
+Credit placement may include:
+- Game credits
+- Acknowledgements section
+- Project website
+- Store page description
+- Documentation or promotional materials
+
+You may NOT:
+
+- Claim these assets as your own original work.
+- Resell, redistribute, or repackage the assets as a standalone asset pack.
+- Upload this asset pack (or substantial portions of it) to another marketplace or asset library without permission.
+- Remove or alter any included license or attribution information.
+
+Ownership:
+-----------
+All assets included in this pack remain the intellectual property of Vicious Potato Studios.
+
+This license grants permission to use the assets; it does not transfer ownership or copyright.
+
+
+By using this asset pack, you agree to the terms of this license.
+
+Thank you for supporting Vicious Potato Studios <3
