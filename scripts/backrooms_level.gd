@@ -1,12 +1,21 @@
 extends Node3D
 
 const PlayerScript = preload("res://scripts/player.gd")
+const SpiderScript = preload("res://scripts/spider_enemy.gd")
 const SPAWN := Vector3(9.5, 0.12, -9.5)
 const EXIT := Vector3(-10.5, 0.0, 10.5)
+const SPIDER_BOUNDS := Rect2(-12.7, -13.25, 25.4, 26.5)
+const DEFAULT_STATUS := "หาทางออกที่มีไฟสีเขียว"
+const SPIDER_ALERT := "แมงมุมเห็นคุณแล้ว! วิ่งหนี!"
 
 var playing := false
 var was_captured := false
 var player: CharacterBody3D
+var spider: CharacterBody3D
+var caught := false
+var ui: CanvasLayer
+var caught_overlay: Control
+var retry_button: Button
 var font: Font
 var overlay: Control
 var prompt: Label
@@ -37,6 +46,7 @@ func _ready() -> void:
 	player.pivot.rotation.y = 2.35
 	player.body_visual.rotation.y = 2.35 - PI
 	setup_ui()
+	setup_spider()
 	if get_tree().root.has_meta("from_lobby"):
 		get_tree().root.remove_meta("from_lobby")
 		begin_game()
@@ -186,7 +196,7 @@ func styled_label(text: String, size: int, color: Color) -> Label:
 
 
 func setup_ui() -> void:
-	var ui := CanvasLayer.new()
+	ui = CanvasLayer.new()
 	ui.name = "BackroomsHUD"
 	add_child(ui)
 	var top := MarginContainer.new()
@@ -198,7 +208,7 @@ func setup_ui() -> void:
 	var header := VBoxContainer.new()
 	top.add_child(header)
 	header.add_child(styled_label("LEVEL 01  /  THE BACKROOMS", 18, Color(0.95, 0.9, 0.61)))
-	status = styled_label("หาทางออกที่มีไฟสีเขียว", 20, Color(0.96, 0.95, 0.83))
+	status = styled_label(DEFAULT_STATUS, 20, Color(0.96, 0.95, 0.83))
 	header.add_child(status)
 	prompt = styled_label("", 20, Color(0.6, 1.0, 0.69))
 	prompt.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
@@ -229,7 +239,7 @@ func setup_ui() -> void:
 	content.add_theme_constant_override("separation", 18)
 	margin.add_child(content)
 	content.add_child(styled_label("THE BACKROOMS", 36, Color(0.95, 0.9, 0.59)))
-	content.add_child(styled_label("ด่านแรก  •  คุณหลงอยู่ในห้องสีเหลืองที่ไม่มีทางออกชัดเจน\nเดินสำรวจและมองหาแสงสีเขียวเพื่อออกจาก Backrooms\n\nHazmat เป็นตัวละครชั่วคราวระหว่างรอโมเดลตัวจริง", 20, Color(0.92, 0.91, 0.82)))
+	content.add_child(styled_label("ด่านแรก  •  คุณหลงอยู่ในห้องสีเหลืองที่ไม่มีทางออกชัดเจน\nเดินสำรวจและมองหาแสงสีเขียวเพื่อออกจาก Backrooms\n\nระวัง! มีแมงมุมยักษ์ลาดตระเวนอยู่ในห้องนี้ มันได้ยินเสียงวิ่งของคุณ (Shift) และไล่ล่าได้เร็วกว่าการเดิน", 20, Color(0.92, 0.91, 0.82)))
 	var begin := Button.new()
 	begin.text = "เริ่มด่าน  /  BEGIN"
 	begin.custom_minimum_size.y = 50
@@ -237,6 +247,60 @@ func setup_ui() -> void:
 	begin.pressed.connect(begin_game)
 	content.add_child(begin)
 	begin.grab_focus.call_deferred()
+	setup_caught_ui()
+
+
+func setup_spider() -> void:
+	spider = CharacterBody3D.new()
+	spider.name = "SpiderEnemy"
+	spider.set_script(SpiderScript)
+	spider.game = self
+	spider.target = player
+	spider.bounds = SPIDER_BOUNDS
+	add_child(spider)
+	spider.caught_player.connect(on_player_caught)
+
+
+func setup_caught_ui() -> void:
+	caught_overlay = Control.new()
+	caught_overlay.name = "CaughtOverlay"
+	caught_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	caught_overlay.hide()
+	ui.add_child(caught_overlay)
+	var dim := ColorRect.new()
+	dim.color = Color(0.22, 0.0, 0.0, 0.84)
+	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	caught_overlay.add_child(dim)
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	caught_overlay.add_child(center)
+	var content := VBoxContainer.new()
+	content.add_theme_constant_override("separation", 18)
+	center.add_child(content)
+	content.add_child(styled_label("ถูกแมงมุมจับได้", 40, Color(1.0, 0.36, 0.3)))
+	content.add_child(styled_label("แมงมุมยักษ์ตามคุณทัน\nลองใหม่ และอย่าวิ่งส่งเสียงดังโดยไม่จำเป็น", 20, Color(0.95, 0.88, 0.82)))
+	retry_button = Button.new()
+	retry_button.text = "ลองใหม่  /  RETRY"
+	retry_button.custom_minimum_size.y = 50
+	retry_button.add_theme_font_override("font", font)
+	retry_button.pressed.connect(restart_level)
+	content.add_child(retry_button)
+
+
+func on_player_caught() -> void:
+	if caught:
+		return
+	caught = true
+	playing = false
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	caught_overlay.show()
+	retry_button.grab_focus.call_deferred()
+
+
+func restart_level() -> void:
+	# Skip the intro card and start playing straight away after a retry.
+	get_tree().root.set_meta("from_lobby", true)
+	get_tree().reload_current_scene()
 
 
 func show_intro() -> void:
@@ -252,6 +316,8 @@ func begin_game() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if caught:
+		return
 	if event.is_action_pressed("pause_game"):
 		if playing:
 			show_intro()
@@ -274,5 +340,7 @@ func _process(delta: float) -> void:
 	elapsed += delta
 	if is_instance_valid(flicker_light):
 		flicker_light.light_energy = 0.72 if sin(elapsed * 3.7) > -0.94 else 0.07
+	if is_instance_valid(spider) and not caught:
+		status.text = SPIDER_ALERT if spider.state_name() == "CHASE" else DEFAULT_STATUS
 	if is_instance_valid(player):
 		prompt.text = "E  ออกจาก Backrooms / กลับสวน" if player.global_position.distance_to(EXIT) < 1.8 and playing else ""

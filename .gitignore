@@ -19,7 +19,7 @@ assets/*
 !assets/shaders/
 !assets/models/
 # Textures Godot extracts next to a GLB stay local (the GLB embeds them).
-assets/models/**/*_Image_*.png
+assets/models/**/*.png
 
 # Local, unneeded font copy
 fonts/
