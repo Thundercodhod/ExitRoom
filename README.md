@@ -66,7 +66,7 @@
 `Room407` เป็นเกมทดลองอีกโปรเจกต์หนึ่ง ไม่ใช่ scene ต่อจาก ExitRoom และไม่ควรรวม scene หรือสคริปต์เข้าด้วยกัน:
 
 - ExitRoom: `GodotGame/Game3D/Godot/ExitRoom/project.godot`
-- ROOM 407: `GodotGame/Game3D/Godot/Room407/project.godot`
+- ROOM 407: `Room407/project.godot`
 
 ถ้าเปิดจาก GitHub clone ให้เปิดแต่ละโฟลเดอร์เป็นโปรเจกต์แยกใน Godot; การเปลี่ยนเกมทำโดยเปิดโปรเจกต์อีกโฟลเดอร์ ไม่ใช่เปลี่ยน `main_scene` ข้ามกัน
 
