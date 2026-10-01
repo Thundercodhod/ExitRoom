@@ -17,6 +17,9 @@ assets/*
 !assets/abandoned_house_playable.glb
 !assets/textures/
 !assets/shaders/
+!assets/models/
+# Textures Godot extracts next to a GLB stay local (the GLB embeds them).
+assets/models/**/*.png
 
 # Local, unneeded font copy
 fonts/
