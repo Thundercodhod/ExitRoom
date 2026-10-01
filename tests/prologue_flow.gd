@@ -27,7 +27,7 @@ func run() -> void:
 	check(scene.name == "VillagePrologue", "The village prologue scene loads")
 	check(scene.get_node_or_null("01_LandAndRoad/RoadSection_00") != null, "The long road is editable geometry")
 	check(scene.get_node_or_null("02_HousesAndVillageLandmarks/GrandmaHouse_Editable") != null, "Grandma's house is editable geometry")
-	check(scene.player.body_visual.find_child("HazmatDemo", true, false) != null, "The temporary player is present")
+	check(scene.player.body_visual.find_child("MainCharacter", true, false) != null, "The main character model is present")
 	scene.begin_game()
 	await frames(20)
 	check(scene.player.is_on_floor(), "The player stands on the village terrain")

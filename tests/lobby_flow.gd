@@ -21,7 +21,7 @@ func run() -> void:
 	await frames(8)
 	var lobby = current_scene
 	check(lobby.name == "GardenLobby" and lobby.overlay.visible, "Garden opens as the lobby")
-	check(lobby.player.body_visual.find_child("HazmatDemo", true, false) != null, "Hazmat is available in the lobby")
+	check(lobby.player.body_visual.find_child("MainCharacter", true, false) != null, "Main character is available in the lobby")
 	lobby.begin_roaming()
 	await frames(35)
 	check(lobby.player.is_on_floor(), "Garden has a walkable floor")
