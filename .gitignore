@@ -13,7 +13,6 @@ preview-*.png
 !3Dmodel_import/backrooms_rigged_hazmat.glb
 !3Dmodel_import/low-poly_furnished_abandoned_house.glb
 assets/*
-!assets/garden_fountain_toothless.glb
 !assets/abandoned_house_playable.glb
 !assets/textures/
 !assets/shaders/
@@ -26,3 +25,7 @@ fonts/
 .buildtmp/
 tools/house-inspection.json
 build/
+
+# Texture copies extracted from the tree GLBs during import.
+tree/dead_tree_*.png
+tree/tree_ps1psx_style_*.png

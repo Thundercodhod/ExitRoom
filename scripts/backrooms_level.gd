@@ -47,8 +47,8 @@ func _ready() -> void:
 	player.body_visual.rotation.y = 2.35 - PI
 	setup_ui()
 	setup_spider()
-	if get_tree().root.has_meta("from_lobby"):
-		get_tree().root.remove_meta("from_lobby")
+	if get_tree().root.has_meta("retry_backrooms"):
+		get_tree().root.remove_meta("retry_backrooms")
 		begin_game()
 	else:
 		show_intro()
@@ -170,7 +170,7 @@ func setup_exit() -> void:
 		add_exit_box(exit_root, Vector3(side, 1.04, 0.84), Vector3(0.08, 2.12, 0.12), green)
 	add_exit_box(exit_root, Vector3(0, 2.10, 0.84), Vector3(1.5, 0.12, 0.12), green)
 	var sign := Label3D.new()
-	sign.text = "EXIT"
+	sign.text = "EXIT\n406"
 	sign.font = font
 	sign.font_size = 48
 	sign.pixel_size = 0.005
@@ -239,7 +239,7 @@ func setup_ui() -> void:
 	content.add_theme_constant_override("separation", 18)
 	margin.add_child(content)
 	content.add_child(styled_label("THE BACKROOMS", 36, Color(0.95, 0.9, 0.59)))
-	content.add_child(styled_label("ด่านแรก  •  คุณหลงอยู่ในห้องสีเหลืองที่ไม่มีทางออกชัดเจน\nเดินสำรวจและมองหาแสงสีเขียวเพื่อออกจาก Backrooms\n\nระวัง! มีแมงมุมยักษ์ลาดตระเวนอยู่ในห้องนี้ มันได้ยินเสียงวิ่งของคุณ (Shift) และไล่ล่าได้เร็วกว่าการเดิน", 20, Color(0.92, 0.91, 0.82)))
+	content.add_child(styled_label("ประตูหลังบ้านปิดลง กลิ่นบ้านยายกลายเป็นกลิ่นพรมชื้น\nบนผนังมีเลข 406 เหมือนห้องพักที่คุณพยายามลืม\nหาทางออกสีเขียวเพื่อกลับไปยังคืนนั้น\n\nระวัง! มีแมงมุมยักษ์ลาดตระเวนอยู่ในห้องนี้ มันได้ยินเสียงวิ่งของคุณ (Shift) และไล่ล่าได้เร็วกว่าการเดิน", 20, Color(0.92, 0.91, 0.82)))
 	var begin := Button.new()
 	begin.text = "เริ่มด่าน  /  BEGIN"
 	begin.custom_minimum_size.y = 50
@@ -299,7 +299,7 @@ func on_player_caught() -> void:
 
 func restart_level() -> void:
 	# Skip the intro card and start playing straight away after a retry.
-	get_tree().root.set_meta("from_lobby", true)
+	get_tree().root.set_meta("retry_backrooms", true)
 	get_tree().reload_current_scene()
 
 
@@ -326,9 +326,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("interact") and playing and player.global_position.distance_to(EXIT) < 1.8:
 		playing = false
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-		get_tree().root.set_meta("backrooms_complete", true)
-		get_tree().root.set_meta("school_unlocked", true)
-		get_tree().change_scene_to_file("res://main.tscn")
+		var error := get_tree().change_scene_to_file("res://Room407/main.tscn")
+		if error != OK:
+			show_intro()
+			status.text = "เปิด ROOM 407 ไม่สำเร็จ กรุณาตรวจการนำเข้าไฟล์"
 
 
 func _process(delta: float) -> void:
@@ -343,4 +344,4 @@ func _process(delta: float) -> void:
 	if is_instance_valid(spider) and not caught:
 		status.text = SPIDER_ALERT if spider.state_name() == "CHASE" else DEFAULT_STATUS
 	if is_instance_valid(player):
-		prompt.text = "E  ออกจาก Backrooms / กลับสวน" if player.global_position.distance_to(EXIT) < 1.8 and playing else ""
+		prompt.text = "E  เปิดทางออก 406 / ROOM 407" if player.global_position.distance_to(EXIT) < 1.8 and playing else ""

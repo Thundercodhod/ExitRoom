@@ -320,14 +320,14 @@ func build() -> void:
 	var marble := group(story, "BlueMarbleInteraction", Vector3(35.0, 0.3, -154.0))
 	sphere(marble, "LostBlueMarble", Vector3.ZERO, Vector3.ONE * 0.22, materials.portal_rim)
 	omni(marble, "MarbleGlimmer", Vector3.ZERO, Color(0.31, 0.84, 0.9), 0.5, 2.5)
-	var gate := group(story, "PortalToGardenLobby", Vector3(23.0, 0, -169.5))
+	var gate := group(story, "DoorToBackrooms", Vector3(23.0, 0, -169.5))
 	box(gate, "LeftGatePost", Vector3(-1.6, 1.5, 0), Vector3(0.32, 3.0, 0.55), materials.wood_dark, true)
 	box(gate, "RightGatePost", Vector3(1.6, 1.5, 0), Vector3(0.32, 3.0, 0.55), materials.wood_dark, true)
 	box(gate, "GateLintel", Vector3(0, 3.12, 0), Vector3(3.5, 0.27, 0.55), materials.wood_dark, true)
 	box(gate, "DarkOpening", Vector3(0, 1.5, -0.1), Vector3(2.65, 2.9, 0.05), materials.portal_dark)
 	box(gate, "StrangeLight", Vector3(0, 2.7, 0.02), Vector3(2.55, 0.04, 0.06), materials.portal_rim)
-	omni(gate, "GardenGlow", Vector3(0, 1.8, 0.6), Color(0.47, 0.9, 0.84), 1.2, 7.5)
-	label(gate, "FaintMessage", "กลับมารอที่น้ำพุ", Vector3(0, 3.6, 0), Color(0.67, 0.96, 0.86), 38)
+	omni(gate, "BackDoorGlow", Vector3(0, 1.8, 0.6), Color(0.47, 0.9, 0.84), 1.2, 7.5)
+	label(gate, "FaintMessage", "จำได้ไหม... ห้อง 406", Vector3(0, 3.6, 0), Color(0.67, 0.96, 0.86), 38)
 
 	var camera := Camera3D.new()
 	camera.name = "EditorOverviewCamera"

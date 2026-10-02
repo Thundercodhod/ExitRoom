@@ -3,7 +3,7 @@ extends Node3D
 const PlayerScript = preload("res://scripts/player.gd")
 const CASSETTE := Vector3(21.8, 0.99, -148.6)
 const MARBLE := Vector3(35.0, 0.3, -154.0)
-const GARDEN_GATE := Vector3(23.0, 0.0, -169.5)
+const BACK_DOOR := Vector3(23.0, 0.0, -169.5)
 
 var playing := false
 var story_stage := 0
@@ -17,6 +17,7 @@ var font: Font
 var was_captured := false
 var wavering_lamp: OmniLight3D
 var atmosphere_clock := 0.0
+var clue: Label
 
 
 func _ready() -> void:
@@ -78,6 +79,9 @@ func setup_ui() -> void:
 	objective = styled_label("เดินตามถนนไปบ้านยาย", 21, Color(0.98, 0.95, 0.84))
 	objective.position = Vector2(26, 52)
 	hud.add_child(objective)
+	clue = Label.new()
+	clue.set_script(preload("res://scripts/story_caption.gd"))
+	hud.add_child(clue)
 	prompt = styled_label("", 20, Color(0.59, 0.96, 0.89))
 	prompt.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
 	prompt.position = Vector2(-170, -80)
@@ -122,7 +126,7 @@ func setup_ui() -> void:
 func show_intro() -> void:
 	playing = false
 	intro_title.text = "EXITROOM  /  ทางกลับบ้าน"
-	intro_copy.text = "นนท์กลับบ้านต่างจังหวัดหลังยายเสีย\nเดินจากป้ายรถไปที่บ้าน เก็บเทปของยาย แล้วตามเสียงน้ำพุ\n\nHazmat ยังเป็นโมเดลผู้เล่นชั่วคราว"
+	intro_copy.text = "นนท์กลับบ้านหลังยายเสีย พร้อมความทรงจำขาดหายจากหอพักในเมือง\nเมย์ น้องสาวของเขา หายตัวไปใกล้บึงหลังบ้าน\nยายทิ้งเทปไว้ให้ และกำชับว่าอย่าตอบเสียงที่มองไม่เห็นเจ้าของ"
 	overlay.show()
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
@@ -136,15 +140,15 @@ func begin_game() -> void:
 func update_story_visuals() -> void:
 	var cassette := $"04_StoryObjectsAndExit/CassetteInteraction"
 	var marble := $"04_StoryObjectsAndExit/BlueMarbleInteraction"
-	var gate := $"04_StoryObjectsAndExit/PortalToGardenLobby"
+	var gate := $"04_StoryObjectsAndExit/DoorToBackrooms"
 	cassette.visible = story_stage == 0
 	marble.visible = story_stage == 1
 	gate.get_node("StrangeLight").visible = story_stage == 2
-	gate.get_node("GardenGlow").visible = story_stage == 2
+	gate.get_node("BackDoorGlow").visible = story_stage == 2
 	gate.get_node("FaintMessage").visible = story_stage == 2
 	match story_stage:
 		0: objective.text = "เดินตามถนนไปบ้านยาย แล้วหาเทปบนโต๊ะ"
-		1: objective.text = "เสียงน้ำพุดังจากหลังบ้าน หาลูกแก้วสีน้ำเงิน"
+		1: objective.text = "เสียงน้ำดังจากหลังบ้าน หาลูกแก้วสีน้ำเงิน"
 		2: objective.text = "เดินตามทางหลังบ้านไปยังประตูที่มีแสง"
 
 
@@ -152,7 +156,7 @@ func interaction_position() -> Vector3:
 	match story_stage:
 		0: return CASSETTE
 		1: return MARBLE
-		_: return GARDEN_GATE
+		_: return BACK_DOOR
 
 
 func interact() -> void:
@@ -161,15 +165,14 @@ func interact() -> void:
 	match story_stage:
 		0:
 			story_stage = 1
-			objective.text = "ยายพูดในเทป: ถ้าได้ยินเสียงจากที่ที่ไม่มีคน อย่าเพิ่งตอบ"
+			clue.show_clue("เทปยาย: เมย์บอกว่าได้ยินเสียงเอ็งเรียกจากบึง แต่คืนนั้นเอ็งอยู่ห้อง 406\nถ้าได้ยินเสียงจากที่ที่ไม่มีคน อย่าเพิ่งตอบ เก็บลูกแก้วของน้องแล้วเดินไปที่ประตูหลังบ้าน")
 		1:
 			story_stage = 2
-			objective.text = "ลูกแก้วสีน้ำเงินเย็นจัด เสียงน้ำพุอยู่หลังบ้าน"
+			clue.show_clue("ลูกแก้วของเมย์... น้องใช้มันวางจำทางกลับบ้าน\nเทปยังเล่นต่อ: หลังประตูคือคืนที่เอ็งลืม อย่าเชื่อทุกอย่างที่หน้าตาเหมือนเดิม")
 		2:
 			playing = false
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-			get_tree().root.set_meta("from_prologue", true)
-			get_tree().change_scene_to_file("res://main.tscn")
+			get_tree().change_scene_to_file("res://backrooms_level.tscn")
 			return
 	update_story_visuals()
 
@@ -198,6 +201,6 @@ func _process(delta: float) -> void:
 		match story_stage:
 			0: prompt.text = "E  ฟังเทปของยาย"
 			1: prompt.text = "E  เก็บลูกแก้วสีน้ำเงิน"
-			_: prompt.text = "E  ตามเสียงน้ำพุไปยังสวน"
+			_: prompt.text = "E  เปิดประตูหลังบ้าน"
 	else:
 		prompt.text = ""

@@ -49,7 +49,7 @@ func run() -> void:
 	scene.interact()
 	await scene_changed
 	await frames(4)
-	check(current_scene.name == "GardenLobby", "The garden gate enters the lobby")
-	check(current_scene.menu_title.text.contains("สวนที่ไม่ควร"), "The lobby acknowledges the prologue")
+	check(current_scene.name == "BackroomsLevel01", "The back door enters Backrooms directly")
+	check(current_scene.overlay.visible, "The memory transition gives the player time to read")
 	print("EXITROOM_PROLOGUE_TEST_FAILURES=", failures)
 	quit(1 if failures else 0)

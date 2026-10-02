@@ -86,22 +86,3 @@ static func find_surface(root: Node, wanted: String) -> StandardMaterial3D:
 		if found:
 			return found
 	return null
-
-static func school_materials() -> Dictionary:
-	var source: Node3D=load(SOURCE).instantiate()
-	var result: Dictionary={}
-	for pair in [["wall","M_Parede3",0.23],["floor","M_PisoMusgo2",0.22],["ceiling","M_Forro",0.36],["wood","M_Madeira1",0.60]]:
-		var original:=find_surface(source,pair[1])
-		assert(original!=null,"Missing source material: "+pair[1])
-		var m: StandardMaterial3D=original.duplicate()
-		m.resource_name="HouseReference_"+pair[0]
-		m.uv1_triplanar=true
-		m.uv1_world_triplanar=true
-		m.uv1_scale=Vector3.ONE*pair[2]
-		m.texture_filter=BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
-		m.roughness=0.94
-		m.metallic=0.0
-		m.normal_scale=0.18
-		result[pair[0]]=m
-	source.free()
-	return result

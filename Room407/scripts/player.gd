@@ -35,7 +35,7 @@ func _ready() -> void:
 	torch.visible = false
 	camera.add_child(torch)
 	footstep = AudioStreamPlayer.new()
-	footstep.stream = load("res://audio/step.wav")
+	footstep.stream = load("res://Room407/audio/step.wav")
 	footstep.volume_db = -23
 	add_child(footstep)
 

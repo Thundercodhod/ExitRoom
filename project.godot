@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="ExitRoom"
-config/description="Story prologue, garden lobby and Backrooms level one with a temporary Hazmat player."
+config/description="ExitRoom: borrowed voices. Grandma's house, Backrooms and ROOM 407, leading to DON'T FOLLOW THE FROG."
 run/main_scene="res://prologue_village.tscn"
 config/features=PackedStringArray("4.7")
 

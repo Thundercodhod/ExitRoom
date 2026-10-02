@@ -9,7 +9,7 @@ func _initialize() -> void:
 func material(name: String, file: String, tint:=Color.WHITE) -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
 	m.resource_name=name
-	m.albedo_texture=load("res://assets/textures/"+file)
+	m.albedo_texture=load("res://Room407/assets/textures/"+file)
 	m.albedo_color=tint
 	m.roughness=.9
 	m.texture_filter=BaseMaterial3D.TEXTURE_FILTER_NEAREST_WITH_MIPMAPS
@@ -38,7 +38,7 @@ func box(parent: Node3D, name: String, pos: Vector3, size: Vector3, mat: Materia
 	return n
 
 func asset(parent: Node3D, file: String, pos: Vector3, angle:=0.0, solid:=true) -> Node3D:
-	var n := (load("res://assets/models/"+file+".glb") as PackedScene).instantiate()
+	var n := (load("res://Room407/assets/models/"+file+".glb") as PackedScene).instantiate()
 	# Store editable children explicitly, without also retaining an inherited instance.
 	n.scene_file_path=""
 	n.name=file.to_pascal_case()
@@ -83,7 +83,7 @@ func build() -> void:
 	material("Wall","wallpaper.jpg",Color(.7,.73,.7))
 	material("Plaster","plastered_wall_albedo.jpg",Color(.7,.72,.71))
 	material("Floor","apartment_floor.jpg",Color(.72,.61,.48))
-	material("Rug","rug.jpeg" if FileAccess.file_exists("res://assets/textures/rug.jpeg") else "rug.jpg")
+	material("Rug","rug.jpeg" if FileAccess.file_exists("res://Room407/assets/textures/rug.jpeg") else "rug.jpg")
 	var env:=WorldEnvironment.new()
 	env.name="WorldEnvironment"
 	var e:=Environment.new()
@@ -129,12 +129,12 @@ func build() -> void:
 	player.position=Vector3(-6.3,.03,1.5)
 	player.rotation.y=.65
 	scene_root.add_child(player)
-	player.set_script(load("res://scripts/player.gd"))
-	scene_root.set_script(load("res://scripts/story.gd"))
+	player.set_script(load("res://Room407/scripts/player.gd"))
+	scene_root.set_script(load("res://Room407/scripts/story.gd"))
 	own(scene_root)
 	var packed:=PackedScene.new()
 	packed.pack(scene_root)
-	ResourceSaver.save(packed,"res://main.tscn")
+	ResourceSaver.save(packed,"res://Room407/main.tscn")
 	print("SCENE_BUILT")
 	quit()
 
@@ -187,7 +187,7 @@ func make_room(x: float, number: int) -> void:
 	# A small real framed painting, using a texture extracted from the existing licensed house.
 	box(room,"PictureFrame",Vector3(0,1.7,-.14),Vector3(.82,.63,.06),mats.Oak,false)
 	var art:=StandardMaterial3D.new()
-	art.albedo_texture=load("res://assets/textures/painting.jpg")
+	art.albedo_texture=load("res://Room407/assets/textures/painting.jpg")
 	art.texture_filter=BaseMaterial3D.TEXTURE_FILTER_NEAREST
 	var pic:=MeshInstance3D.new()
 	var qm:=QuadMesh.new()
@@ -220,7 +220,7 @@ func own(n: Node) -> void:
 
 func curtains(room: Node3D) -> void:
 	var fabric:=StandardMaterial3D.new()
-	fabric.albedo_texture=load("res://assets/textures/curtain.jpg")
+	fabric.albedo_texture=load("res://Room407/assets/textures/curtain.jpg")
 	fabric.albedo_color=Color(.62,.62,.52)
 	fabric.roughness=1
 	fabric.cull_mode=BaseMaterial3D.CULL_DISABLED

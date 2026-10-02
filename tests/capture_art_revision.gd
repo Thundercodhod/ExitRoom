@@ -34,12 +34,4 @@ func run() -> void:
 	current_scene.get_node("PrologueHUD").show()
 	await settle()
 	root.get_texture().get_image().save_png("res://preview-house-gameplay.png")
-	change_scene_to_file("res://abandoned_school.tscn")
-	await scene_changed
-	current_scene.begin_game()
-	current_scene.player.visible=false
-	current_scene.player.set_physics_process(false)
-	current_scene.get_node("SchoolHUD").hide()
-	await shot(Vector3(0.6,1.7,-38),Vector3(0,1.65,-65),"res://preview-school-revised.png")
-	await shot(Vector3(5.2,1.7,-48.5),Vector3(11.5,1.5,-57),"res://preview-classroom-revised.png")
 	quit()

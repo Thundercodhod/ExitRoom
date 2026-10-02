@@ -18,18 +18,8 @@ func run() -> void:
 	current_scene.player.position = Vector3(23.5, 0.12, -148.0)
 	current_scene.player.pivot.rotation.y = 1.15
 	await save_view("res://preview-first-person-house.png")
-	change_scene_to_file("res://main.tscn")
-	await scene_changed
-	current_scene.begin_roaming()
-	await save_view("res://preview-first-person-lobby.png")
 	change_scene_to_file("res://backrooms_level.tscn")
 	await scene_changed
 	current_scene.begin_game()
 	await save_view("res://preview-first-person-backrooms.png")
-	change_scene_to_file("res://abandoned_school.tscn")
-	await scene_changed
-	current_scene.begin_game()
-	await save_view("res://preview-first-person-school.png")
-	current_scene.player.position = Vector3(0, 0.12, -24.0)
-	await save_view("res://preview-first-person-school-hall.png")
 	quit()

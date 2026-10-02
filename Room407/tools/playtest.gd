@@ -18,7 +18,7 @@ func walk(from: Vector3,to: Vector3) -> void:
 		if Vector2(delta.x,delta.z).length()<.08:break
 	check(Vector2(p.position.x-to.x,p.position.z-to.z).length()<.22,"walk through doorway to "+str(to))
 func run() -> void:
-	game=load("res://main.tscn").instantiate()
+	game=load("res://Room407/main.tscn").instantiate()
 	root.add_child(game)
 	await process_frame
 	game.start()

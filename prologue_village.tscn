@@ -29815,65 +29815,65 @@ light_color = Color(0.31, 0.84, 0.9, 1)
 light_energy = 0.5
 omni_range = 2.5
 
-[node name="PortalToGardenLobby" type="Node3D" parent="04_StoryObjectsAndExit" unique_id=465280550]
+[node name="DoorToBackrooms" type="Node3D" parent="04_StoryObjectsAndExit" unique_id=465280550]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23, 0, -169.5)
 
-[node name="LeftGatePost" type="StaticBody3D" parent="04_StoryObjectsAndExit/PortalToGardenLobby" unique_id=649389902]
+[node name="LeftGatePost" type="StaticBody3D" parent="04_StoryObjectsAndExit/DoorToBackrooms" unique_id=649389902]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 1.5, 0)
 
-[node name="Visual" type="MeshInstance3D" parent="04_StoryObjectsAndExit/PortalToGardenLobby/LeftGatePost" unique_id=2038205194]
+[node name="Visual" type="MeshInstance3D" parent="04_StoryObjectsAndExit/DoorToBackrooms/LeftGatePost" unique_id=2038205194]
 material_override = SubResource("ShaderMaterial_hn66v")
 mesh = SubResource("BoxMesh_55042")
 
-[node name="Collision" type="CollisionShape3D" parent="04_StoryObjectsAndExit/PortalToGardenLobby/LeftGatePost" unique_id=206959245]
+[node name="Collision" type="CollisionShape3D" parent="04_StoryObjectsAndExit/DoorToBackrooms/LeftGatePost" unique_id=206959245]
 shape = SubResource("BoxShape3D_m8plj")
 
-[node name="RightGatePost" type="StaticBody3D" parent="04_StoryObjectsAndExit/PortalToGardenLobby" unique_id=582176252]
+[node name="RightGatePost" type="StaticBody3D" parent="04_StoryObjectsAndExit/DoorToBackrooms" unique_id=582176252]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6, 1.5, 0)
 
-[node name="Visual" type="MeshInstance3D" parent="04_StoryObjectsAndExit/PortalToGardenLobby/RightGatePost" unique_id=1832590638]
+[node name="Visual" type="MeshInstance3D" parent="04_StoryObjectsAndExit/DoorToBackrooms/RightGatePost" unique_id=1832590638]
 material_override = SubResource("ShaderMaterial_hn66v")
 mesh = SubResource("BoxMesh_q1rmk")
 
-[node name="Collision" type="CollisionShape3D" parent="04_StoryObjectsAndExit/PortalToGardenLobby/RightGatePost" unique_id=1243448949]
+[node name="Collision" type="CollisionShape3D" parent="04_StoryObjectsAndExit/DoorToBackrooms/RightGatePost" unique_id=1243448949]
 shape = SubResource("BoxShape3D_hkaxl")
 
-[node name="GateLintel" type="StaticBody3D" parent="04_StoryObjectsAndExit/PortalToGardenLobby" unique_id=481486910]
+[node name="GateLintel" type="StaticBody3D" parent="04_StoryObjectsAndExit/DoorToBackrooms" unique_id=481486910]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.12, 0)
 
-[node name="Visual" type="MeshInstance3D" parent="04_StoryObjectsAndExit/PortalToGardenLobby/GateLintel" unique_id=2071113214]
+[node name="Visual" type="MeshInstance3D" parent="04_StoryObjectsAndExit/DoorToBackrooms/GateLintel" unique_id=2071113214]
 material_override = SubResource("ShaderMaterial_hn66v")
 mesh = SubResource("BoxMesh_4ohto")
 
-[node name="Collision" type="CollisionShape3D" parent="04_StoryObjectsAndExit/PortalToGardenLobby/GateLintel" unique_id=414500331]
+[node name="Collision" type="CollisionShape3D" parent="04_StoryObjectsAndExit/DoorToBackrooms/GateLintel" unique_id=414500331]
 shape = SubResource("BoxShape3D_kvjhc")
 
-[node name="DarkOpening" type="Node3D" parent="04_StoryObjectsAndExit/PortalToGardenLobby" unique_id=1548475020]
+[node name="DarkOpening" type="Node3D" parent="04_StoryObjectsAndExit/DoorToBackrooms" unique_id=1548475020]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -0.1)
 
-[node name="Visual" type="MeshInstance3D" parent="04_StoryObjectsAndExit/PortalToGardenLobby/DarkOpening" unique_id=1865167730]
+[node name="Visual" type="MeshInstance3D" parent="04_StoryObjectsAndExit/DoorToBackrooms/DarkOpening" unique_id=1865167730]
 material_override = SubResource("StandardMaterial3D_1ej5q")
 mesh = SubResource("BoxMesh_3anoc")
 
-[node name="StrangeLight" type="Node3D" parent="04_StoryObjectsAndExit/PortalToGardenLobby" unique_id=663320646]
+[node name="StrangeLight" type="Node3D" parent="04_StoryObjectsAndExit/DoorToBackrooms" unique_id=663320646]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, 0.02)
 
-[node name="Visual" type="MeshInstance3D" parent="04_StoryObjectsAndExit/PortalToGardenLobby/StrangeLight" unique_id=372044399]
+[node name="Visual" type="MeshInstance3D" parent="04_StoryObjectsAndExit/DoorToBackrooms/StrangeLight" unique_id=372044399]
 material_override = SubResource("StandardMaterial3D_mkebm")
 mesh = SubResource("BoxMesh_tii1u")
 
-[node name="GardenGlow" type="OmniLight3D" parent="04_StoryObjectsAndExit/PortalToGardenLobby" unique_id=431399135]
+[node name="BackDoorGlow" type="OmniLight3D" parent="04_StoryObjectsAndExit/DoorToBackrooms" unique_id=431399135]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0.6)
 light_color = Color(0.47, 0.9, 0.84, 1)
 light_energy = 1.2
 omni_range = 7.5
 
-[node name="FaintMessage" type="Label3D" parent="04_StoryObjectsAndExit/PortalToGardenLobby" unique_id=933088815]
+[node name="FaintMessage" type="Label3D" parent="04_StoryObjectsAndExit/DoorToBackrooms" unique_id=933088815]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.6, 0)
 pixel_size = 0.0035
 billboard = 1
 modulate = Color(0.67, 0.96, 0.86, 1)
-text = "กลับมารอที่น้ำพุ"
+text = "จำได้ไหม... ห้อง 406"
 font_size = 38
 
 [node name="EditorOverviewCamera" type="Camera3D" parent="." unique_id=1348370108]
