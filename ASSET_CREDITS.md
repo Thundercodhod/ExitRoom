@@ -1,5 +1,11 @@
 # Asset credits for the abandoned-house revision
 
+## Frog field chapter
+
+**Godot Grass Shader** by **Binbun** — https://binbun3d.itch.io/godot-grass — CC0 (license stated on the author's page). Uses the user-supplied shader and textures under `Grass/assets/BinbunGrass/src/` unchanged, with a chapter-specific material, palette and MultiMesh placement.
+
+The field house's bedroom reuses the existing Room407 furniture and textures; its original credits remain in `Room407/ASSET_CREDITS.md`. New car/house block geometry and the procedural audio in `audio/frog_chapter/` were authored for this chapter. Frog model and animations are unchanged.
+
 **Low-poly Furnished Abandoned House** by **NeoKG**
 
 Source: https://sketchfab.com/3d-models/low-poly-furnished-abandoned-house-ab6c142e1c494c8e84dd82c852138501
