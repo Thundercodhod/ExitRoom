@@ -25,4 +25,10 @@ Additional CC0 texture sources used for village buildings and generated props:
 - https://polyhaven.com/a/wood_table_001
 - https://polyhaven.com/a/asphalt_06
 
+## Enemy models
+
+**The Frog** (`assets/models/enemy/frog.glb`): generated with Meshy AI from the project's own concept sheet (`Meshy_AI_Character_Frog.glb`, auto-rigged by Meshy). Changes: renamed the 50 bones, scaled to 1.9 m, baked idle / walk / sit animations in Blender (`assets_src/frog/build_frog.py`). Check the Meshy plan used for the download: assets from the free plan are CC BY 4.0 and need attribution to Meshy; paid plans grant their own terms.
+
+**The giant spider** (`assets/models/enemy/spider.glb`): derived from the free "Spider_free" download (unrigged FBX + texture). The original author and license were not recorded when it was downloaded: confirm the source and license before publishing. Changes: scaled by 0.5, rigged with 17 bones and animated by script (`assets_src/spider/build_spider.py`), texture kept, normal map removed.
+
 This document covers the assets touched by this revision; it is not a license audit of the existing character or Backrooms assets.
