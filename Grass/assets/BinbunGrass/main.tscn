@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://bsxg8vbm2rc2a"]
+[gd_scene format=3 uid="uid://bsxg8vbm2rc2a"]
 
 [ext_resource type="Material" uid="uid://bra6ug2wjmj0j" path="res://assets/BinbunGrass/src/materials/grass_01/grass_ground_01.tres" id="1_0xm2m"]
 [ext_resource type="Material" uid="uid://c2to67v55oatp" path="res://assets/BinbunGrass/src/materials/grass_01/grass_01.tres" id="2_h2yge"]
