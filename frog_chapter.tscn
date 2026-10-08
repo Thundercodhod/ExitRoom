@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://ba75ge6nj1out"]
+
+[ext_resource type="Script" uid="uid://cbmwlv4xflcv4" path="res://scripts/frog_chapter.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://bvjmrgoxt38dc" path="res://frog_field_world.tscn" id="2"]
+
+[node name="FrogChapter" type="Node3D" unique_id=2121793153]
+process_mode = 3
+script = ExtResource("1")
+
+[node name="World" parent="." unique_id=1587165213 instance=ExtResource("2")]
