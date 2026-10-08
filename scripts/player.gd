@@ -2,18 +2,21 @@ extends CharacterBody3D
 
 const MainCharacterScene = preload("res://assets/models/player/main_character.glb")
 
+# A heel touched the ground (also plays the footstep sound). Enemies can listen.
+signal stepped(running: bool)
+
 # Third-person by default. Press V in game to switch to first-person and back.
 const THIRD_PERSON_DEFAULT := true
 const CAMERA_DISTANCE := 2.4
 const CAMERA_SHOULDER := 0.3
 const FOV_THIRD := 65.0
 const FOV_FIRST := 73.0
-# Ground speed (m/s) of the planted foot in each baked clip. Used to scale the
-# playback speed so feet do not slide on the floor.
-const WALK_CLIP_SPEED := 0.22
-const RUN_CLIP_SPEED := 1.98
-const WALK_CLIP_MAX_SPEED := 0.6
-const ANIM_BLEND := 0.2
+# Movement speeds (m/s). The walk and run cycles are generated for exactly
+# these speeds by tools/build_player_gait.gd (re-run it if you change them).
+const WALK_SPEED := 1.4
+const SPRINT_SPEED := 4.8
+const WalkClip = preload("res://assets/models/player/player_walk.tres")
+const RunClip = preload("res://assets/models/player/player_run.tres")
 
 var game: Node3D
 var pivot: Node3D
@@ -31,7 +34,13 @@ var hiding := false
 # no input, no gravity, no animation changes until it is cleared.
 var held := false
 var sprinting := false
-var step_clock := 0.0
+# Gait: one shared phase drives both cycles (0 = left heel down, 0.5 = right),
+# so blending walk <-> run never crosses the legs. See _update_animation.
+var gait_phase := 0.0
+var anim_tree: AnimationTree
+var _move_blend := 0.0
+var _run_blend := 0.0
+var _idle_time := 0.0
 var footstep: AudioStreamPlayer
 var atmosphere_audio: AudioStreamPlayer
 var pitch := -0.05
@@ -89,6 +98,7 @@ func _ready() -> void:
 	body_visual.add_child(model)
 	player_animation = model.find_child("AnimationPlayer", true, false) as AnimationPlayer
 	_resolve_animations()
+	_setup_anim_tree()
 	_play_animation("idle", 1.0)
 	_apply_view()
 	torch = SpotLight3D.new()
@@ -151,7 +161,7 @@ func _physics_process(delta: float) -> void:
 	var input := Input.get_vector("left", "right", "forward", "back")
 	var direction := (Basis(Vector3.UP, pivot.rotation.y) * Vector3(input.x, 0, input.y)).normalized()
 	sprinting = Input.is_action_pressed("sprint") and input.length() > 0.1 and stamina > 1
-	var speed := 4.8 if sprinting else 2.65
+	var speed := SPRINT_SPEED if sprinting else WALK_SPEED
 	stamina = clampf(stamina + (-24 if sprinting else 15) * delta, 0, 100)
 	velocity.x = move_toward(velocity.x, direction.x * speed, delta * 18)
 	velocity.z = move_toward(velocity.z, direction.z * speed, delta * 18)
@@ -167,12 +177,7 @@ func _physics_process(delta: float) -> void:
 	var ground_speed := Vector2(velocity.x, velocity.z).length()
 	if direction.length() > 0.1:
 		body_visual.rotation.y = lerp_angle(body_visual.rotation.y, atan2(direction.x, direction.z), delta * 12)
-		step_clock += delta * (1.55 if sprinting else 1)
-		if step_clock > 0.43:
-			step_clock = 0
-			footstep.pitch_scale = randf_range(0.85, 1.1)
-			footstep.play()
-	_update_animation(ground_speed)
+	_update_animation(ground_speed, delta)
 
 func set_hiding(value: bool) -> void:
 	hiding = value
@@ -191,35 +196,117 @@ func _apply_view() -> void:
 	# Hide the body in first-person (it would block the view) and while hiding.
 	body_visual.visible = third_person and not hiding
 
-# Find the baked clips by keyword so the code works whether or not the importer
-# keeps the "-loop" suffix on the animation names.
+# Idle comes from the model; walk and run are the generated cycles. anim_names
+# maps idle/walk/run to the clip names (other scripts and tests use it).
 func _resolve_animations() -> void:
 	if not player_animation:
 		return
-	for key in ["idle", "walk", "run"]:
-		for clip in player_animation.get_animation_list():
-			if String(clip).to_lower().begins_with(key):
-				anim_names[key] = clip
-				player_animation.get_animation(clip).loop_mode = Animation.LOOP_LINEAR
+	for clip in player_animation.get_animation_list():
+		if String(clip).to_lower().begins_with("idle"):
+			anim_names["idle"] = clip
+			player_animation.get_animation(clip).loop_mode = Animation.LOOP_LINEAR
+	var lib := AnimationLibrary.new()
+	lib.add_animation("walk", WalkClip)
+	lib.add_animation("run", RunClip)
+	player_animation.add_animation_library("gait", lib)
+	anim_names["walk"] = &"gait/walk"
+	anim_names["run"] = &"gait/run"
 
-func _play_animation(key: String, speed: float) -> void:
-	if not player_animation or not anim_names.has(key):
+
+# idle → seek(clock) ─────────────────┐
+# walk → seek(phase) ┐                 ├ move (Blend2) → out
+# run  → seek(phase) ┴ gait (Blend2) ──┘
+# The tree never advances on its own (manual mode, advance(0)): every clip is
+# placed explicitly, so the feet stay in step with the body, which only moves
+# on physics ticks, however fast frames are rendered.
+func _setup_anim_tree() -> void:
+	if not player_animation or not anim_names.has("idle"):
 		return
-	var clip: StringName = anim_names[key]
-	if current_anim != clip:
-		current_anim = clip
-		player_animation.play(clip, ANIM_BLEND)
-	player_animation.speed_scale = speed
+	var bt := AnimationNodeBlendTree.new()
+	var idle := AnimationNodeAnimation.new()
+	idle.animation = anim_names["idle"]
+	var walk := AnimationNodeAnimation.new()
+	walk.animation = anim_names["walk"]
+	var run := AnimationNodeAnimation.new()
+	run.animation = anim_names["run"]
+	bt.add_node("idle", idle)
+	bt.add_node("walk", walk)
+	bt.add_node("run", run)
+	bt.add_node("idle_seek", AnimationNodeTimeSeek.new())
+	bt.add_node("walk_seek", AnimationNodeTimeSeek.new())
+	bt.add_node("run_seek", AnimationNodeTimeSeek.new())
+	bt.add_node("gait", AnimationNodeBlend2.new())
+	bt.add_node("move", AnimationNodeBlend2.new())
+	bt.connect_node("walk_seek", 0, "walk")
+	bt.connect_node("run_seek", 0, "run")
+	bt.connect_node("gait", 0, "walk_seek")
+	bt.connect_node("gait", 1, "run_seek")
+	bt.connect_node("idle_seek", 0, "idle")
+	bt.connect_node("move", 0, "idle_seek")
+	bt.connect_node("move", 1, "gait")
+	bt.connect_node("output", 0, "move")
+	anim_tree = AnimationTree.new()
+	anim_tree.name = "GaitTree"
+	anim_tree.tree_root = bt
+	player_animation.get_parent().add_child(anim_tree)
+	anim_tree.anim_player = anim_tree.get_path_to(player_animation)
+	anim_tree.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
+	anim_tree.active = true
 
-func _update_animation(ground_speed: float) -> void:
-	if ground_speed < 0.15:
-		_play_animation("idle", 1.0)
-	elif ground_speed < WALK_CLIP_MAX_SPEED:
-		_play_animation("walk", ground_speed / WALK_CLIP_SPEED)
+
+# Every rendered frame: breathe (idle clock) and show the current gait phase.
+# Runs even when gameplay is paused for a cutscene, so the idle stays alive.
+func _process(delta: float) -> void:
+	_idle_time += delta
+	_apply_blends()
+
+
+# Kept for other scripts (e.g. the frog's choke puts the player in idle).
+func _play_animation(key: String, _speed: float) -> void:
+	if not anim_names.has(key):
+		return
+	current_anim = anim_names[key]
+	_move_blend = 0.0 if key == "idle" else 1.0
+	_run_blend = 1.0 if key == "run" else 0.0
+	_apply_blends()
+
+
+# Advances the shared gait phase by distance covered / stride length, so a foot
+# on the ground moves back exactly as fast as the body moves forward.
+func _update_animation(ground_speed: float, delta: float) -> void:
+	if not anim_tree:
+		return
+	var walk_stride: float = WalkClip.get_meta("stride")
+	var run_stride: float = RunClip.get_meta("stride")
+	_run_blend = clampf((ground_speed - WALK_SPEED) / (SPRINT_SPEED - WALK_SPEED), 0.0, 1.0)
+	# Fade in from idle over the first ~60 % of walking speed.
+	_move_blend = clampf(ground_speed / (WALK_SPEED * 0.6), 0.0, 1.0)
+	var stride := lerpf(walk_stride, run_stride, _run_blend)
+	var before := gait_phase
+	gait_phase = fposmod(gait_phase + ground_speed / stride * delta, 1.0)
+	# Footstep on each heel contact (phase 0 and 0.5).
+	if _move_blend > 0.5 and (gait_phase < before or (before < 0.5 and gait_phase >= 0.5)):
+		footstep.pitch_scale = randf_range(0.85, 1.1) * lerpf(1.0, 1.15, _run_blend)
+		footstep.volume_db = lerpf(-15.0, -10.0, _run_blend)
+		footstep.play()
+		stepped.emit(_run_blend > 0.5)
+	if _move_blend <= 0.0:
+		current_anim = anim_names["idle"]
 	else:
-		_play_animation("run", ground_speed / RUN_CLIP_SPEED)
+		current_anim = anim_names["run"] if _run_blend > 0.5 else anim_names["walk"]
+	_apply_blends()
 
 
+func _apply_blends() -> void:
+	if not anim_tree:
+		return
+	anim_tree.set("parameters/move/blend_amount", _move_blend)
+	anim_tree.set("parameters/gait/blend_amount", _run_blend)
+	var idle_len := player_animation.get_animation(anim_names["idle"]).length
+	anim_tree.set("parameters/idle_seek/seek_request", fposmod(_idle_time, idle_len))
+	anim_tree.set("parameters/walk_seek/seek_request", gait_phase * WalkClip.length)
+	anim_tree.set("parameters/run_seek/seek_request", gait_phase * RunClip.length)
+	anim_tree.advance(0.0)
 func try_step_up(motion: Vector3) -> void:
 	# Raise only when a low obstacle blocks us, the capsule clears it, and a
 	# walkable landing is found. Tall walls and low ceilings remain solid.
