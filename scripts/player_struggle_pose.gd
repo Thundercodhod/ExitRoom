@@ -7,7 +7,8 @@ extends SkeletonModifier3D
 #   kick        0..1  how hard the legs kick (the choke fades this out)
 #   grab_point        world point the hands reach for (the frog's wrist)
 #
-# Skeleton space of main_character.glb: faces +Z, left side is +X, feet at y = 0.
+# Skeleton space of player_better_rig.glb (humanoid bone names): faces +Z,
+# left side is +X, feet at y = 0.
 
 var weight := 0.0
 var kick := 0.0
@@ -26,10 +27,10 @@ var _legs := {}   # side -> [upleg, leg, foot]
 
 func setup() -> void:
 	var s := get_skeleton()
-	_neck = s.find_bone("neck")
+	_neck = s.find_bone("Neck")
 	for side in ["Left", "Right"]:
-		_arms[side] = [s.find_bone(side + "Arm"), s.find_bone(side + "ForeArm"), s.find_bone(side + "Hand")]
-		_legs[side] = [s.find_bone(side + "UpLeg"), s.find_bone(side + "Leg"), s.find_bone(side + "Foot")]
+		_arms[side] = [s.find_bone(side + "UpperArm"), s.find_bone(side + "LowerArm"), s.find_bone(side + "Hand")]
+		_legs[side] = [s.find_bone(side + "UpperLeg"), s.find_bone(side + "LowerLeg"), s.find_bone(side + "Foot")]
 
 
 func _process_modification_with_delta(delta: float) -> void:

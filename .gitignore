@@ -1,6 +1,10 @@
 # Godot-generated cache and import metadata
 .godot/
 *.import
+# Except: the player model's import settings rename its bones to Godot's
+# humanoid names (player_better_rig_bone_map.tres); without them the player's
+# animations do not bind.
+!assets/models/player/player_better_rig.glb.import
 *.log
 
 # Local captures used while checking the game

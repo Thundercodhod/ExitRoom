@@ -91,7 +91,7 @@ func run() -> void:
 	fx.add_child(player)
 	player.stepped.connect(func(_r): steps += 1)
 	await frames(20)
-	var toes := [attach("LeftToeBase"), attach("RightToeBase")]
+	var toes := [attach("LeftToes"), attach("RightToes")]
 
 	check(player.anim_tree != null and player.anim_tree.active, "Gait AnimationTree is running")
 	check(player.WALK_SPEED == 1.4 and player.SPRINT_SPEED == 4.8, "Walk 1.4 m/s, sprint 4.8 m/s")
@@ -101,7 +101,8 @@ func run() -> void:
 	await frames(40)
 	var walk := await measure(126, toes)        # 2.1 s
 	check(absf(walk.speed - 1.4) < 0.05, "Walks at 1.4 m/s (%.2f)" % walk.speed)
-	check(walk.steps >= 5 and walk.steps <= 7, "About 6 footsteps in 2.1 s of walking (%d)" % walk.steps)
+	var walk_expect: float = 2.0 * 2.1 / player.WalkClip.length      # two heel strikes per cycle
+	check(absf(walk.steps - walk_expect) <= 1.0, "Footsteps match the walk cycle: %d in 2.1 s (expect ~%.1f)" % [walk.steps, walk_expect])
 	check(walk.slide < 0.02, "Planted foot does not slide while walking (%.3f m)" % walk.slide)
 	check(player.current_anim == player.anim_names["walk"], "Walking plays the walk cycle")
 
@@ -110,7 +111,8 @@ func run() -> void:
 	await frames(40)
 	var run_m := await measure(126, toes)
 	check(absf(run_m.speed - 4.8) < 0.1, "Sprints at 4.8 m/s (%.2f)" % run_m.speed)
-	check(run_m.steps >= 7 and run_m.steps <= 9, "About 8 footsteps in 2.1 s of running (%d)" % run_m.steps)
+	var run_expect: float = 2.0 * 2.1 / player.RunClip.length
+	check(absf(run_m.steps - run_expect) <= 1.0, "Footsteps match the run cycle: %d in 2.1 s (expect ~%.1f)" % [run_m.steps, run_expect])
 	check(run_m.slide < 0.02, "Planted foot does not slide while running (%.3f m)" % run_m.slide)
 	check(player.current_anim == player.anim_names["run"], "Sprinting plays the run cycle")
 

@@ -64,10 +64,10 @@ func start(the_frog: CharacterBody3D, the_player: CharacterBody3D) -> void:
 	_was_visible = player.body_visual.visible
 	player.body_visual.visible = true       # seen from the cinematic camera
 	var skel := player.body_visual.find_child("Skeleton3D", true, false) as Skeleton3D
-	_start_throat = player.global_position + Vector3.UP * 1.34
-	_neck_offset = Vector3.UP * 1.34
+	_start_throat = player.global_position + Vector3.UP * 1.42
+	_neck_offset = Vector3.UP * 1.42
 	if skel:
-		var neck := skel.find_bone("neck")
+		var neck := skel.find_bone("Neck")
 		if neck >= 0:
 			_start_throat = skel.global_transform * skel.get_bone_global_pose(neck).origin
 			_neck_offset = _start_throat - player.global_position

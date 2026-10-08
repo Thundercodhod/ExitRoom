@@ -441,7 +441,7 @@ func run() -> void:
 	frog.caught_player.connect(func(): choke.start(frog, player))
 	frog.start_hunt()
 	var pskel: Skeleton3D = player.body_visual.find_child("Skeleton3D", true, false)
-	var p_neck := BoneAttachment3D.new(); p_neck.bone_name = "neck"; pskel.add_child(p_neck)
+	var p_neck := BoneAttachment3D.new(); p_neck.bone_name = "Neck"; pskel.add_child(p_neck)
 	var p_lhand := BoneAttachment3D.new(); p_lhand.bone_name = "LeftHand"; pskel.add_child(p_lhand)
 	var p_rhand := BoneAttachment3D.new(); p_rhand.bone_name = "RightHand"; pskel.add_child(p_rhand)
 	var f_wrist := attach(frog, "L_Wrist")

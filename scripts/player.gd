@@ -1,6 +1,7 @@
 extends CharacterBody3D
 
-const MainCharacterScene = preload("res://assets/models/player/main_character.glb")
+# Rigged with Godot's humanoid bone names at import (player_better_rig_bone_map.tres).
+const MainCharacterScene = preload("res://assets/models/player/player_better_rig.glb")
 
 # A heel touched the ground (also plays the footstep sound). Enemies can listen.
 signal stepped(running: bool)
@@ -11,10 +12,11 @@ const CAMERA_DISTANCE := 2.4
 const CAMERA_SHOULDER := 0.3
 const FOV_THIRD := 65.0
 const FOV_FIRST := 73.0
-# Movement speeds (m/s). The walk and run cycles are generated for exactly
-# these speeds by tools/build_player_gait.gd (re-run it if you change them).
+# Movement speeds (m/s). The idle, walk and run clips are generated for this
+# model by tools/build_player_gait.gd (re-run it if you change the speeds).
 const WALK_SPEED := 1.4
 const SPRINT_SPEED := 4.8
+const IdleClip = preload("res://assets/models/player/player_idle.tres")
 const WalkClip = preload("res://assets/models/player/player_walk.tres")
 const RunClip = preload("res://assets/models/player/player_run.tres")
 
@@ -91,12 +93,15 @@ func _ready() -> void:
 	body_visual.name = "PlayerVisual"
 	add_child(body_visual)
 	body_visual.rotation.y = PI
-	# main_character.glb is 1.64 m tall with its feet at y = 0 and faces +Z, like
-	# the old Hazmat demo, so levels keep setting body_visual.rotation.y = yaw - PI.
+	# player_better_rig.glb is 1.70 m tall with its feet at y = 0 and faces +Z,
+	# so levels keep setting body_visual.rotation.y = yaw - PI.
 	var model := MainCharacterScene.instantiate() as Node3D
 	model.name = "MainCharacter"
 	body_visual.add_child(model)
-	player_animation = model.find_child("AnimationPlayer", true, false) as AnimationPlayer
+	# The model ships without animations; the generated clips play on this.
+	player_animation = AnimationPlayer.new()
+	player_animation.name = "AnimationPlayer"
+	model.add_child(player_animation)
 	_resolve_animations()
 	_setup_anim_tree()
 	_play_animation("idle", 1.0)
@@ -196,19 +201,17 @@ func _apply_view() -> void:
 	# Hide the body in first-person (it would block the view) and while hiding.
 	body_visual.visible = third_person and not hiding
 
-# Idle comes from the model; walk and run are the generated cycles. anim_names
-# maps idle/walk/run to the clip names (other scripts and tests use it).
+# Idle, walk and run are the generated clips. anim_names maps idle/walk/run to
+# the clip names (other scripts and tests use it).
 func _resolve_animations() -> void:
 	if not player_animation:
 		return
-	for clip in player_animation.get_animation_list():
-		if String(clip).to_lower().begins_with("idle"):
-			anim_names["idle"] = clip
-			player_animation.get_animation(clip).loop_mode = Animation.LOOP_LINEAR
 	var lib := AnimationLibrary.new()
+	lib.add_animation("idle", IdleClip)
 	lib.add_animation("walk", WalkClip)
 	lib.add_animation("run", RunClip)
 	player_animation.add_animation_library("gait", lib)
+	anim_names["idle"] = &"gait/idle"
 	anim_names["walk"] = &"gait/walk"
 	anim_names["run"] = &"gait/run"
 
