@@ -5,6 +5,11 @@ extends CharacterBody3D
 # make it vanish when seen, move when it is not being looked at, or sit down
 # (passenger seat).
 #
+# Hunt mode (start_hunt / stop_hunt): it runs at the player leaning forward and
+# swings its left arm out to clutch them: RUN -> REACH -> HOLD (hand snaps shut)
+# -> RECOVER -> RUN. If the player is inside catch_range while the hand closes
+# it emits caught_player and stands over them; the level decides what happens.
+#
 # Create it like the other actors: CharacterBody3D.new() + set_script().
 #
 #   frog.game = level                      # optional, needs a `playing` bool
@@ -17,12 +22,18 @@ signal vanished
 signal reappeared
 signal relocated(point: Vector3)
 signal settled            # reached its viewing distance
+signal hunt_started
+signal clutch_started     # the arm starts swinging out
+signal clutch_missed      # the hand closed on nothing
+signal caught_player
 
 const FrogModel = preload("res://assets/models/enemy/frog.glb")
 const NavGrid = preload("res://scripts/nav_grid.gd")
 const HeadTracker = preload("res://scripts/frog_head_tracker.gd")
+const ChasePose = preload("res://scripts/frog_chase_pose.gd")
 
-enum Mode { WATCH, SITTING, GONE }
+enum Mode { WATCH, SITTING, GONE, HUNT }
+enum Clutch { RUN, REACH, HOLD, RECOVER, CAUGHT }
 enum Move { HOLD, APPROACH, RETREAT }
 
 # Tuning (change after creating, before or after add_child)
@@ -35,6 +46,18 @@ var approach_enabled := true
 var head_tracking := true
 var turn_body := true             # turn the whole body toward the player, not only the head
 var turn_rate := 3.0
+
+# Hunt tuning
+var hunt_speed := 3.0             # running speed while chasing
+var lunge_speed := 4.2            # short burst while the arm swings out
+var hunt_turn_rate := 9.0
+var clutch_range := 2.0           # starts a grab when the player is this close
+var catch_range := 1.1            # the grab connects inside this distance (arm is ~0.6 m long)
+var close_time := 0.12            # the hand must be shut this long before a catch counts
+var reach_time := 0.25            # arm swings out
+var hold_time := 0.3              # arm stays out, hand snaps shut
+var recover_time := 0.4           # arm pulls back after a miss
+var clutch_cooldown := 1.5        # seconds of plain running before the next grab
 
 # Clip speeds: ground speed (m/s) of the planted foot in the baked walk clip.
 const WALK_CLIP_SPEED := 1.5
@@ -56,6 +79,10 @@ var rng := RandomNumberGenerator.new()
 
 var skeleton: Skeleton3D
 var tracker
+var chase_pose
+var clutch := Clutch.RUN
+var _clutch_timer := 0.0
+var _cooldown_timer := 0.0
 var player_animation: AnimationPlayer
 var anim_names := {}
 var current_anim := &""
@@ -94,6 +121,12 @@ func _ready() -> void:
 		tracker.name = "HeadTracker"
 		skeleton.add_child(tracker)
 		tracker.setup("Neck", "Head")
+		# Chase posture (lean, left-arm reach, fingers); idle unless hunting.
+		chase_pose = ChasePose.new()
+		chase_pose.name = "ChasePose"
+		skeleton.add_child(chase_pose)
+		skeleton.move_child(chase_pose, tracker.get_index())  # posture first, head tracking on top
+		chase_pose.setup()
 	_resolve_animations()
 	_play_animation("idle", 1.0)
 	if bounds.has_area():
@@ -115,6 +148,7 @@ func _build_nav_when_ready() -> void:
 # ---------------------------------------------------------------- scene helpers
 
 func sit() -> void:
+	_reset_chase_pose()
 	mode = Mode.SITTING
 	move_state = Move.HOLD
 	velocity = Vector3.ZERO
@@ -135,6 +169,7 @@ func vanish() -> void:
 	if mode == Mode.GONE:
 		return
 	mode = Mode.GONE
+	_reset_chase_pose()
 	visible = false
 	velocity = Vector3.ZERO
 	path.clear()
@@ -146,12 +181,46 @@ func appear_at(point: Vector3, sitting := false) -> void:
 	global_position = point
 	visible = true
 	mode = Mode.WATCH
+	_reset_chase_pose()
 	body_shape.disabled = false
 	if sitting:
 		sit()
 	else:
 		_play_animation("idle", 1.0)
 	reappeared.emit()
+
+
+# Starts chasing the player. Pending vanish / relocation rules are dropped.
+func start_hunt() -> void:
+	if mode == Mode.GONE or target == null:
+		return
+	clear_scene_rules()
+	body_shape.disabled = false
+	mode = Mode.HUNT
+	move_state = Move.HOLD
+	clutch = Clutch.RUN
+	_clutch_timer = 0.0
+	_cooldown_timer = 0.6  # a beat of running before the first grab
+	path.clear()
+	repath_timer = 0.0
+	hunt_started.emit()
+
+
+# Back to watching (keeps its distance again). The posture eases out.
+func stop_hunt() -> void:
+	if mode != Mode.HUNT:
+		return
+	mode = Mode.WATCH
+	clutch = Clutch.RUN
+	path.clear()
+
+
+func is_hunting() -> bool:
+	return mode == Mode.HUNT
+
+
+func clutch_name() -> String:
+	return Clutch.keys()[clutch]
 
 
 # Disappears once the player has had it in view for `delay` seconds while closer than `distance`.
@@ -241,6 +310,9 @@ func _physics_process(delta: float) -> void:
 			_watch(delta)
 		Mode.SITTING:
 			_apply_gravity(delta)
+		Mode.HUNT:
+			_hunt(delta)
+	_update_chase_pose(delta)
 
 
 func _update_scene_rules(delta: float) -> void:
@@ -309,6 +381,113 @@ func _watch(delta: float) -> void:
 	_update_animation(walk_sign)
 
 
+# ---------------------------------------------------------------- hunt
+
+func _hunt(delta: float) -> void:
+	if target == null:
+		stop_hunt()
+		return
+	var dist := distance_to_target()
+	var offset := target.global_position - global_position
+	offset.y = 0.0
+	var to_player := offset.normalized() if dist > 0.01 else -global_transform.basis.z
+	_turn_towards(to_player, delta, hunt_turn_rate)
+	_cooldown_timer = maxf(_cooldown_timer - delta, 0.0)
+	_clutch_timer += delta
+	var speed := hunt_speed
+	match clutch:
+		Clutch.RUN:
+			if _cooldown_timer <= 0.0 and dist <= clutch_range:
+				_set_clutch(Clutch.REACH)
+				clutch_started.emit()
+		Clutch.REACH:
+			speed = lunge_speed
+			if _clutch_timer >= reach_time:
+				_set_clutch(Clutch.HOLD)
+		Clutch.HOLD:
+			speed = hunt_speed * 0.5
+			if _clutch_timer >= close_time and dist <= catch_range and not bool(target.get("hiding")):
+				_set_clutch(Clutch.CAUGHT)
+				velocity.x = 0.0
+				velocity.z = 0.0
+				caught_player.emit()
+			elif _clutch_timer >= hold_time:
+				_set_clutch(Clutch.RECOVER)
+				clutch_missed.emit()
+		Clutch.RECOVER:
+			speed = hunt_speed * 0.6
+			if _clutch_timer >= recover_time:
+				_set_clutch(Clutch.RUN)
+				_cooldown_timer = clutch_cooldown
+		Clutch.CAUGHT:
+			_stop(delta)
+			_update_hunt_animation()
+			return
+	# Stop just short of the player's body instead of pushing into it.
+	var move_dir := Vector3.ZERO
+	if dist > 0.75:
+		move_dir = _direction_to_goal(target.global_position, delta)
+	velocity.x = move_toward(velocity.x, move_dir.x * speed, delta * 14.0)
+	velocity.z = move_toward(velocity.z, move_dir.z * speed, delta * 14.0)
+	_apply_gravity(delta)
+	move_and_slide()
+	_update_hunt_animation()
+
+
+func _set_clutch(next: Clutch) -> void:
+	clutch = next
+	_clutch_timer = 0.0
+
+
+# Eases the posture weights toward what the current hunt phase wants.
+func _update_chase_pose(delta: float) -> void:
+	if chase_pose == null:
+		return
+	var want_lean := 0.0
+	var want_reach := 0.0
+	var want_grip := 0.0
+	var reach_rate := 6.0
+	var grip_rate := 8.0
+	if mode == Mode.HUNT:
+		want_lean = 1.0
+		match clutch:
+			Clutch.REACH:
+				want_reach = 1.0
+				want_grip = -1.0                       # fingers spread
+				reach_rate = 1.0 / maxf(reach_time, 0.01)
+			Clutch.HOLD, Clutch.CAUGHT:
+				want_reach = 1.0
+				want_grip = 1.0                        # snap shut
+				reach_rate = 1.0 / maxf(reach_time, 0.01)
+				grip_rate = 14.0
+			Clutch.RECOVER:
+				want_reach = 0.0
+				want_grip = 0.0
+				reach_rate = 1.0 / maxf(recover_time, 0.01)
+	chase_pose.lean = move_toward(chase_pose.lean, want_lean, delta * 3.0)
+	chase_pose.reach = move_toward(chase_pose.reach, want_reach, delta * reach_rate)
+	chase_pose.grip = move_toward(chase_pose.grip, want_grip, delta * grip_rate)
+	if target != null:
+		chase_pose.reach_target = target.global_position + Vector3.UP * 1.2
+
+
+func _reset_chase_pose() -> void:
+	clutch = Clutch.RUN
+	if chase_pose:
+		chase_pose.lean = 0.0
+		chase_pose.reach = 0.0
+		chase_pose.grip = 0.0
+
+
+func _update_hunt_animation() -> void:
+	var ground_speed := Vector2(velocity.x, velocity.z).length()
+	if ground_speed < STOP_SPEED:
+		_play_animation("idle", 1.0)
+	else:
+		# The walk clip sped up to match: ~2x at running speed.
+		_play_animation("walk", ground_speed / WALK_CLIP_SPEED)
+
+
 func _update_move_state(dist: float) -> void:
 	if dist > approach_range:
 		move_state = Move.HOLD
@@ -357,10 +536,11 @@ func _flat_direction(point: Vector3) -> Vector3:
 	return d.normalized() if d.length() > 0.3 else Vector3.ZERO
 
 
-func _turn_towards(direction: Vector3, delta: float) -> void:
+func _turn_towards(direction: Vector3, delta: float, rate := -1.0) -> void:
 	if Vector2(direction.x, direction.z).length() < 0.01:
 		return
-	rotation.y = lerp_angle(rotation.y, atan2(-direction.x, -direction.z), clampf(delta * turn_rate, 0.0, 1.0))
+	var r := turn_rate if rate < 0.0 else rate
+	rotation.y = lerp_angle(rotation.y, atan2(-direction.x, -direction.z), clampf(delta * r, 0.0, 1.0))
 
 
 func _apply_gravity(delta: float) -> void:

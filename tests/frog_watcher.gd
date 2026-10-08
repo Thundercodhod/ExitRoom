@@ -7,6 +7,9 @@ var failures := 0
 var vanished_count := 0
 var relocated_count := 0
 var settled_count := 0
+var clutch_count := 0
+var missed_count := 0
+var caught_count := 0
 
 func _initialize() -> void:
 	call_deferred("run")
@@ -59,6 +62,9 @@ func make_frog(fixture: Node, player: Node3D, pos: Vector3, use_nav := false) ->
 	f.vanished.connect(func(): vanished_count += 1)
 	f.relocated.connect(func(_p): relocated_count += 1)
 	f.settled.connect(func(): settled_count += 1)
+	f.clutch_started.connect(func(): clutch_count += 1)
+	f.clutch_missed.connect(func(): missed_count += 1)
+	f.caught_player.connect(func(): caught_count += 1)
 	return f
 
 func yaw_towards(from: Vector3, to: Vector3) -> float:
@@ -71,6 +77,21 @@ func body_error(frog: Node3D, player: Node3D) -> float:
 	var forward := -frog.global_transform.basis.z
 	forward.y = 0.0
 	return forward.normalized().angle_to(d.normalized())
+
+# Final (rendered) bone position, read through a BoneAttachment3D so it includes
+# every skeleton modifier, not just what a modifier believes it set.
+func attach(frog: Node3D, bone: String) -> BoneAttachment3D:
+	var att := BoneAttachment3D.new()
+	att.bone_name = bone
+	frog.skeleton.add_child(att)
+	return att
+
+# Angle between the rendered head's facing and the direction to `point`.
+func real_head_error(frog: Node3D, head: BoneAttachment3D, point: Vector3) -> float:
+	var s: Skeleton3D = frog.skeleton
+	var local_forward: Vector3 = s.get_bone_global_rest(s.find_bone("Head")).basis.inverse() * Vector3.BACK
+	var forward: Vector3 = (head.global_transform.basis * local_forward).normalized()
+	return forward.angle_to((point - head.global_position).normalized())
 
 func flat_distance(a: Node3D, b: Node3D) -> float:
 	var d := a.global_position - b.global_position
@@ -103,6 +124,10 @@ func run() -> void:
 	check(body_error(frog, player) > 1.3, "Body is not turned toward the player in this test")
 	var tracked: float = frog.head_error()
 	check(tracked < 0.45, "Head turns toward the player (error %.2f rad)" % tracked)
+	var head_att := attach(frog, "Head")
+	await frames(5)
+	var real: float = real_head_error(frog, head_att, player.pivot.global_position)
+	check(real < 0.2, "Rendered head really faces the player (error %.2f rad)" % real)
 	await frames(120)
 	check(frog.head_error() < 0.45, "Head tracking stays steady over time (error %.2f rad)" % frog.head_error())
 	frog.head_tracking = false
@@ -240,6 +265,114 @@ func run() -> void:
 	frog.stand()
 	await frames(10)
 	check(frog.current_anim != frog.anim_names["sit"], "Stands up again")
+	fx.queue_free()
+	await frames(2)
+
+	# 10. Hunt: runs leaning forward, swings the left arm out and catches
+	fx = new_fixture(false)
+	player = make_player(fx, Vector3(0, 0.15, 0))
+	frog = make_frog(fx, player, Vector3(0, 0.05, -12), true)
+	await frames(10)
+	clutch_count = 0
+	caught_count = 0
+	missed_count = 0
+	var wrist_att := attach(frog, "L_Wrist")
+	var hunt_head := attach(frog, "Head")
+	var hips_att := attach(frog, "Hips")
+	var real_hand := INF
+	var real_lean := 0.0
+	var head_level := INF
+	frog.start_hunt()
+	var top_speed := 0.0
+	var top_anim := 0.0
+	var best_hand := INF
+	var best_aim := INF
+	var max_lean := 0.0
+	var reach_before_grab := 0.0
+	for i in 300:
+		await physics_frame
+		top_speed = maxf(top_speed, Vector2(frog.velocity.x, frog.velocity.z).length())
+		top_anim = maxf(top_anim, frog.player_animation.speed_scale)
+		max_lean = maxf(max_lean, frog.chase_pose.lean)
+		if clutch_count == 0:
+			reach_before_grab = maxf(reach_before_grab, frog.chase_pose.reach)
+		if frog.clutch_name() == "RUN" and frog.chase_pose.lean > 0.99:
+			var inv: Transform3D = frog.global_transform.affine_inverse()
+			real_lean = maxf(real_lean, -(inv * hunt_head.global_position - inv * hips_att.global_position).z)
+			head_level = minf(head_level, real_head_error(frog, hunt_head, player.pivot.global_position))
+		if frog.clutch_name() in ["HOLD", "CAUGHT"]:
+			real_hand = minf(real_hand, wrist_att.global_position.distance_to(frog.chase_pose.reach_target))
+			best_hand = minf(best_hand, frog.chase_pose.hand_error)
+			best_aim = minf(best_aim, frog.chase_pose.aim_error)
+		if caught_count > 0:
+			break
+	check(frog.is_hunting(), "Hunt mode is on")
+	check(top_speed > 2.7, "Runs at chase speed (%.1f m/s)" % top_speed)
+	check(top_anim > 1.7, "Walk clip is sped up into a run (x%.2f)" % top_anim)
+	check(max_lean > 0.95, "Leans forward while chasing (%.2f)" % max_lean)
+	check(reach_before_grab < 0.05, "Arm stays down while just running")
+	check(clutch_count >= 1, "Starts a grab when close")
+	check(best_aim < deg_to_rad(8.0), "Left arm points straight at the player's chest (%.1f deg)" % rad_to_deg(best_aim))
+	check(best_hand < 0.2, "Left hand gets to the player's chest (%.2f m off)" % best_hand)
+	check(real_lean > 0.2, "Rendered head is ahead of the hips while running (%.2f m)" % real_lean)
+	check(head_level < 0.35, "Rendered head looks at the player while running (%.2f rad)" % head_level)
+	check(real_hand < 0.2, "Rendered left wrist reaches the player's chest (%.2f m)" % real_hand)
+	check(caught_count == 1 and frog.clutch_name() == "CAUGHT", "Catches a player who stays in range")
+	check(frog.chase_pose.grip > 0.9, "Hand is clenched on the catch")
+	var held := frog.global_position
+	await frames(30)
+	check(frog.global_position.distance_to(held) < 0.1, "Stands still after the catch")
+	fx.queue_free()
+	await frames(2)
+
+	# 11. Hunt: a missed grab pulls the arm back and keeps running
+	fx = new_fixture(false)
+	player = make_player(fx, Vector3(0, 0.15, 0))
+	frog = make_frog(fx, player, Vector3(0, 0.05, -8), true)
+	await frames(10)
+	clutch_count = 0
+	caught_count = 0
+	missed_count = 0
+	var dodge := func():
+		# Jump the player away the moment the arm swings out.
+		var away: Vector3 = (player.global_position - frog.global_position)
+		away.y = 0.0
+		player.global_position += away.normalized() * 4.0
+	frog.clutch_started.connect(dodge)
+	frog.start_hunt()
+	var run_after_miss := false
+	var miss_frame := -1
+	var second_grab_frame := -1
+	for i in 420:
+		await physics_frame
+		if missed_count == 1 and miss_frame < 0:
+			miss_frame = i
+		if miss_frame >= 0 and frog.clutch_name() == "RUN" and frog.chase_pose.reach < 0.05:
+			run_after_miss = true
+		if clutch_count >= 2 and second_grab_frame < 0:
+			second_grab_frame = i
+			frog.clutch_started.disconnect(dodge)
+	check(missed_count >= 1 and caught_count == 0, "Grab misses when the player dodges")
+	check(run_after_miss, "Arm pulls back and it runs normally again")
+	var gap := (second_grab_frame - miss_frame) / 60.0 if second_grab_frame >= 0 else 0.0
+	check(second_grab_frame >= 0 and gap >= frog.recover_time + frog.clutch_cooldown - 0.05, "Waits before grabbing again (%.2f s)" % gap)
+	fx.queue_free()
+	await frames(2)
+
+	# 12. Hunt: a hiding player is not caught; stop_hunt eases back to watching
+	fx = new_fixture(false)
+	player = make_player(fx, Vector3(0, 0.15, 0))
+	frog = make_frog(fx, player, Vector3(0, 0.05, -4))
+	await frames(10)
+	caught_count = 0
+	player.hiding = true
+	frog.start_hunt()
+	await frames(150)
+	check(caught_count == 0, "Does not catch a hiding player")
+	frog.stop_hunt()
+	await frames(240)
+	check(not frog.is_hunting() and frog.chase_pose.lean < 0.05 and frog.chase_pose.reach < 0.05, "Posture eases out after the hunt stops")
+	check(frog.distance_to_target() > 2.8, "Backs off to its watching distance again (%.1f m)" % frog.distance_to_target())
 	fx.queue_free()
 	await frames(2)
 
