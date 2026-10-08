@@ -1,0 +1,230 @@
+{
+ "textures": [
+  {
+   "name": "brick_red",
+   "category": "brick",
+   "tiling": "both",
+   "size": [
+    128,
+    128
+   ],
+   "alpha": false
+  },
+  {
+   "name": "concrete",
+   "category": "concrete_stone",
+   "tiling": "both",
+   "size": [
+    128,
+    128
+   ],
+   "alpha": false
+  },
+  {
+   "name": "plaster_cracked",
+   "category": "plaster_paper",
+   "tiling": "both",
+   "size": [
+    128,
+    128
+   ],
+   "alpha": false
+  },
+  {
+   "name": "paint_mint",
+   "category": "plaster_paper",
+   "tiling": "both",
+   "size": [
+    128,
+    128
+   ],
+   "alpha": false
+  },
+  {
+   "name": "tiles_lino",
+   "category": "tiles",
+   "tiling": "both",
+   "size": [
+    128,
+    128
+   ],
+   "alpha": false
+  },
+  {
+   "name": "tiles_white_dirty",
+   "category": "tiles",
+   "tiling": "both",
+   "size": [
+    128,
+    128
+   ],
+   "alpha": false
+  },
+  {
+   "name": "wood_floor",
+   "category": "wood",
+   "tiling": "both",
+   "size": [
+    128,
+    128
+   ],
+   "alpha": false
+  },
+  {
+   "name": "steel_rusty",
+   "category": "metal",
+   "tiling": "both",
+   "size": [
+    128,
+    128
+   ],
+   "alpha": false
+  },
+  {
+   "name": "corrugated_rusty",
+   "category": "metal",
+   "tiling": "both",
+   "size": [
+    128,
+    128
+   ],
+   "alpha": false
+  },
+  {
+   "name": "grass",
+   "category": "ground",
+   "tiling": "both",
+   "size": [
+    128,
+    128
+   ],
+   "alpha": false
+  },
+  {
+   "name": "asphalt",
+   "category": "street",
+   "tiling": "both",
+   "size": [
+    128,
+    128
+   ],
+   "alpha": false
+  },
+  {
+   "name": "ceiling_tiles",
+   "category": "roof_ceiling",
+   "tiling": "both",
+   "size": [
+    128,
+    128
+   ],
+   "alpha": false
+  },
+  {
+   "name": "wainscot_tiles",
+   "category": "trim",
+   "tiling": "across",
+   "size": [
+    128,
+    128
+   ],
+   "alpha": false
+  },
+  {
+   "name": "door_wood",
+   "category": "door_window",
+   "tiling": "none",
+   "size": [
+    128,
+    256
+   ],
+   "alpha": false
+  },
+  {
+   "name": "sign_exit",
+   "category": "sign",
+   "tiling": "none",
+   "size": [
+    128,
+    32
+   ],
+   "alpha": false
+  },
+  {
+   "name": "blood_splatter",
+   "category": "decal",
+   "tiling": "none",
+   "size": [
+    128,
+    128
+   ],
+   "alpha": true
+  }
+ ],
+ "sets": {
+  "hospital": {
+   "floor": "tiles_lino",
+   "wall": "paint_mint",
+   "trim": "wainscot_tiles",
+   "ceiling": "ceiling_tiles",
+   "door": "door_wood",
+   "window": "",
+   "sign": "sign_exit",
+   "light": "d0ece0",
+   "decals": [
+    [
+     "blood_splatter",
+     "floor",
+     [
+      0.5,
+      -1.0
+     ],
+     1.2
+    ]
+   ]
+  },
+  "house": {
+   "floor": "wood_floor",
+   "wall": "plaster_cracked",
+   "trim": "",
+   "ceiling": "ceiling_tiles",
+   "door": "door_wood",
+   "window": "",
+   "sign": "",
+   "light": "ffd8a0",
+   "decals": []
+  },
+  "yard": {
+   "floor": "asphalt",
+   "wall": "brick_red",
+   "trim": "",
+   "ceiling": "",
+   "door": "door_wood",
+   "window": "",
+   "sign": "",
+   "light": "ffb060",
+   "decals": [
+    [
+     "blood_splatter",
+     "back",
+     [
+      1.3,
+      1.2
+     ],
+     1.0
+    ]
+   ]
+  },
+  "shed": {
+   "floor": "concrete",
+   "wall": "corrugated_rusty",
+   "trim": "",
+   "ceiling": "steel_rusty",
+   "door": "door_wood",
+   "window": "",
+   "sign": "",
+   "light": "c0d8ff",
+   "decals": []
+  }
+ }
+}

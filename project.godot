@@ -11,9 +11,13 @@ config_version=5
 [application]
 
 config/name="ExitRoom"
-config/description="ExitRoom: borrowed voices. Grandma's house, Backrooms and ROOM 407, leading to DON'T FOLLOW THE FROG."
-run/main_scene="res://prologue_village.tscn"
+config/description="ExitRoom — An anthology of quiet horrors. Four independent psychological horror episodes."
+run/main_scene="res://main_menu.tscn"
 config/features=PackedStringArray("4.7")
+
+[autoload]
+
+Anthology="*res://scripts/anthology.gd"
 
 [display]
 

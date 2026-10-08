@@ -1,5 +1,13 @@
 # Asset credits for the abandoned-house revision
 
+## Anthology menu and story presentation — October 2026
+
+- **Chakra Petch**, Regular and Bold, by **Cadson Demak**: https://github.com/google/fonts/tree/main/ofl/chakrapetch — SIL Open Font License 1.1. Bundled license: `ui/fonts/OFL-ChakraPetch.txt`. Used for Thai and Latin menu, subtitle and narrative text.
+- **VT323** by **Peter Hull**: https://github.com/google/fonts/tree/main/ofl/vt323 — SIL Open Font License 1.1. Bundled as an optional display font with `ui/fonts/OFL-VT323.txt`.
+- The ten sound effects and ambient loops under `audio/anthology/` are original procedural synthesis for this project. Reproducible source: `tools/build_anthology_audio.py`. No third-party recordings or voice performances are used in this sound set.
+- Episode thumbnails in `ui/previews/` are rendered from this project's existing scenes. The live menu backdrop reuses `frog_field_world.tscn` and the existing `tree/dead_tree.glb`; source models and authored scene layouts are unchanged by the menu.
+- Menu layout and film shader were authored for ExitRoom. Reference screenshots supplied by the user are visual direction; no Fears to Fathom artwork, logo, audio or fonts were extracted.
+
 ## Frog field chapter
 
 **Godot Grass Shader** by **Binbun** — https://binbun3d.itch.io/godot-grass — CC0 (license stated on the author's page). Uses the user-supplied shader and textures under `Grass/assets/BinbunGrass/src/` unchanged, with a chapter-specific material, palette and MultiMesh placement.

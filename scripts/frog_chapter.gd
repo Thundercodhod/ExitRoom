@@ -2,6 +2,8 @@ extends Node3D
 ## Story direction uses only the existing frog's public scene helpers.
 const PlayerScript = preload("res://scripts/player.gd")
 const FrogScript = preload("res://scripts/frog_watcher.gd")
+const EPISODE_ID := "passenger"
+const EPILOGUE := "ผมขับต่อไป ไม่กล้าหันไปดูอีกจนถึงปั๊มที่มีคนอยู่\nพอเปิดไฟในรถ เบาะข้าง ๆ ก็ว่าง แต่เปียกจนชุ่ม\n\nวันต่อมาผมพาเพื่อนไปดู เราขับวนอยู่สองรอบก็หาทางเข้าบ้านไม่เจอ\nเครื่องจั๊มพ์แบตยังอยู่ท้ายรถ ผมยังไม่กล้าเอามาใช้\n\nมีเรื่องหนึ่งที่ผมไม่ได้บอกเพื่อน\nบางคืน ตอนดับเครื่อง ผมยังได้ยินเสียงปลดเข็มขัดจากเบาะข้าง ๆ"
 enum Stage { CAR, FIELD, HOUSE, NOTE, BATTERY, RECOGNITION, RETURN, REPAIRED, END }
 var stage := Stage.CAR
 var playing := false
@@ -19,8 +21,12 @@ var panel: CenterContainer
 var panel_title: Label
 var panel_text: Label
 var panel_button: Button
+var menu_button: Button
+var subtitle_backdrop: PanelContainer
 var caption_time := 0.0
+var caption_reveal := 0.0
 var elapsed := 0.0
+var return_caption_step := 0
 var return_step := 0
 var destination_pending := false
 var cut_camera: Camera3D
@@ -28,6 +34,7 @@ var sound: AudioStreamPlayer
 var ringing: AudioStreamPlayer3D
 var engine: AudioStreamPlayer
 var house_lights: Array[Light3D] = []
+var ending_presented := false
 
 func _ready() -> void:
 	for action_name in {"forward":KEY_W,"back":KEY_S,"left":KEY_A,"right":KEY_D,"sprint":KEY_SHIFT,"interact":KEY_E,"flashlight":KEY_F,"pause_game":KEY_ESCAPE}:
@@ -83,19 +90,26 @@ func _ready() -> void:
 	atmosphere.loop_end = atmosphere.data.size()/2
 	field.stream = atmosphere
 	field.volume_db = -12
+	if AudioServer.get_bus_index("Ambience") >= 0: field.bus = &"Ambience"
 	field.process_mode = Node.PROCESS_MODE_PAUSABLE
 	add_child(field)
 	field.play()
 	setup_ui()
-	show_panel("DON'T FOLLOW THE FROG","ถนนชนบท · คืนเดียวกัน\n\nรถที่เคยจอดอยู่หน้าโรงแรมมาอยู่ตรงนี้ได้อย่างไร\nไฟฉุกเฉินยังติดอยู่ แต่เครื่องยนต์เงียบสนิท\n\nWASD เดิน  ·  เมาส์มอง  ·  Shift วิ่ง\nE สำรวจ  ·  F ไฟฉาย  ·  Esc พัก","เริ่มบทกบ")
+	show_panel("THE PASSENGER  /  ผู้โดยสาร","ภาคิน / กลับจากเก็บของที่ห้องเช่าของพ่อ / 23:46\n\nพ่อเสียไปเกือบปี ผมจ่ายค่าเช่าทิ้งไว้จนไม่ไหว\nวันนั้นเลยต้องไปขนของออก แล้วคืนกุญแจเสียที\n\nขากลับถนนใหญ่ปิดซ่อม ผมเลยใช้ทางเลียบทุ่ง\nขับมาได้พักหนึ่ง ไฟหน้าก็หรี่ลง แล้วเครื่องก็ดับ\nมองไปรอบ ๆ มีบ้านเปิดไฟอยู่แค่หลังเดียว\n\nWASD เดิน · เมาส์มอง · Shift วิ่ง\nE สำรวจ · F ไฟฉาย · Esc พัก · F1 เมนู","เริ่มเรื่อง")
+	play_cue("tape",-23.0)
+
+func episode_font(bold := false) -> Font:
+	var path := "res://ui/fonts/ChakraPetch-Bold.ttf" if bold else "res://ui/fonts/ChakraPetch-Regular.ttf"
+	if ResourceLoader.exists(path): return load(path) as Font
+	return load("res://NotoSansThai.ttf") as Font
 
 func make_label(size: int, color := Color(.89,.91,.81)) -> Label:
 	var n := Label.new()
-	n.add_theme_font_override("font",load("res://NotoSansThai.ttf"))
+	n.add_theme_font_override("font",episode_font())
 	n.add_theme_font_size_override("font_size",size)
 	n.add_theme_color_override("font_color",color)
 	n.add_theme_color_override("font_outline_color",Color(.015,.025,.022,.95))
-	n.add_theme_constant_override("outline_size",5)
+	n.add_theme_constant_override("outline_size",4)
 	n.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return n
 
@@ -110,7 +124,7 @@ func setup_ui() -> void:
 	var stack := VBoxContainer.new()
 	margin.add_child(stack)
 	var chapter := make_label(15,Color(.64,.76,.62))
-	chapter.text = "DON'T FOLLOW THE FROG   /   ถนนกลางทุ่ง"
+	chapter.text = "EPISODE 04  /  THE PASSENGER"
 	stack.add_child(chapter)
 	objective = make_label(22)
 	stack.add_child(objective)
@@ -124,15 +138,28 @@ func setup_ui() -> void:
 	prompt.offset_top = -70
 	prompt.offset_bottom = -30
 	ui.add_child(prompt)
-	subtitle = make_label(23)
-	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	subtitle_backdrop = PanelContainer.new()
+	subtitle_backdrop.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	subtitle_backdrop.anchor_left = .15
+	subtitle_backdrop.anchor_right = .85
+	subtitle_backdrop.offset_top = -166
+	subtitle_backdrop.offset_bottom = -82
+	subtitle_backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var caption_style := StyleBoxFlat.new()
+	caption_style.bg_color = Color(.018,.021,.019,.84)
+	caption_style.border_color = Color(.70,.67,.43,.7)
+	caption_style.border_width_left = 2
+	caption_style.content_margin_left = 24
+	caption_style.content_margin_right = 24
+	caption_style.content_margin_top = 12
+	caption_style.content_margin_bottom = 12
+	subtitle_backdrop.add_theme_stylebox_override("panel",caption_style)
+	ui.add_child(subtitle_backdrop)
+	subtitle_backdrop.hide()
+	subtitle = make_label(24,Color(.96,.94,.83))
+	subtitle.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	subtitle.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	subtitle.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	subtitle.offset_left = 80
-	subtitle.offset_right = -80
-	subtitle.offset_top = -170
-	subtitle.offset_bottom = -85
-	ui.add_child(subtitle)
+	subtitle_backdrop.add_child(subtitle)
 	overlay = ColorRect.new()
 	overlay.color = Color(0,0,0,0)
 	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -144,9 +171,10 @@ func setup_ui() -> void:
 	var card := PanelContainer.new()
 	card.custom_minimum_size = Vector2(700,0)
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(.025,.043,.035,.98)
-	style.border_color = Color(.25,.33,.21)
+	style.bg_color = Color(.018,.026,.024,.98)
+	style.border_color = Color(.46,.49,.35)
 	style.set_border_width_all(1)
+	style.border_width_top = 3
 	style.content_margin_left = 38
 	style.content_margin_right = 38
 	style.content_margin_top = 32
@@ -156,7 +184,8 @@ func setup_ui() -> void:
 	var contents := VBoxContainer.new()
 	contents.add_theme_constant_override("separation",22)
 	card.add_child(contents)
-	panel_title = make_label(32,Color(.73,.83,.59))
+	panel_title = make_label(32,Color(.80,.80,.60))
+	panel_title.add_theme_font_override("font",episode_font(true))
 	contents.add_child(panel_title)
 	panel_text = make_label(22)
 	panel_text.custom_minimum_size.x = 620
@@ -164,21 +193,67 @@ func setup_ui() -> void:
 	contents.add_child(panel_text)
 	panel_button = Button.new()
 	panel_button.custom_minimum_size.y = 48
-	panel_button.add_theme_font_override("font",load("res://NotoSansThai.ttf"))
+	panel_button.add_theme_font_override("font",episode_font(true))
 	panel_button.add_theme_font_size_override("font_size",22)
+	style_button(panel_button)
 	contents.add_child(panel_button)
 	panel_button.pressed.connect(panel_continue)
+	menu_button = Button.new()
+	menu_button.text = "กลับไปเลือกตอน"
+	menu_button.custom_minimum_size.y = 40
+	menu_button.add_theme_font_override("font",episode_font())
+	menu_button.add_theme_font_size_override("font_size",18)
+	style_button(menu_button)
+	contents.add_child(menu_button)
+	menu_button.pressed.connect(return_to_menu)
+
+func style_button(button: Button) -> void:
+	for state in ["normal","hover","pressed","focus"]:
+		var style := StyleBoxFlat.new()
+		style.bg_color = Color(.08,.12,.10,.8) if state == "normal" else Color(.19,.24,.17,.95)
+		style.border_color = Color(.40,.46,.31) if state == "normal" else Color(.77,.80,.54)
+		style.set_border_width_all(1)
+		style.content_margin_top = 8
+		style.content_margin_bottom = 8
+		button.add_theme_stylebox_override(state,style)
+	button.add_theme_color_override("font_color",Color(.91,.92,.79))
+	button.add_theme_color_override("font_hover_color",Color(1,.97,.78))
+	button.mouse_entered.connect(func(): play_cue("ui_move",-27.0))
+
+func play_cue(cue: String, volume := -20.0) -> void:
+	var anthology := get_node_or_null("/root/Anthology")
+	if anthology and anthology.has_method("play_sfx"):
+		anthology.play_sfx(cue,volume)
+
+func return_to_menu() -> void:
+	play_cue("ui_accept",-22.0)
+	var anthology := get_node_or_null("/root/Anthology")
+	if anthology and anthology.has_method("return_to_menu"):
+		get_tree().paused = false
+		anthology.return_to_menu()
 
 func show_panel(title: String, text: String, button: String) -> void:
 	panel_title.text = title
 	panel_text.text = text
 	panel_button.text = button
+	menu_button.visible = not reading and get_node_or_null("/root/Anthology") != null
 	panel.show()
 	playing = false
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	panel_button.grab_focus()
 
 func panel_continue() -> void:
+	var anthology := get_node_or_null("/root/Anthology")
+	if stage==Stage.END and anthology:
+		anthology.launch_episode(EPISODE_ID)
+		return
+	if not started and anthology and anthology.has_method("reveal_gameplay"):
+		await anthology.reveal_gameplay(_continue_panel)
+	else:
+		_continue_panel()
+
+func _continue_panel() -> void:
+	play_cue("ui_accept",-25.0)
 	if stage == Stage.END:
 		get_tree().reload_current_scene()
 		return
@@ -195,11 +270,22 @@ func panel_continue() -> void:
 		started = true
 		playing = true
 		objective.text = "ลองสตาร์ตรถที่จอดอยู่ข้างถนน"
-		say("ฉันจำได้ว่าจอดรถไว้หน้าโรงแรม...",5)
+		say("เมื่อเช้ายังขับได้อยู่เลย ลองสตาร์ตอีกทีแล้วกัน",6)
 
 func say(text: String, seconds := 5.0) -> void:
 	subtitle.text = text
-	caption_time = seconds
+	subtitle.visible_characters = -1 if instant_text_enabled() else 0
+	caption_reveal = 0.0
+	caption_time = maxf(seconds,text.length()/38.0+2.5)
+	subtitle_backdrop.show()
+
+func instant_text_enabled() -> bool:
+	var anthology := get_node_or_null("/root/Anthology")
+	return anthology != null and bool(anthology.settings.get("instant_text",false))
+
+func reduced_motion_enabled() -> bool:
+	var anthology := get_node_or_null("/root/Anthology")
+	return anthology != null and bool(anthology.settings.get("reduced_motion",false))
 
 func play_sound(file: String, volume := -12.0) -> void:
 	sound.stream = load("res://audio/frog_chapter/"+file+".wav")
@@ -223,7 +309,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			panel_continue()
 		else:
 			paused = true
-			show_panel("พักเกม","WASD เดิน · E สำรวจ · F ไฟฉาย\nกลับไปยังรถหลังได้เครื่องจั๊มพ์แบตเตอรี่","เล่นต่อ")
+			show_panel("พักเกม","THE PASSENGER  /  ผู้โดยสาร\n\n"+objective.text+"\n\nWASD เดิน · E สำรวจ · F ไฟฉาย · Shift วิ่ง","เล่นต่อ")
 			get_tree().paused = true
 		get_viewport().set_input_as_handled()
 		return
@@ -238,7 +324,10 @@ func _process(delta: float) -> void:
 		n.visible = fmod(elapsed,1.25)<.45 and stage<Stage.REPAIRED
 	if caption_time>0:
 		caption_time -= delta
+		caption_reveal += delta*38.0
+		subtitle.visible_characters = -1 if instant_text_enabled() else int(caption_reveal)
 		if caption_time<=0: subtitle.text = ""
+	subtitle_backdrop.visible = not subtitle.text.is_empty() and not panel.visible
 	if not playing:
 		prompt.text = ""
 		return
@@ -249,7 +338,7 @@ func _process(delta: float) -> void:
 		frog.vanish()
 		stage = Stage.HOUSE
 		objective.text = "เข้าไปขอความช่วยเหลือในบ้านที่เปิดไฟ"
-		say("มีใครอยู่ไหมครับ รถผมเสีย...",5)
+		say("ขอโทษครับ มีใครอยู่ไหม รถผมเสียอยู่ตรงถนนครับ",5)
 	if stage == Stage.HOUSE and player.position.z< -31:
 		stage = Stage.NOTE
 		objective.text = "สำรวจบ้าน · มีกระดาษอยู่บนโต๊ะข้างหน้าต่าง"
@@ -264,20 +353,22 @@ func interact(key: String) -> void:
 		"car":
 			if stage == Stage.CAR: failed_start()
 			elif stage == Stage.RETURN: repair_car()
-			else: say("แบตเตอรี่หมด ต้องหาเครื่องจั๊มพ์แบตเตอรี่จากบ้านกลางทุ่ง")
+			else: say("ไฟหน้าหรี่ขนาดนี้ แบตน่าจะไม่ไหวแล้ว ลองไปขอให้เขาช่วยดูก่อน")
 		"note":
 			if stage in [Stage.HOUSE,Stage.NOTE]:
 				stage = Stage.NOTE
 				reading = true
-				show_panel("DON'T LOOK AT IT.","If it knows you can see it,\nit will follow you.\n\nอย่ามองมัน\nถ้ามันรู้ว่าคุณมองเห็น มันจะตามคุณมา","วางกระดาษ")
-			else: say("DON'T LOOK AT IT. If it knows you can see it, it will follow you.")
+				play_cue("tape",-27.0)
+				show_panel("กระดาษข้างหน้าต่าง","เครื่องจั๊มพ์แบตอยู่ในห้องนอน\nเอาไปใช้ได้ ไม่ต้องเอามาคืน\n\nถ้าเห็นมันอยู่ข้างนอก อย่าเดินเข้าไปหา\nอย่าจ้องมัน และอย่าเรียกมัน\n\nตรงขอบกระดาษมีอีกบรรทัด ลายมือคนละคน\n“ไม่ว่าได้ยินเสียงใคร ก็ไม่ต้องตอบ”","[ วางกระดาษ ]")
+			else: say("ไม่ต้องเอามาคืนด้วยเหรอ ขอให้ยังใช้ได้ก็พอ")
 		"battery":
 			if stage == Stage.BATTERY:
 				$World/House/Bedroom407/JumpStarter.hide()
 				stage = Stage.RECOGNITION
 				objective.text = "นำเครื่องจั๊มพ์แบตเตอรี่กลับไปที่รถ"
-				say("ยังมีไฟอยู่... น่าจะพอสตาร์ตรถได้")
-			else: say("เครื่องจั๊มพ์แบตเตอรี่... ลองอ่านกระดาษข้างหน้าต่างก่อน")
+				play_cue("ui_accept",-28.0)
+				say("ไฟยังขึ้นอยู่ น่าจะใช้ได้ ขอยืมก่อนนะครับ")
+			else: say("มีเครื่องจั๊มพ์แบตด้วย กระดาษข้างหน้าต่างเขียนไว้ว่าอะไรนะ")
 
 func lock_scene() -> void:
 	busy = true
@@ -292,6 +383,7 @@ func wait_for(seconds: float) -> void:
 	await get_tree().create_timer(seconds,false).timeout
 
 func look_at_point(point: Vector3, seconds := .8) -> void:
+	if reduced_motion_enabled(): seconds = maxf(seconds*2.0,1.6)
 	var d: Vector3 = (point-player.camera.global_position).normalized()
 	var yaw: float = player.pivot.rotation.y+wrapf(atan2(-d.x,-d.z)-player.pivot.rotation.y,-PI,PI)
 	var pitch := asin(clampf(d.y,-1,1))
@@ -310,9 +402,9 @@ func failed_start() -> void:
 	add_child(driver)
 	driver.current = true
 	play_sound("starter")
-	say("เครื่องยนต์หมุนอย่างอ่อนแรง... แล้วเงียบไป",3)
+	say("ไม่ติดแฮะ อย่าบอกนะว่าต้องนอนอยู่ตรงนี้",3)
 	await wait_for(2.4)
-	say("โทรศัพท์ไม่มีสัญญาณ แต่บ้านกลางทุ่งยังเปิดไฟอยู่",5)
+	say("โทรออกไม่ได้เลย บ้านตรงนั้นยังมีไฟ ลองเดินไปถามดูแล้วกัน",5)
 	await wait_for(1.5)
 	player.camera.current = true
 	driver.queue_free()
@@ -334,6 +426,7 @@ func window_event() -> void:
 	await wait_for(1.1)
 	for n in house_lights: n.visible = false
 	player.torch.visible = false
+	play_cue("low_pulse",-23.0)
 	overlay.color.a = 1
 	await wait_for(2.0)
 	frog.vanish()
@@ -342,6 +435,7 @@ func window_event() -> void:
 	player.torch.visible = true
 	stage = Stage.BATTERY
 	objective.text = "หาอุปกรณ์ช่วยสตาร์ตรถ · สำรวจห้องนอนด้านใน"
+	say("เมื่อกี้มีเสียงหายใจอยู่ข้างหู ผมยืนกลั้นหายใจแทบตาย",7)
 	unlock_scene()
 
 func recognize_room() -> void:
@@ -350,24 +444,36 @@ func recognize_room() -> void:
 	var door := $World/House/BedroomDoor
 	var t := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP)
 	t.tween_property(door,"rotation:y",-.45,.7)
+	play_cue("door",-26.0)
 	await t.finished
 	await look_at_point(Vector3(0,1.85,-40.2),.8)
-	await wait_for(1.3)
+	say("407... เลขเดียวกับห้องพ่อเลย",5)
+	await wait_for(3.5)
 	await look_at_point(Vector3(-.9,1,-44.8),1.2)
+	say("สายชาร์จพันเทปแบบนี้ ของพ่อนี่ ผมเพิ่งเก็บใส่กล่องมาเอง",5)
+	await wait_for(4.0)
 	ringing.play()
-	await wait_for(1.5)
+	say("เสียงโทรศัพท์พ่อดังมาจากใต้ผ้าห่ม\nแต่เครื่องของพ่ออยู่ในกระเป๋าผม ผมปิดมันไว้แล้วด้วย",5)
+	await wait_for(4.5)
 	# Leave a full opening for the return; the number stays attached to the door.
 	t = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP)
 	t.tween_property(door,"rotation:y",-PI/2,.5)
 	await t.finished
 	stage = Stage.RETURN
-	objective.text = "Return to your car.  /  กลับไปที่รถ"
+	objective.text = "กลับไปที่รถ · ไม่ต้องรับสาย"
 	frog.appear_at(Vector3(-4,.05,-23))
 	frog.face_towards(player.position)
 	unlock_scene()
 
 func update_return() -> void:
 	if player.position.z> -29: ringing.stop()
+	if return_caption_step == 0 and player.position.z> -28:
+		return_caption_step = 1
+		say("เมื่อกี้มันอยู่หน้าบ้าน ทำไมมาอยู่ตรงนี้แล้ว",6)
+	if return_caption_step == 1 and player.position.z> -12:
+		return_caption_step = 2
+		play_cue("low_pulse",-26.0)
+		say("อย่าไปมองมัน เดินไปให้ถึงรถก่อน",6)
 	# Queue one move per route milestone. Existing frog logic waits until unseen.
 	# Also protect the destination: it must be outside the current view, avoiding pops.
 	var points: Array[Vector3] = [Vector3(3.8,.05,-15),Vector3(-2.1,.05,-4)]
@@ -398,7 +504,9 @@ func repair_car() -> void:
 	t = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP)
 	t.tween_property(hood,"rotation:x",0,.6)
 	await t.finished
-	overlay.color.a = 1
+	t = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP)
+	t.tween_property(overlay,"color:a",1.0,.4)
+	await t.finished
 	await wait_for(.5)
 	cut_camera = Camera3D.new()
 	cut_camera.name = "DriverView"
@@ -408,13 +516,15 @@ func repair_car() -> void:
 	cut_camera.current = true
 	player.torch.visible = false
 	player.body_visual.hide()
-	overlay.color.a = 0
+	t = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP)
+	t.tween_property(overlay,"color:a",0.0,.65)
+	await t.finished
 	play_sound("starter")
 	await wait_for(1.7)
 	engine.play()
 	stage = Stage.REPAIRED
 	objective.text = ""
-	say("เครื่องติดแล้ว... กลับได้แล้ว",4)
+	say("ติดแล้ว ไปได้สักที",4)
 	await wait_for(4.5)
 	# The original sitting animation owns the pose; no skeleton/model edits.
 	player.position = Vector3(1.92,0,4.2)
@@ -429,13 +539,19 @@ func repair_car() -> void:
 	await wait_for(.7)
 	var aim := cut_camera.transform.looking_at(Vector3(2.88,1.5,4.05),Vector3.UP)
 	t = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP)
-	t.tween_property(cut_camera,"quaternion",aim.basis.get_rotation_quaternion(),1.6)
+	t.tween_property(cut_camera,"quaternion",aim.basis.get_rotation_quaternion(),2.8 if reduced_motion_enabled() else 1.6)
 	await t.finished
-	say("“Now you can stop looking.”",4)
+	say("“ไม่ต้องมองหาแล้ว”",4)
 	await wait_for(3)
 	overlay.color.a = 1
 	subtitle.text = ""
 	engine.stop()
+	play_cue("tape",-24.0)
 	stage = Stage.END
 	await wait_for(1)
-	show_panel("DON'T FOLLOW THE FROG","จบบท","เล่นบทนี้อีกครั้ง")
+	ending_presented = true
+	var anthology := get_node_or_null("/root/Anthology")
+	if anthology and anthology.has_method("complete_episode"):
+		anthology.complete_episode(EPISODE_ID,EPILOGUE)
+	else:
+		show_panel("THE PASSENGER  /  ผู้โดยสาร",EPILOGUE,"เล่นตอนนี้อีกครั้ง")

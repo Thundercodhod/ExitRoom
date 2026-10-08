@@ -103,6 +103,8 @@ func _ready() -> void:
 	footstep.volume_db = -15
 	add_child(footstep)
 	atmosphere_audio = AudioStreamPlayer.new()
+	if AudioServer.get_bus_index("Ambience") >= 0:
+		atmosphere_audio.bus = &"Ambience"
 	var drone := (load("res://audio/drone.wav") as AudioStreamWAV).duplicate() as AudioStreamWAV
 	drone.loop_mode = AudioStreamWAV.LOOP_FORWARD
 	atmosphere_audio.stream = drone

@@ -3,6 +3,8 @@ extends SceneTree
 var failures := 0
 var chapter
 var capture := false
+var had_preferences := false
+var original_preferences := ""
 
 func _initialize() -> void:
 	capture = "--capture" in OS.get_cmdline_user_args()
@@ -35,16 +37,19 @@ func idle() -> void:
 	check(not chapter.busy,"cinematic releases control")
 
 func run() -> void:
+	had_preferences = FileAccess.file_exists("user://anthology.cfg")
+	if had_preferences: original_preferences = FileAccess.get_file_as_string("user://anthology.cfg")
 	change_scene_to_file("res://frog_chapter.tscn")
 	await scene_changed
 	chapter = current_scene
 	await frames()
+	check(chapter.EPISODE_ID=="passenger" and chapter.panel_title.text.contains("THE PASSENGER"),"standalone passenger episode opens with its own introduction")
 	check(chapter.frog.mode==chapter.frog.Mode.GONE,"frog hidden before the failed start")
 	check(chapter.get_node("World/BinbunGrass").get_child_count()==72,"chunked Binbun grass loaded")
 	var grass: MultiMesh = chapter.get_node("World/BinbunGrass").get_child(0).multimesh
 	if capture: check(grass.get_instance_transform(0).origin.length()>1,"grass transforms survived scene serialization")
 	await shot("title")
-	chapter.panel_continue()
+	await chapter.panel_continue()
 	await aim(Vector3(.3,.1,1.8),Vector3(2.4,.95,2.5))
 	check(chapter.target()!=null and chapter.target().get_meta("action")=="car","car reachable by interaction ray")
 	chapter.interact("car")
@@ -90,7 +95,7 @@ func run() -> void:
 	await create_timer(2).timeout
 	await shot("407")
 	await idle()
-	check(chapter.stage==chapter.Stage.RETURN,"407 reveal leads to return objective")
+	check(chapter.stage==chapter.Stage.RETURN,"father's old room reveal leads to return objective")
 	check(not chapter.get_node("World/House/Bedroom407/JumpStarter").visible,"starter collected once")
 	await aim(Vector3(0,.05,-39),Vector3(0,1,0))
 	check(not chapter.player.test_move(chapter.player.global_transform,Vector3(0,0,3)),"revealed door leaves exit clear")
@@ -113,7 +118,15 @@ func run() -> void:
 	check(chapter.frog.global_position.distance_to(Vector3(2.88,.28,4.05))<.1,"seated frog remains at passenger seat")
 	while chapter.stage!=chapter.Stage.END and Time.get_ticks_msec()<deadline: await process_frame
 	await create_timer(1.3).timeout
-	check(chapter.stage==chapter.Stage.END and chapter.panel.visible,"ends at black title after repaired car")
+	var anthology := root.get_node_or_null("Anthology")
+	if anthology:
+		while anthology.changing: await process_frame
+	check(chapter.stage==chapter.Stage.END and chapter.ending_presented,"repaired car ends standalone episode through anthology or local fallback")
 	await shot("ending")
+	if had_preferences:
+		var preferences := FileAccess.open("user://anthology.cfg",FileAccess.WRITE)
+		if preferences: preferences.store_string(original_preferences)
+	else:
+		DirAccess.remove_absolute(ProjectSettings.globalize_path("user://anthology.cfg"))
 	print("FROG_CHAPTER_FAILURES=",failures)
 	quit(failures)
