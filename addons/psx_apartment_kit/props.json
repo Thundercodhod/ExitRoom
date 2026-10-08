@@ -1,0 +1,941 @@
+{
+ "atlas": 1024,
+ "atlas_used": 256,
+ "fps": 30,
+ "props": [
+  {
+   "name": "floor_carpet",
+   "title": "Carpet Floor",
+   "group": "floors",
+   "place": "floor",
+   "note": "2 x 2 m, the flats'",
+   "tris": 8,
+   "size": [
+    2.0,
+    2.0,
+    0.0
+   ],
+   "min": [
+    -1.0,
+    -1.0,
+    0.0
+   ],
+   "max": [
+    1.0,
+    1.0,
+    0.0
+   ],
+   "parts": [
+    {
+     "name": "floor_carpet",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 8,
+     "min": [
+      -1.0,
+      -1.0,
+      0.0
+     ],
+     "max": [
+      1.0,
+      1.0,
+      0.0
+     ]
+    }
+   ],
+   "anims": []
+  },
+  {
+   "name": "ceiling_plaster",
+   "title": "Plaster Ceiling",
+   "group": "ceilings",
+   "place": "floor",
+   "note": "hangs at 3 m",
+   "tris": 8,
+   "size": [
+    2.0,
+    2.0,
+    0.0
+   ],
+   "min": [
+    -1.0,
+    -1.0,
+    3.0
+   ],
+   "max": [
+    1.0,
+    1.0,
+    3.0
+   ],
+   "parts": [
+    {
+     "name": "ceiling_plaster",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 8,
+     "min": [
+      -1.0,
+      -1.0,
+      3.0
+     ],
+     "max": [
+      1.0,
+      1.0,
+      3.0
+     ]
+    }
+   ],
+   "anims": []
+  },
+  {
+   "name": "wall_papered",
+   "title": "Papered Wall",
+   "group": "walls",
+   "place": "floor",
+   "note": "damask over a skirting board",
+   "tris": 28,
+   "size": [
+    2.0,
+    0.2,
+    3.0
+   ],
+   "min": [
+    -1.0,
+    -0.1,
+    0.0
+   ],
+   "max": [
+    1.0,
+    0.1,
+    3.0
+   ],
+   "parts": [
+    {
+     "name": "wall_papered",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 28,
+     "min": [
+      -1.0,
+      -0.1,
+      0.0
+     ],
+     "max": [
+      1.0,
+      0.1,
+      3.0
+     ]
+    }
+   ],
+   "anims": []
+  },
+  {
+   "name": "wall_papered_torn",
+   "title": "Torn Wallpaper Wall",
+   "group": "walls",
+   "place": "floor",
+   "note": "torn and damp on its front",
+   "tris": 28,
+   "size": [
+    2.0,
+    0.2,
+    3.0
+   ],
+   "min": [
+    -1.0,
+    -0.1,
+    0.0
+   ],
+   "max": [
+    1.0,
+    0.1,
+    3.0
+   ],
+   "parts": [
+    {
+     "name": "wall_papered_torn",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 28,
+     "min": [
+      -1.0,
+      -0.1,
+      0.0
+     ],
+     "max": [
+      1.0,
+      0.1,
+      3.0
+     ]
+    }
+   ],
+   "anims": []
+  },
+  {
+   "name": "wall_doorway_flat",
+   "title": "Flat Entrance",
+   "group": "walls",
+   "place": "floor",
+   "note": "the corridor in front, the flat behind",
+   "tris": 56,
+   "size": [
+    2.0,
+    0.2,
+    3.0
+   ],
+   "min": [
+    -1.0,
+    -0.1,
+    0.0
+   ],
+   "max": [
+    1.0,
+    0.1,
+    3.0
+   ],
+   "parts": [
+    {
+     "name": "wall_doorway_flat",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 20,
+     "min": [
+      -1.0,
+      -0.1,
+      0.0
+     ],
+     "max": [
+      -0.5,
+      0.1,
+      3.0
+     ]
+    },
+    {
+     "name": "wall_doorway_flat_1",
+     "parent": "wall_doorway_flat",
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 16,
+     "min": [
+      -0.5,
+      -0.1,
+      2.2
+     ],
+     "max": [
+      0.5,
+      0.1,
+      3.0
+     ]
+    },
+    {
+     "name": "wall_doorway_flat_2",
+     "parent": "wall_doorway_flat",
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 20,
+     "min": [
+      0.5,
+      -0.1,
+      0.0
+     ],
+     "max": [
+      1.0,
+      0.1,
+      3.0
+     ]
+    }
+   ],
+   "anims": []
+  },
+  {
+   "name": "wall_window",
+   "title": "Window Wall",
+   "group": "walls",
+   "place": "floor",
+   "note": "fits the windows; brick outside",
+   "tris": 68,
+   "size": [
+    2.0,
+    0.2,
+    3.0
+   ],
+   "min": [
+    -1.0,
+    -0.1,
+    0.0
+   ],
+   "max": [
+    1.0,
+    0.1,
+    3.0
+   ],
+   "parts": [
+    {
+     "name": "wall_window",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 20,
+     "min": [
+      -1.0,
+      -0.1,
+      0.0
+     ],
+     "max": [
+      -0.5,
+      0.1,
+      3.0
+     ]
+    },
+    {
+     "name": "wall_window_1",
+     "parent": "wall_window",
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 12,
+     "min": [
+      -0.5,
+      -0.1,
+      0.0
+     ],
+     "max": [
+      0.5,
+      0.1,
+      0.8
+     ]
+    },
+    {
+     "name": "wall_window_2",
+     "parent": "wall_window",
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 16,
+     "min": [
+      -0.5,
+      -0.1,
+      2.3
+     ],
+     "max": [
+      0.5,
+      0.1,
+      3.0
+     ]
+    },
+    {
+     "name": "wall_window_3",
+     "parent": "wall_window",
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 20,
+     "min": [
+      0.5,
+      -0.1,
+      0.0
+     ],
+     "max": [
+      1.0,
+      0.1,
+      3.0
+     ]
+    }
+   ],
+   "anims": []
+  },
+  {
+   "name": "wall_post",
+   "title": "Wall Post",
+   "group": "walls",
+   "place": "floor",
+   "note": "fills the corner where walls meet",
+   "tris": 26,
+   "size": [
+    0.2,
+    0.2,
+    3.0
+   ],
+   "min": [
+    -0.1,
+    -0.1,
+    0.0
+   ],
+   "max": [
+    0.1,
+    0.1,
+    3.0
+   ],
+   "parts": [
+    {
+     "name": "wall_post",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 26,
+     "min": [
+      -0.1,
+      -0.1,
+      0.0
+     ],
+     "max": [
+      0.1,
+      0.1,
+      3.0
+     ]
+    }
+   ],
+   "anims": []
+  },
+  {
+   "name": "door_flat",
+   "title": "Flat Door",
+   "group": "doors",
+   "place": "floor",
+   "note": "a flat's front door, number 12; swings open",
+   "tris": 148,
+   "size": [
+    1.14,
+    0.24,
+    2.27
+   ],
+   "min": [
+    -0.57,
+    -0.12,
+    0.0
+   ],
+   "max": [
+    0.57,
+    0.12,
+    2.27
+   ],
+   "parts": [
+    {
+     "name": "door_flat",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 12,
+     "min": [
+      -0.57,
+      -0.12,
+      0.0
+     ],
+     "max": [
+      -0.49,
+      0.12,
+      2.27
+     ]
+    },
+    {
+     "name": "door_flat_casing_r",
+     "parent": "door_flat",
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 12,
+     "min": [
+      0.49,
+      -0.12,
+      0.0
+     ],
+     "max": [
+      0.57,
+      0.12,
+      2.27
+     ]
+    },
+    {
+     "name": "door_flat_casing_top",
+     "parent": "door_flat",
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 12,
+     "min": [
+      -0.51,
+      -0.12,
+      2.19
+     ],
+     "max": [
+      0.51,
+      0.12,
+      2.26
+     ]
+    },
+    {
+     "name": "door_flat_leaf",
+     "parent": "door_flat",
+     "pivot": [
+      -0.48,
+      0.0,
+      0.0
+     ],
+     "tris": 112,
+     "min": [
+      -0.48,
+      -0.0725,
+      0.01
+     ],
+     "max": [
+      0.48,
+      0.0525,
+      2.19
+     ]
+    }
+   ],
+   "anims": [
+    {
+     "name": "open",
+     "seconds": 2.4,
+     "loop": false
+    }
+   ]
+  },
+  {
+   "name": "window_sash",
+   "title": "Sash Window",
+   "group": "windows",
+   "place": "floor",
+   "note": "the lower sash slides up; in a window wall",
+   "tris": 176,
+   "size": [
+    1.16,
+    0.28,
+    1.515
+   ],
+   "min": [
+    -0.58,
+    -0.16,
+    0.785
+   ],
+   "max": [
+    0.58,
+    0.12,
+    2.3
+   ],
+   "parts": [
+    {
+     "name": "window_sash",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 112,
+     "min": [
+      -0.58,
+      -0.16,
+      0.785
+     ],
+     "max": [
+      0.58,
+      0.12,
+      2.3
+     ]
+    },
+    {
+     "name": "window_sash_lower",
+     "parent": "window_sash",
+     "pivot": [
+      0.0,
+      -0.01,
+      0.8
+     ],
+     "tris": 64,
+     "min": [
+      -0.5,
+      -0.03,
+      0.83
+     ],
+     "max": [
+      0.5,
+      0.01,
+      1.6
+     ]
+    }
+   ],
+   "anims": [
+    {
+     "name": "open",
+     "seconds": 2.4,
+     "loop": false
+    }
+   ]
+  },
+  {
+   "name": "kitchen_sink",
+   "title": "Kitchen Sink",
+   "group": "kitchen",
+   "place": "wall",
+   "note": "a metre of unit, the sink set in",
+   "tris": 316,
+   "size": [
+    1.0,
+    0.65,
+    1.16
+   ],
+   "min": [
+    -0.5,
+    -0.64,
+    0.0
+   ],
+   "max": [
+    0.5,
+    0.01,
+    1.16
+   ],
+   "parts": [
+    {
+     "name": "kitchen_sink",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 292,
+     "min": [
+      -0.5,
+      -0.64,
+      0.0
+     ],
+     "max": [
+      0.5,
+      0.01,
+      1.1602
+     ]
+    },
+    {
+     "name": "kitchen_sink_door",
+     "parent": "kitchen_sink",
+     "pivot": [
+      0.49,
+      -0.61,
+      0.0
+     ],
+     "tris": 24,
+     "min": [
+      0.01,
+      -0.64,
+      0.11
+     ],
+     "max": [
+      0.49,
+      -0.6,
+      0.85
+     ]
+    }
+   ],
+   "anims": [
+    {
+     "name": "open",
+     "seconds": 1.6,
+     "loop": false
+    }
+   ]
+  },
+  {
+   "name": "bare_bulb",
+   "title": "Bare Bulb",
+   "group": "lights",
+   "place": "floor",
+   "note": "on its flex; it swings",
+   "tris": 122,
+   "size": [
+    0.1,
+    0.1,
+    0.9
+   ],
+   "min": [
+    -0.05,
+    -0.05,
+    2.1
+   ],
+   "max": [
+    0.05,
+    0.05,
+    3.0
+   ],
+   "parts": [
+    {
+     "name": "bare_bulb",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 28,
+     "min": [
+      -0.05,
+      -0.05,
+      2.97
+     ],
+     "max": [
+      0.05,
+      0.05,
+      3.0
+     ]
+    },
+    {
+     "name": "bare_bulb_flex",
+     "parent": "bare_bulb",
+     "pivot": [
+      0.0,
+      0.0,
+      2.97
+     ],
+     "tris": 94,
+     "min": [
+      -0.04,
+      -0.04,
+      2.1
+     ],
+     "max": [
+      0.04,
+      0.04,
+      2.97
+     ]
+    }
+   ],
+   "anims": [
+    {
+     "name": "swing",
+     "seconds": 3.0,
+     "loop": false
+    }
+   ]
+  },
+  {
+   "name": "radiator",
+   "title": "Radiator",
+   "group": "fixtures",
+   "place": "wall",
+   "note": "cast iron",
+   "tris": 262,
+   "size": [
+    1.074,
+    0.16,
+    0.76
+   ],
+   "min": [
+    -0.48,
+    -0.2,
+    0.0
+   ],
+   "max": [
+    0.594,
+    -0.04,
+    0.76
+   ],
+   "parts": [
+    {
+     "name": "radiator",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 262,
+     "min": [
+      -0.48,
+      -0.2,
+      0.0
+     ],
+     "max": [
+      0.5943,
+      -0.04,
+      0.76
+     ]
+    }
+   ],
+   "anims": []
+  },
+  {
+   "name": "wallpaper_peel",
+   "title": "Peeling Wallpaper",
+   "group": "mess",
+   "place": "wall",
+   "note": "a strip curling off the wall",
+   "tris": 24,
+   "size": [
+    0.5,
+    0.35,
+    1.2
+   ],
+   "min": [
+    -0.25,
+    -0.35,
+    1.4
+   ],
+   "max": [
+    0.25,
+    0.0,
+    2.6
+   ],
+   "parts": [
+    {
+     "name": "wallpaper_peel",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 24,
+     "min": [
+      -0.25,
+      -0.35,
+      1.4
+     ],
+     "max": [
+      0.25,
+      0.0002,
+      2.6
+     ]
+    }
+   ],
+   "anims": []
+  },
+  {
+   "name": "mould",
+   "title": "Mould",
+   "group": "mess",
+   "place": "wall",
+   "note": "black damp spreading down from the ceiling",
+   "tris": 24,
+   "size": [
+    0.996,
+    0.0,
+    0.757
+   ],
+   "min": [
+    -0.435,
+    -0.003,
+    2.054
+   ],
+   "max": [
+    0.561,
+    -0.003,
+    2.811
+   ],
+   "parts": [
+    {
+     "name": "mould",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 24,
+     "min": [
+      -0.4347,
+      -0.003,
+      2.0545
+     ],
+     "max": [
+      0.5609,
+      -0.003,
+      2.8114
+     ]
+    }
+   ],
+   "anims": []
+  },
+  {
+   "name": "blood_drag",
+   "title": "Blood Drag",
+   "group": "mess",
+   "place": "floor",
+   "note": "a pool and the trail from it",
+   "tris": 56,
+   "size": [
+    0.648,
+    2.425,
+    0.0
+   ],
+   "min": [
+    -0.262,
+    -2.086,
+    0.003
+   ],
+   "max": [
+    0.385,
+    0.338,
+    0.003
+   ],
+   "parts": [
+    {
+     "name": "blood_drag",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 56,
+     "min": [
+      -0.2624,
+      -2.0862,
+      0.003
+     ],
+     "max": [
+      0.3853,
+      0.3383,
+      0.003
+     ]
+    }
+   ],
+   "anims": []
+  }
+ ]
+}

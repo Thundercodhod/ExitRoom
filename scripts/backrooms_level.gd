@@ -5,8 +5,9 @@ const SpiderScript = preload("res://scripts/spider_enemy.gd")
 const SPAWN := Vector3(9.5, 0.12, -9.5)
 const EXIT := Vector3(-10.5, 0.0, 10.5)
 const SPIDER_BOUNDS := Rect2(-12.7, -13.25, 25.4, 26.5)
-const DEFAULT_STATUS := "หาทางออกที่มีไฟสีเขียว"
-const SPIDER_ALERT := "แมงมุมเห็นคุณแล้ว! วิ่งหนี!"
+const DEFAULT_STATUS := "หาประตูหนีไฟสีเขียว  /  อย่าทำตามเสียงประกาศ"
+const SPIDER_ALERT := "มันได้ยินคุณแล้ว  /  หาที่กำบัง"
+const ENDING := "พอผลักประตูออกมา ฉันเจอลานจอดรถเดิม ฟ้าสว่างแล้ว\nฉันวิ่งไปหาพี่ รปภ. ขอให้เขาเรียกรถให้ มือสั่นจนกดมือถือไม่ได้\n\nเขาถามว่าฉันออกมาได้ยังไง ในระบบยังไม่มีใครเปิดประตูชั้นนั้น\nฉันกำลังจะเล่าเรื่องที่เจอ แต่วิทยุบนโต๊ะเขาดังขึ้นก่อน\n\n“พี่ อย่าเปิดประตูนะ คนข้างนอกไม่ใช่ฉัน”\nฉันรู้ว่าเสียงตัวเองเป็นยังไง เสียงในวิทยุนั่นแหละ"
 
 var playing := false
 var was_captured := false
@@ -22,27 +23,38 @@ var prompt: Label
 var status: Label
 var flicker_light: OmniLight3D
 var elapsed := 0.0
+var intro_title: Label
+var intro_copy: Label
+var begin_button: Button
+var clue: Label
+var started := false
+var finished := false
+var story_beat := 0
+var chase_seen := false
+var near_exit_seen := false
+var title_font: Font
 
 
 func _ready() -> void:
 	setup_inputs()
-	# Bundled Thai font: web builds have no OS fonts to fall back on.
-	font = load("res://NotoSansThai.ttf") as Font
+	font = load("res://ui/fonts/ChakraPetch-Regular.ttf") as Font
+	title_font = load("res://ui/fonts/ChakraPetch-Bold.ttf") as Font
 	if font == null:
-		font = ThemeDB.fallback_font
-	else:
-		font.fallbacks = [ThemeDB.fallback_font]
+		font = load("res://NotoSansThai.ttf") as Font
+	if title_font == null:
+		title_font = font
 	setup_environment()
 	prepare_backrooms_materials()
 	setup_collisions()
 	setup_lights()
 	setup_exit()
 	player = CharacterBody3D.new()
-	player.name = "PlayerHazmatDemo"
+	player.name = "AfterHoursPlayer"
 	player.set_script(PlayerScript)
 	player.game = self
 	player.position = SPAWN
 	add_child(player)
+	player.set_third_person(false)
 	player.pivot.rotation.y = 2.35
 	player.body_visual.rotation.y = 2.35 - PI
 	setup_ui()
@@ -170,7 +182,7 @@ func setup_exit() -> void:
 		add_exit_box(exit_root, Vector3(side, 1.04, 0.84), Vector3(0.08, 2.12, 0.12), green)
 	add_exit_box(exit_root, Vector3(0, 2.10, 0.84), Vector3(1.5, 0.12, 0.12), green)
 	var sign := Label3D.new()
-	sign.text = "EXIT\n406"
+	sign.text = "EXIT\nSTAFF ONLY"
 	sign.font = font
 	sign.font_size = 48
 	sign.pixel_size = 0.005
@@ -192,12 +204,37 @@ func styled_label(text: String, size: int, color: Color) -> Label:
 	label.add_theme_font_override("font", font)
 	label.add_theme_font_size_override("font_size", size)
 	label.add_theme_color_override("font_color", color)
+	label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
+	label.add_theme_constant_override("shadow_offset_y", 2)
 	return label
+
+
+func make_button(words: String, callback: Callable) -> Button:
+	var button := Button.new()
+	button.text = words
+	button.custom_minimum_size.y = 50
+	button.add_theme_font_override("font", font)
+	button.add_theme_font_size_override("font_size", 20)
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.10, 0.10, 0.07, 0.95)
+	style.border_width_left = 2
+	style.border_color = Color(0.62, 0.58, 0.32)
+	style.content_margin_left = 20
+	button.add_theme_stylebox_override("normal", style)
+	var hover := style.duplicate() as StyleBoxFlat
+	hover.bg_color = Color(0.22, 0.20, 0.12)
+	hover.border_color = Color(0.87, 0.78, 0.43)
+	button.add_theme_stylebox_override("hover", hover)
+	button.add_theme_stylebox_override("focus", hover)
+	button.mouse_entered.connect(func(): sound("ui_move", -25))
+	button.pressed.connect(callback)
+	return button
 
 
 func setup_ui() -> void:
 	ui = CanvasLayer.new()
 	ui.name = "BackroomsHUD"
+	ui.layer = 5
 	add_child(ui)
 	var top := MarginContainer.new()
 	top.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
@@ -207,14 +244,19 @@ func setup_ui() -> void:
 	ui.add_child(top)
 	var header := VBoxContainer.new()
 	top.add_child(header)
-	header.add_child(styled_label("LEVEL 01  /  THE BACKROOMS", 18, Color(0.95, 0.9, 0.61)))
+	header.add_child(styled_label("02   /   AFTER HOURS", 17, Color(0.84, 0.78, 0.55)))
 	status = styled_label(DEFAULT_STATUS, 20, Color(0.96, 0.95, 0.83))
 	header.add_child(status)
 	prompt = styled_label("", 20, Color(0.6, 1.0, 0.69))
 	prompt.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	prompt.position = Vector2(-170, -80)
+	prompt.position = Vector2(-230, -232)
+	prompt.size.x = 460
+	prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	ui.add_child(prompt)
-	var hint := styled_label("WASD เดิน  •  Space กระโดด  •  Shift วิ่ง  •  F ไฟฉาย  •  Esc พัก", 15, Color(0.82, 0.8, 0.62))
+	clue = Label.new()
+	clue.set_script(preload("res://scripts/story_caption.gd"))
+	ui.add_child(clue)
+	var hint := styled_label("WASD เดิน   /   SHIFT วิ่ง   /   E สำรวจ   /   F ไฟฉาย   /   ESC พัก   /   F1 เมนู", 14, Color(0.70, 0.69, 0.56))
 	hint.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 	hint.position = Vector2(26, -40)
 	ui.add_child(hint)
@@ -222,31 +264,39 @@ func setup_ui() -> void:
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	ui.add_child(overlay)
 	var dim := ColorRect.new()
-	dim.color = Color(0.04, 0.045, 0.03, 0.88)
+	dim.color = Color(0.025, 0.026, 0.02, 0.93)
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	overlay.add_child(dim)
 	var center := CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	overlay.add_child(center)
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(620, 0)
+	panel.custom_minimum_size = Vector2(780, 0)
+	var panel_style := StyleBoxFlat.new()
+	panel_style.bg_color = Color(0.055, 0.055, 0.035, 0.96)
+	panel_style.border_width_top = 2
+	panel_style.border_color = Color(0.62, 0.56, 0.30)
+	panel.add_theme_stylebox_override("panel", panel_style)
 	center.add_child(panel)
 	var margin := MarginContainer.new()
 	for side in ["margin_left", "margin_right", "margin_top", "margin_bottom"]:
-		margin.add_theme_constant_override(side, 26)
+		margin.add_theme_constant_override(side, 38)
 	panel.add_child(margin)
 	var content := VBoxContainer.new()
-	content.add_theme_constant_override("separation", 18)
+	content.add_theme_constant_override("separation", 16)
 	margin.add_child(content)
-	content.add_child(styled_label("THE BACKROOMS", 36, Color(0.95, 0.9, 0.59)))
-	content.add_child(styled_label("ประตูหลังบ้านปิดลง กลิ่นบ้านยายกลายเป็นกลิ่นพรมชื้น\nบนผนังมีเลข 406 เหมือนห้องพักที่คุณพยายามลืม\nหาทางออกสีเขียวเพื่อกลับไปยังคืนนั้น\n\nระวัง! มีแมงมุมยักษ์ลาดตระเวนอยู่ในห้องนี้ มันได้ยินเสียงวิ่งของคุณ (Shift) และไล่ล่าได้เร็วกว่าการเดิน", 20, Color(0.92, 0.91, 0.82)))
-	var begin := Button.new()
-	begin.text = "เริ่มด่าน  /  BEGIN"
-	begin.custom_minimum_size.y = 50
-	begin.add_theme_font_override("font", font)
-	begin.pressed.connect(begin_game)
-	content.add_child(begin)
-	begin.grab_focus.call_deferred()
+	content.add_child(styled_label("EXITROOM   /   EPISODE 02", 16, Color(0.65, 0.64, 0.47)))
+	intro_title = styled_label("AFTER HOURS  /  กะสุดท้าย", 40, Color(0.95, 0.9, 0.59))
+	intro_title.add_theme_font_override("font", title_font)
+	content.add_child(intro_title)
+	intro_copy = styled_label("", 21, Color(0.86, 0.85, 0.76))
+	intro_copy.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	intro_copy.custom_minimum_size.x = 704
+	content.add_child(intro_copy)
+	begin_button = make_button("เริ่มกะสุดท้าย  /  BEGIN EPISODE", begin_game)
+	content.add_child(begin_button)
+	content.add_child(make_button("กลับหน้าเลือกตอน  /  EPISODES", return_to_menu))
+	begin_button.grab_focus.call_deferred()
 	setup_caught_ui()
 
 
@@ -268,7 +318,7 @@ func setup_caught_ui() -> void:
 	caught_overlay.hide()
 	ui.add_child(caught_overlay)
 	var dim := ColorRect.new()
-	dim.color = Color(0.22, 0.0, 0.0, 0.84)
+	dim.color = Color(0.035, 0.025, 0.020, 0.96)
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	caught_overlay.add_child(dim)
 	var center := CenterContainer.new()
@@ -277,59 +327,106 @@ func setup_caught_ui() -> void:
 	var content := VBoxContainer.new()
 	content.add_theme_constant_override("separation", 18)
 	center.add_child(content)
-	content.add_child(styled_label("ถูกแมงมุมจับได้", 40, Color(1.0, 0.36, 0.3)))
-	content.add_child(styled_label("แมงมุมยักษ์ตามคุณทัน\nลองใหม่ และอย่าวิ่งส่งเสียงดังโดยไม่จำเป็น", 20, Color(0.95, 0.88, 0.82)))
-	retry_button = Button.new()
-	retry_button.text = "ลองใหม่  /  RETRY"
-	retry_button.custom_minimum_size.y = 50
-	retry_button.add_theme_font_override("font", font)
-	retry_button.pressed.connect(restart_level)
+	content.add_child(styled_label("หนีไม่ทัน", 40, Color(0.89, 0.78, 0.52)))
+	content.add_child(styled_label("มันได้ยินเสียงวิ่ง\nลองอ้อมหลังผนังให้พ้นสายตา แล้วรอให้มันเดินผ่านไปก่อน", 21, Color(0.87, 0.85, 0.77)))
+	retry_button = make_button("ลองอีกครั้ง  /  RETRY", restart_level)
 	content.add_child(retry_button)
+	content.add_child(make_button("กลับหน้าเลือกตอน  /  EPISODES", return_to_menu))
 
 
 func on_player_caught() -> void:
-	if caught:
+	if caught or finished:
 		return
 	caught = true
 	playing = false
+	sound("sting", -15)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	caught_overlay.show()
 	retry_button.grab_focus.call_deferred()
 
 
 func restart_level() -> void:
-	# Skip the intro card and start playing straight away after a retry.
-	get_tree().root.set_meta("retry_backrooms", true)
-	get_tree().reload_current_scene()
+	var anthology := get_node_or_null("/root/Anthology")
+	if anthology and anthology.has_method("launch_episode"):
+		anthology.launch_episode("after_hours")
+	else:
+		get_tree().reload_current_scene()
 
 
 func show_intro() -> void:
 	playing = false
+	if started:
+		intro_copy.text = "พักเกมอยู่\n\nกดเล่นต่อเมื่อพร้อม"
+		begin_button.text = "เดินต่อ  /  RESUME"
+	else:
+		intro_copy.text = "ฉันชื่อริน ทำงานซ่อมบำรุงในอาคารสำนักงาน\nคืนนั้นมารับกะแทนเพื่อนที่ไม่สบาย\n\nสี่ทุ่มกว่า ฉันเก็บเครื่องมือเตรียมกลับแล้ว\nแต่ได้ยินคนเรียกจากห้องเก็บของ เลยเข้าไปดู\nนึกว่ามีแม่บ้านถูกล็อกไว้ข้างใน\n\nพอหันกลับมา ทางเดินข้างหลังก็ไม่เหมือนเดิม"
 	overlay.show()
+	begin_button.grab_focus.call_deferred()
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 
 func begin_game() -> void:
+	var anthology := get_node_or_null("/root/Anthology")
+	if not started and anthology and anthology.has_method("reveal_gameplay"):
+		await anthology.reveal_gameplay(_begin_game)
+	else:
+		_begin_game()
+
+func _begin_game() -> void:
+	if caught or finished:
+		return
 	overlay.hide()
 	playing = true
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	was_captured = true
+	sound("ui_accept", -24)
+	if not started:
+		started = true
+		sound("fluorescent", -22)
+		clue.show_clue("22:06 น.\nฉันเพิ่งเดินเข้ามาตรงนี้เอง ประตูหายไปไหนแล้ว")
+
+
+func sound(key: String, volume: float = -20.0) -> void:
+	var anthology := get_node_or_null("/root/Anthology")
+	if anthology != null and anthology.has_method("play_sfx"):
+		anthology.play_sfx(key, volume)
+
+
+func return_to_menu() -> void:
+	var anthology := get_node_or_null("/root/Anthology")
+	if anthology != null and anthology.has_method("return_to_menu"):
+		anthology.return_to_menu()
+
+
+func finish_episode() -> void:
+	if finished or caught:
+		return
+	finished = true
+	playing = false
+	prompt.text = ""
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	sound("door", -17)
+	var anthology := get_node_or_null("/root/Anthology")
+	if anthology != null and anthology.has_method("complete_episode"):
+		anthology.complete_episode("after_hours", ENDING)
+	else:
+		intro_title.text = "AFTER HOURS  /  END"
+		intro_copy.text = ENDING
+		begin_button.hide()
+		overlay.show()
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if caught:
+	if caught or finished:
 		return
 	if event.is_action_pressed("pause_game"):
 		if playing:
 			show_intro()
 		else:
 			begin_game()
+		get_viewport().set_input_as_handled()
 	if event.is_action_pressed("interact") and playing and player.global_position.distance_to(EXIT) < 1.8:
-		playing = false
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-		var error := get_tree().change_scene_to_file("res://Room407/main.tscn")
-		if error != OK:
-			show_intro()
-			status.text = "เปิด ROOM 407 ไม่สำเร็จ กรุณาตรวจการนำเข้าไฟล์"
+		finish_episode()
 
 
 func _process(delta: float) -> void:
@@ -338,10 +435,34 @@ func _process(delta: float) -> void:
 	if playing and was_captured and not captured:
 		show_intro()
 	was_captured = captured
+	if not playing:
+		prompt.text = ""
+		return
 	elapsed += delta
 	if is_instance_valid(flicker_light):
 		flicker_light.light_energy = 0.72 if sin(elapsed * 3.7) > -0.94 else 0.07
 	if is_instance_valid(spider) and not caught:
 		status.text = SPIDER_ALERT if spider.state_name() == "CHASE" else DEFAULT_STATUS
+		if spider.state_name() == "CHASE" and not chase_seen:
+			chase_seen = true
+			sound("low_pulse", -18)
+	# Timed, one-shot incidents only advance while the player is in control.
+	if story_beat == 0 and elapsed > 18.0:
+		story_beat = 1
+		sound("message", -23)
+		clue.show_clue("“พนักงานที่ยังอยู่ในอาคาร กรุณากลับไปที่ห้องเก็บของ”\nปกติประกาศจะเรียกให้ลงไปข้างล่าง ทำไมคืนนี้ให้ย้อนกลับ")
+	elif story_beat == 1 and elapsed > 42.0:
+		story_beat = 2
+		sound("fluorescent", -19)
+		clue.show_clue("“รออยู่ตรงนั้นนะ เดี๋ยวฉันไปหา”\nเสียงประกาศเมื่อกี้เป็นเสียงฉัน แต่ฉันไม่ได้พูดอะไรเลย")
+	elif story_beat == 2 and elapsed > 69.0:
+		story_beat = 3
+		sound("knock", -22)
+		clue.show_clue("มีเสียงอยู่หลังผนัง ตามมาหลายมุมแล้ว\nลองหยุดเดินดู มันก็หยุดด้วย")
 	if is_instance_valid(player):
-		prompt.text = "E  เปิดทางออก 406 / ROOM 407" if player.global_position.distance_to(EXIT) < 1.8 and playing else ""
+		var exit_distance := player.global_position.distance_to(EXIT)
+		prompt.text = "[ E ]  ผลักประตูหนีไฟ" if exit_distance < 1.8 else ""
+		if exit_distance < 5.0 and not near_exit_seen:
+			near_exit_seen = true
+			sound("message", -21)
+			clue.show_clue("บัตรใครตกอยู่... ชื่อฉัน รูปฉันด้วย\nมุมบัตรบิ่นตรงเดียวกันเลย แต่ของฉันยังคล้องคออยู่")

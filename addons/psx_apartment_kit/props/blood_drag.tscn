@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://addons/psx_apartment_kit/models/blood_drag_model.glb" id="1"]
+
+[sub_resource type="BoxShape3D" id="box0"]
+size = Vector3(0.6477, 0.0050, 2.4245)
+
+[node name="blood_drag" instance=ExtResource("1")]
+
+[node name="Collision" type="StaticBody3D" parent="blood_drag"]
+
+[node name="Box" type="CollisionShape3D" parent="blood_drag/Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0614, 0.0030, 0.8739)
+shape = SubResource("box0")
