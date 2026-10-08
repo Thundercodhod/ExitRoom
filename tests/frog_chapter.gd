@@ -99,6 +99,27 @@ func run() -> void:
 	var before: Vector3 = chapter.frog.position
 	await create_timer(.7).timeout
 	check(chapter.frog.position.distance_to(before)<.2,"return frog does not jump while watched")
+	# Staring at it from close up: threat -> hunt -> choke -> restart at the bedroom door.
+	check(chapter.frog.threat_enabled,"threat rule is on for the walk back")
+	await aim(Vector3(-1.2,.05,-21.6),Vector3(-4,1.4,-23))
+	var t0 := Time.get_ticks_msec()
+	while not chapter.frog.is_hunting() and Time.get_ticks_msec()-t0 < 9000: await process_frame
+	var hunt_after := (Time.get_ticks_msec()-t0)/1000.0
+	check(chapter.frog.is_hunting() and hunt_after > 4.0,"staring for ~5 s starts the hunt (%.1f s)" % hunt_after)
+	while chapter.choke == null and Time.get_ticks_msec()-t0 < 15000: await process_frame
+	check(chapter.choke != null and chapter.busy,"standing still gets you caught and choked")
+	if chapter.choke and capture:
+		while chapter.choke.t < 2.0: await process_frame
+		await RenderingServer.frame_post_draw
+		root.get_texture().get_image().save_png("res://.buildtmp/frog-choke.png")
+	while chapter.catches == 0 and Time.get_ticks_msec()-t0 < 25000: await process_frame
+	await idle()
+	check(chapter.catches == 1 and chapter.choke == null,"choke ends and the chapter recovers")
+	check(chapter.stage==chapter.Stage.RETURN and chapter.player.position.distance_to(chapter.RETURN_START)<.3,"restart puts you back at the bedroom door")
+	check(chapter.frog.mode==chapter.frog.Mode.WATCH and chapter.frog.global_position.distance_to(chapter.RETURN_FROG)<.3 and chapter.frog.threat<.01,"frog back at its first spot, threat cleared")
+	check(not chapter.player.held and chapter.player.camera.current,"player control and view restored")
+	await create_timer(1.2).timeout
+	check(chapter.overlay.color.a < .05,"screen fades back in")
 	await aim(Vector3(0,.05,-21),Vector3(0,1,-5))
 	await create_timer(.7).timeout
 	await shot("return")

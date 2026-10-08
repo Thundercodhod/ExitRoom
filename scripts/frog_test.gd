@@ -5,6 +5,7 @@ extends Node3D
 
 const PlayerScript = preload("res://scripts/player.gd")
 const FrogScript = preload("res://scripts/frog_watcher.gd")
+const ChokeScript = preload("res://scripts/frog_choke.gd")
 
 const ARENA := Rect2(-18, -18, 36, 36)
 const PLAYER_START := Vector3(0, 0.1, 9)
@@ -22,6 +23,7 @@ var message := ""
 var message_time := 0.0
 var vanish_rule := false
 var relocate_count := 0
+var choke: Node3D
 
 
 func _ready() -> void:
@@ -148,6 +150,7 @@ func spawn_frog() -> void:
 	frog.settled.connect(func(): flash("Frog settled at %.1f m" % frog.distance_to_target()))
 	frog.clutch_missed.connect(func(): flash("Grab missed"))
 	frog.caught_player.connect(_on_caught)
+	frog.threat_stage_changed.connect(func(n): if n > 0: flash("Threat stage %d" % n))
 
 
 func setup_ui() -> void:
@@ -157,7 +160,7 @@ func setup_ui() -> void:
 	info.position = Vector2(16, 12)
 	hud.add_child(info)
 	help = styled_label(14, Color(0.9, 0.85, 0.7))
-	help.text = "WASD เดิน  Shift วิ่ง  F ไฟฉาย  V สลับมุมกล้อง  Esc หยุด/เล่นต่อ\n1 เดินเข้าหา on/off   2 หายเมื่อถูกมอง   3 ย้ายเข้ามา 4 ม. ตอนไม่ได้มอง   4 นั่ง/ยืน\n5 รีเซ็ตกบ   6 หันหัวตาม on/off   7 หันทั้งตัว on/off   - / = ระยะยืนดู ลด/เพิ่ม   H โหมดล่า on/off"
+	help.text = "WASD เดิน  Shift วิ่ง  F ไฟฉาย  V สลับมุมกล้อง  Esc หยุด/เล่นต่อ\n1 เดินเข้าหา on/off   2 หายเมื่อถูกมอง   3 ย้ายเข้ามา 4 ม. ตอนไม่ได้มอง   4 นั่ง/ยืน\n5 รีเซ็ตกบ   6 หันหัวตาม on/off   7 หันทั้งตัว on/off   - / = ระยะยืนดู ลด/เพิ่ม   H โหมดล่า on/off   J จ้องแล้วโดนล่า on/off"
 	help.anchor_top = 1.0
 	help.anchor_bottom = 1.0
 	help.offset_left = 16
@@ -215,15 +218,25 @@ func _on_frog_vanished() -> void:
 
 
 func _on_caught() -> void:
-	flash("CAUGHT — resetting in 2 s")
-	await get_tree().create_timer(2.0).timeout
-	if not is_instance_valid(frog) or not frog.is_hunting():
-		return
+	flash("CAUGHT")
+	choke = Node3D.new()
+	choke.set_script(ChokeScript)
+	add_child(choke)
+	choke.finished.connect(_on_choke_finished)
+	choke.start(frog, player)
+
+
+func _on_choke_finished() -> void:
+	await get_tree().create_timer(1.5).timeout   # held on black
 	frog.stop_hunt()
 	frog.appear_at(FROG_START)
 	frog.face_towards(player.global_position)
 	player.global_position = PLAYER_START
 	player.velocity = Vector3.ZERO
+	player.pivot.rotation.y = 0.0
+	choke.cleanup()
+	choke.queue_free()
+	flash("Reset")
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -281,6 +294,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		KEY_7:
 			frog.turn_body = not frog.turn_body
 			flash("Turn body toward player: %s" % ("on" if frog.turn_body else "off"))
+		KEY_J:
+			frog.threat_enabled = not frog.threat_enabled
+			frog.reset_threat()
+			flash("Threat timer (stare within %.0f m for %.0f s): %s" % [frog.threat_range, frog.threat_time, "on" if frog.threat_enabled else "off"])
 		KEY_H:
 			if frog.is_hunting():
 				frog.stop_hunt()
@@ -309,9 +326,9 @@ func _process(delta: float) -> void:
 	var speed_scale := 0.0
 	if frog.player_animation:
 		speed_scale = frog.player_animation.speed_scale
-	info.text = "Frog   distance %.1f m (stands at %.1f)   %s / %s\nanimation %s x%.2f   mode %s   clutch %s   lean %.2f reach %.2f grip %.2f\nseen by you: %s   head error %.0f deg   approach %s   head tracking %s   turn body %s\n%s" % [
+	info.text = "Frog   distance %.1f m (stands at %.1f)   %s / %s\nanimation %s x%.2f   mode %s   clutch %s   lean %.2f reach %.2f grip %.2f   threat %.1f / %.0f s (stage %d)\nseen by you: %s   head error %.0f deg   approach %s   head tracking %s   turn body %s\n%s" % [
 		frog.distance_to_target(), frog.keep_distance, frog.Move.keys()[frog.move_state], "walking" if frog.velocity.length() > 0.12 else "still",
-		String(frog.current_anim), speed_scale, frog.Mode.keys()[frog.mode], frog.clutch_name(), frog.chase_pose.lean, frog.chase_pose.reach, frog.chase_pose.grip,
+		String(frog.current_anim), speed_scale, frog.Mode.keys()[frog.mode], frog.clutch_name(), frog.chase_pose.lean, frog.chase_pose.reach, frog.chase_pose.grip, frog.threat, frog.threat_time, frog.threat_stage,
 		"YES" if frog.is_seen() else "no", rad_to_deg(frog.head_error()),
 		"on" if frog.approach_enabled else "off", "on" if frog.head_tracking else "off", "on" if frog.turn_body else "off",
 		message if message_time > 0.0 else ""]

@@ -10,6 +10,14 @@ extends CharacterBody3D
 # -> RECOVER -> RUN. If the player is inside catch_range while the hand closes
 # it emits caught_player and stands over them; the level decides what happens.
 #
+# Threat (threat_enabled): staring at it from close up angers it. The timer fills
+# while the player is within threat_range AND looking at it, drains otherwise,
+# and starts the hunt when it reaches threat_time. threat_stage_changed fires at
+# 1 (noticed: body snaps to face you), 2 (stops backing away), 3 (about to go).
+#
+# Choke (hold_throat / release_throat): after a catch, a cinematic can steer the
+# clenched left hand to a world point every frame (see frog_choke.gd).
+#
 # Create it like the other actors: CharacterBody3D.new() + set_script().
 #
 #   frog.game = level                      # optional, needs a `playing` bool
@@ -26,6 +34,7 @@ signal hunt_started
 signal clutch_started     # the arm starts swinging out
 signal clutch_missed      # the hand closed on nothing
 signal caught_player
+signal threat_stage_changed(stage: int)
 
 const FrogModel = preload("res://assets/models/enemy/frog.glb")
 const NavGrid = preload("res://scripts/nav_grid.gd")
@@ -59,6 +68,13 @@ var hold_time := 0.3              # arm stays out, hand snaps shut
 var recover_time := 0.4           # arm pulls back after a miss
 var clutch_cooldown := 1.5        # seconds of plain running before the next grab
 
+# Threat tuning
+var threat_enabled := false
+var threat_range := 4.0
+var threat_time := 5.0
+const THREAT_STAGE_TIMES := [0.0, 2.0, 4.0]   # stage 1, 2, 3 start after these many seconds
+const SNAP_TURN_RATE := 14.0
+
 # Clip speeds: ground speed (m/s) of the planted foot in the baked walk clip.
 const WALK_CLIP_SPEED := 1.5
 const ANIM_BLEND := 0.25
@@ -83,6 +99,9 @@ var chase_pose
 var clutch := Clutch.RUN
 var _clutch_timer := 0.0
 var _cooldown_timer := 0.0
+var threat := 0.0
+var threat_stage := 0
+var _throat_point: Variant = null   # world point the hand is held at during a choke
 var player_animation: AnimationPlayer
 var anim_names := {}
 var current_anim := &""
@@ -170,6 +189,7 @@ func vanish() -> void:
 		return
 	mode = Mode.GONE
 	_reset_chase_pose()
+	reset_threat()
 	visible = false
 	velocity = Vector3.ZERO
 	path.clear()
@@ -182,6 +202,7 @@ func appear_at(point: Vector3, sitting := false) -> void:
 	visible = true
 	mode = Mode.WATCH
 	_reset_chase_pose()
+	reset_threat()
 	body_shape.disabled = false
 	if sitting:
 		sit()
@@ -195,6 +216,7 @@ func start_hunt() -> void:
 	if mode == Mode.GONE or target == null:
 		return
 	clear_scene_rules()
+	reset_threat()
 	body_shape.disabled = false
 	mode = Mode.HUNT
 	move_state = Move.HOLD
@@ -212,7 +234,24 @@ func stop_hunt() -> void:
 		return
 	mode = Mode.WATCH
 	clutch = Clutch.RUN
+	_throat_point = null
 	path.clear()
+
+
+func reset_threat() -> void:
+	threat = 0.0
+	if threat_stage != 0:
+		threat_stage = 0
+		threat_stage_changed.emit(0)
+
+
+# Choke: keep the clenched left hand at `point` (world), standing nearly upright.
+func hold_throat(point: Vector3) -> void:
+	_throat_point = point
+
+
+func release_throat() -> void:
+	_throat_point = null
 
 
 func is_hunting() -> bool:
@@ -305,6 +344,10 @@ func _physics_process(delta: float) -> void:
 	_update_scene_rules(delta)
 	if mode == Mode.GONE:
 		return
+	if mode == Mode.WATCH:
+		_update_threat(delta)
+		if mode != Mode.WATCH:
+			return
 	match mode:
 		Mode.WATCH:
 			_watch(delta)
@@ -348,9 +391,13 @@ func _watch(delta: float) -> void:
 	var dist := offset.length()
 	var to_player := offset.normalized() if dist > 0.01 else -global_transform.basis.z
 	_update_move_state(dist)
+	if threat_stage >= 2:
+		move_state = Move.HOLD          # stops backing away: it has made up its mind
 	if not approach_enabled or move_state == Move.HOLD:
 		_stop(delta)
-		if turn_body and dist < approach_range:
+		if threat_stage >= 1:
+			_turn_towards(to_player, delta, SNAP_TURN_RATE)
+		elif turn_body and dist < approach_range:
 			_turn_towards(to_player, delta)
 		_update_animation(1.0)
 		return
@@ -381,6 +428,28 @@ func _watch(delta: float) -> void:
 	_update_animation(walk_sign)
 
 
+# ---------------------------------------------------------------- threat
+
+func _update_threat(delta: float) -> void:
+	if not threat_enabled or target == null:
+		if threat > 0.0:
+			reset_threat()
+		return
+	var watching := distance_to_target() <= threat_range and is_seen()
+	threat = clampf(threat + (delta if watching else -delta), 0.0, threat_time)
+	var stage := 0
+	if threat > 0.0:
+		stage = 1
+		for i in range(1, THREAT_STAGE_TIMES.size()):
+			if threat >= THREAT_STAGE_TIMES[i]:
+				stage = i + 1
+	if stage != threat_stage:
+		threat_stage = stage
+		threat_stage_changed.emit(stage)
+	if threat >= threat_time:
+		start_hunt()
+
+
 # ---------------------------------------------------------------- hunt
 
 func _hunt(delta: float) -> void:
@@ -391,7 +460,10 @@ func _hunt(delta: float) -> void:
 	var offset := target.global_position - global_position
 	offset.y = 0.0
 	var to_player := offset.normalized() if dist > 0.01 else -global_transform.basis.z
-	_turn_towards(to_player, delta, hunt_turn_rate)
+	# Once it has caught the player it stays put: a choke cinematic positions the
+	# player relative to the frog, so turning here would chase its own tail.
+	if clutch != Clutch.CAUGHT:
+		_turn_towards(to_player, delta, hunt_turn_rate)
 	_cooldown_timer = maxf(_cooldown_timer - delta, 0.0)
 	_clutch_timer += delta
 	var speed := hunt_speed
@@ -464,15 +536,22 @@ func _update_chase_pose(delta: float) -> void:
 				want_reach = 0.0
 				want_grip = 0.0
 				reach_rate = 1.0 / maxf(recover_time, 0.01)
+	if _throat_point != null and mode == Mode.HUNT:
+		want_lean = 0.15
+		want_reach = 1.0
+		want_grip = 1.0
 	chase_pose.lean = move_toward(chase_pose.lean, want_lean, delta * 3.0)
 	chase_pose.reach = move_toward(chase_pose.reach, want_reach, delta * reach_rate)
 	chase_pose.grip = move_toward(chase_pose.grip, want_grip, delta * grip_rate)
-	if target != null:
+	if _throat_point != null:
+		chase_pose.reach_target = _throat_point
+	elif target != null:
 		chase_pose.reach_target = target.global_position + Vector3.UP * 1.2
 
 
 func _reset_chase_pose() -> void:
 	clutch = Clutch.RUN
+	_throat_point = null
 	if chase_pose:
 		chase_pose.lean = 0.0
 		chase_pose.reach = 0.0

@@ -27,6 +27,9 @@ var third_person := THIRD_PERSON_DEFAULT
 var torch: SpotLight3D
 var stamina := 100.0
 var hiding := false
+# Set by a cinematic that moves the player directly (e.g. the frog's choke):
+# no input, no gravity, no animation changes until it is cleared.
+var held := false
 var sprinting := false
 var step_clock := 0.0
 var footstep: AudioStreamPlayer
@@ -123,7 +126,7 @@ func _ready() -> void:
 	darkness.add_child(vignette)
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not game.playing:
+	if not game.playing or held:
 		return
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		pivot.rotation.y -= event.relative.x * 0.0022
@@ -137,6 +140,10 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _physics_process(delta: float) -> void:
 	if not game.playing:
+		return
+	if held:
+		velocity = Vector3.ZERO
+		sprinting = false
 		return
 	if hiding:
 		stamina = minf(100, stamina + delta * 16)

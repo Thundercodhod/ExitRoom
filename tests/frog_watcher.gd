@@ -376,5 +376,108 @@ func run() -> void:
 	fx.queue_free()
 	await frames(2)
 
+	# 13. Threat: staring at it from close up for 5 s sets off the hunt
+	fx = new_fixture(false)
+	player = make_player(fx, Vector3(0, 0.15, 0))
+	frog = make_frog(fx, player, Vector3(0, 0.05, -3))
+	frog.approach_enabled = false
+	frog.threat_enabled = true
+	await frames(10)
+	player.set_third_person(false)
+	player.pivot.rotation.y = yaw_towards(player.global_position, frog.global_position)
+	var stages := []
+	var on_stage := func(n): stages.append(n)
+	frog.threat_stage_changed.connect(on_stage)
+	frog.reset_threat()       # start the clock now (it may have seen us during setup)
+	stages.clear()
+	await frames(60)          # ~1 s
+	check(stages.has(1) and not stages.has(2), "Stage 1 (noticed) right away, not yet stage 2")
+	await frames(70)          # ~2.2 s
+	check(stages.has(2) and not stages.has(3), "Stage 2 (stops backing off) after 2 s")
+	await frames(130)         # ~4.3 s
+	check(stages.has(3) and not frog.is_hunting(), "Stage 3 (about to go) after 4 s, not hunting yet")
+	await frames(60)          # ~5.3 s
+	check(frog.is_hunting(), "Hunts after 5 s of being stared at")
+	fx.queue_free()
+	await frames(2)
+
+	# 14. Threat needs BOTH close range and looking; it drains instead of resetting
+	fx = new_fixture(false)
+	player = make_player(fx, Vector3(0, 0.15, 0))
+	frog = make_frog(fx, player, Vector3(0, 0.05, -3))
+	frog.approach_enabled = false
+	frog.threat_enabled = true
+	await frames(10)
+	player.set_third_person(false)
+	player.pivot.rotation.y = yaw_towards(player.global_position, frog.global_position) + PI
+	await frames(360)
+	check(frog.threat < 0.01 and not frog.is_hunting(), "Close but looking away: no threat")
+	player.global_position = Vector3(0, 0.15, 4)   # 7 m away
+	await frames(5)
+	player.pivot.rotation.y = yaw_towards(player.global_position, frog.global_position)
+	await frames(360)
+	check(frog.threat < 0.01 and not frog.is_hunting(), "Looking from outside the range: no threat")
+	player.global_position = Vector3(0, 0.15, 0)
+	await frames(5)
+	player.pivot.rotation.y = yaw_towards(player.global_position, frog.global_position)
+	await frames(180)
+	var peak: float = frog.threat
+	player.pivot.rotation.y += PI
+	await frames(90)
+	check(peak > 2.7 and frog.threat > peak - 1.8 and frog.threat < peak - 1.2, "Looking away drains it gradually (%.1f -> %.1f s)" % [peak, frog.threat])
+	fx.queue_free()
+	await frames(2)
+
+	# 15. Choke: lifts the player by the throat (checked on the rendered bones)
+	fx = new_fixture(false)
+	player = make_player(fx, Vector3(0, 0.15, 0))
+	frog = make_frog(fx, player, Vector3(0, 0.05, -3), true)
+	await frames(10)
+	var choke: Node3D = Node3D.new()
+	choke.set_script(load("res://scripts/frog_choke.gd"))
+	fx.add_child(choke)
+	var choke_done := [false]
+	choke.finished.connect(func(): choke_done[0] = true)
+	frog.caught_player.connect(func(): choke.start(frog, player))
+	frog.start_hunt()
+	var pskel: Skeleton3D = player.body_visual.find_child("Skeleton3D", true, false)
+	var p_neck := BoneAttachment3D.new(); p_neck.bone_name = "neck"; pskel.add_child(p_neck)
+	var p_lhand := BoneAttachment3D.new(); p_lhand.bone_name = "LeftHand"; pskel.add_child(p_lhand)
+	var p_rhand := BoneAttachment3D.new(); p_rhand.bone_name = "RightHand"; pskel.add_child(p_rhand)
+	var f_wrist := attach(frog, "L_Wrist")
+	var lift := 0.0
+	var throat_gap := INF
+	var hands_gap := INF
+	var started_at := -1
+	var ended_at := -1
+	var held_during := true
+	for i in 600:
+		await physics_frame
+		await process_frame
+		if choke.running and started_at < 0:
+			started_at = i
+		if choke.running and choke.t > 1.6:
+			lift = maxf(lift, player.global_position.y)
+			held_during = held_during and player.held
+			throat_gap = minf(throat_gap, f_wrist.global_position.distance_to(p_neck.global_position))
+			hands_gap = minf(hands_gap, maxf(p_lhand.global_position.distance_to(f_wrist.global_position), p_rhand.global_position.distance_to(f_wrist.global_position)))
+		if choke_done[0]:
+			ended_at = i
+			break
+	check(started_at >= 0, "Choke starts on the catch")
+	check(lift > 0.35, "Player is lifted off the ground (feet %.2f m up)" % lift)
+	check(held_during, "Player has no control while held")
+	check(throat_gap < 0.16, "Frog's rendered wrist is at the player's throat (%.2f m)" % throat_gap)
+	check(hands_gap < 0.2, "Player's rendered hands claw at the frog's wrist (%.2f m)" % hands_gap)
+	var dur := (ended_at - started_at) / 60.0
+	check(ended_at > 0 and dur > 3.0 and dur < 4.2, "Ends black after about 3.4 s (%.1f s)" % dur)
+	choke.cleanup()
+	frog.stop_hunt()
+	await frames(5)
+	check(not player.held and player.camera.current, "Cleanup hands control and the camera back")
+	check(pskel.find_child("StrugglePose", false, false) == null or pskel.find_child("StrugglePose", false, false).is_queued_for_deletion(), "Struggle pose removed")
+	fx.queue_free()
+	await frames(2)
+
 	print("EXITROOM_FROG_TEST_FAILURES=", failures)
 	quit(1 if failures > 0 else 0)
