@@ -75,6 +75,7 @@ func _set_global_pose(skeleton: Skeleton3D, bone: int, global_pose: Transform3D,
 	else:
 		var parent := skeleton.get_bone_parent(bone)
 		parent_global = skeleton.get_bone_global_pose(parent) if parent >= 0 else Transform3D.IDENTITY
-	# bone pose is stored relative to the rest transform
-	var pose := skeleton.get_bone_rest(bone).affine_inverse() * (parent_global.affine_inverse() * global_pose)
+	# Godot 4: bone global pose = parent global pose * bone pose (the pose is not
+	# relative to the rest transform).
+	var pose := parent_global.affine_inverse() * global_pose
 	skeleton.set_bone_pose_rotation(bone, pose.basis.get_rotation_quaternion())

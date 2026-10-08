@@ -2,6 +2,10 @@ extends Node3D
 ## Story direction uses only the existing frog's public scene helpers.
 const PlayerScript = preload("res://scripts/player.gd")
 const FrogScript = preload("res://scripts/frog_watcher.gd")
+const ChokeScript = preload("res://scripts/frog_choke.gd")
+const RETURN_START := Vector3(0,.05,-39)       # just outside the bedroom door
+const RETURN_FROG := Vector3(-4,.05,-23)
+const RETURN_OBJECTIVE := "กลับไปที่รถ · ไม่ต้องรับสาย"
 const EPISODE_ID := "passenger"
 const EPILOGUE := "ผมขับต่อไป ไม่กล้าหันไปดูอีกจนถึงปั๊มที่มีคนอยู่\nพอเปิดไฟในรถ เบาะข้าง ๆ ก็ว่าง แต่เปียกจนชุ่ม\n\nวันต่อมาผมพาเพื่อนไปดู เราขับวนอยู่สองรอบก็หาทางเข้าบ้านไม่เจอ\nเครื่องจั๊มพ์แบตยังอยู่ท้ายรถ ผมยังไม่กล้าเอามาใช้\n\nมีเรื่องหนึ่งที่ผมไม่ได้บอกเพื่อน\nบางคืน ตอนดับเครื่อง ผมยังได้ยินเสียงปลดเข็มขัดจากเบาะข้าง ๆ"
 enum Stage { CAR, FIELD, HOUSE, NOTE, BATTERY, RECOGNITION, RETURN, REPAIRED, END }
@@ -34,6 +38,9 @@ var sound: AudioStreamPlayer
 var ringing: AudioStreamPlayer3D
 var engine: AudioStreamPlayer
 var house_lights: Array[Light3D] = []
+var choke: Node3D
+var catches := 0
+var warn_breath: AudioStreamPlayer3D
 var ending_presented := false
 
 func _ready() -> void:
@@ -69,6 +76,19 @@ func _ready() -> void:
 	frog.face_towards(player.position)
 	frog.vanish()
 	frog.relocated.connect(func(_p): destination_pending = false; frog.face_towards(player.position))
+	frog.caught_player.connect(_on_frog_caught)
+	frog.threat_stage_changed.connect(_on_threat_stage)
+	# The frog's own breathing: positional, so it comes from where it stands.
+	warn_breath = AudioStreamPlayer3D.new()
+	warn_breath.process_mode = Node.PROCESS_MODE_PAUSABLE
+	var breath_loop := (load("res://audio/frog_chapter/breath.wav") as AudioStreamWAV).duplicate() as AudioStreamWAV
+	breath_loop.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	breath_loop.loop_end = breath_loop.data.size()/2
+	warn_breath.stream = breath_loop
+	warn_breath.pitch_scale = .62
+	warn_breath.volume_db = -2
+	warn_breath.position = Vector3(0,1.6,0)
+	frog.add_child(warn_breath)
 	for n in $World/House.find_children("*","Light3D",true,false): house_lights.append(n)
 	sound = AudioStreamPlayer.new()
 	sound.process_mode = Node.PROCESS_MODE_PAUSABLE
@@ -304,7 +324,7 @@ func target() -> Node:
 	return null
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("pause_game") and started and not reading and stage != Stage.END:
+	if event.is_action_pressed("pause_game") and started and not reading and stage != Stage.END and choke == null:
 		if paused:
 			panel_continue()
 		else:
@@ -460,13 +480,18 @@ func recognize_room() -> void:
 	t.tween_property(door,"rotation:y",-PI/2,.5)
 	await t.finished
 	stage = Stage.RETURN
-	objective.text = "กลับไปที่รถ · ไม่ต้องรับสาย"
-	frog.appear_at(Vector3(-4,.05,-23))
+	objective.text = RETURN_OBJECTIVE
+	frog.appear_at(RETURN_FROG)
 	frog.face_towards(player.position)
+	# The note has taught the rule: from here, staring at it up close sets it off.
+	frog.threat_enabled = true
 	unlock_scene()
 
 func update_return() -> void:
 	if player.position.z> -29: ringing.stop()
+	# No captions or relocations while the frog is holding you.
+	if choke != null:
+		return
 	if return_caption_step == 0 and player.position.z> -28:
 		return_caption_step = 1
 		say("เมื่อกี้มันอยู่หน้าบ้าน ทำไมมาอยู่ตรงนี้แล้ว",6)
@@ -474,6 +499,9 @@ func update_return() -> void:
 		return_caption_step = 2
 		play_cue("low_pulse",-26.0)
 		say("อย่าไปมองมัน เดินไปให้ถึงรถก่อน",6)
+	# While it hunts it is not playing the relocation game.
+	if frog.is_hunting():
+		return
 	# Queue one move per route milestone. Existing frog logic waits until unseen.
 	# Also protect the destination: it must be outside the current view, avoiding pops.
 	var points: Array[Vector3] = [Vector3(3.8,.05,-15),Vector3(-2.1,.05,-4)]
@@ -490,6 +518,8 @@ func update_return() -> void:
 
 func repair_car() -> void:
 	lock_scene()
+	frog.threat_enabled = false
+	warn_breath.stop()
 	frog.clear_scene_rules()
 	frog.vanish()
 	ringing.stop()
@@ -555,3 +585,66 @@ func repair_car() -> void:
 		anthology.complete_episode(EPISODE_ID,EPILOGUE)
 	else:
 		show_panel("THE PASSENGER  /  ผู้โดยสาร",EPILOGUE,"เล่นตอนนี้อีกครั้ง")
+
+
+
+# ---------------------------------------------------------------- threat & catch
+
+func _on_threat_stage(n: int) -> void:
+	if n >= 3:
+		if not warn_breath.playing: warn_breath.play()
+		# One dark pulse at the edge of the screen: it is about to come.
+		var t := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP)
+		t.tween_property(overlay,"color:a",.35,.12)
+		t.tween_property(overlay,"color:a",0.0,.5)
+	elif warn_breath.playing:
+		warn_breath.stop()
+
+
+func _on_frog_caught() -> void:
+	if choke != null: return
+	busy = true                      # no interaction; the frog keeps running its pose
+	warn_breath.stop()
+	subtitle.text = ""
+	prompt.text = ""
+	objective.visible = false
+	choke = Node3D.new()
+	choke.set_script(ChokeScript)
+	choke.process_mode = Node.PROCESS_MODE_PAUSABLE
+	add_child(choke)
+	choke.finished.connect(_on_choke_finished)
+	choke.start(frog, player)
+
+
+func _on_choke_finished() -> void:
+	overlay.color.a = 1
+	catches += 1
+	choke.cleanup()
+	choke.queue_free()
+	choke = null
+	restart_return()
+	await wait_for(1.5)             # held on black
+	var t := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP)
+	t.tween_property(overlay,"color:a",0.0,1.0)
+	say("ผมสะดุ้ง... ยังยืนอยู่หน้าประตูห้องนอน คอยังเจ็บอยู่เลย",5)
+	busy = false
+
+
+# Back to the start of the walk to the car, frog reset to its first spot.
+func restart_return() -> void:
+	frog.stop_hunt()
+	frog.clear_scene_rules()
+	frog.appear_at(RETURN_FROG)
+	frog.threat_enabled = true
+	return_step = 0
+	destination_pending = false
+	player.global_position = RETURN_START
+	player.velocity = Vector3.ZERO
+	player.pivot.rotation.y = PI             # facing the way out, toward the car
+	player.pitch = 0
+	player.spring_arm.rotation.x = 0
+	player.torch.rotation.x = 0
+	player.stamina = 100
+	frog.face_towards(player.position)
+	objective.text = RETURN_OBJECTIVE
+	objective.visible = true

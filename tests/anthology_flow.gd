@@ -1,11 +1,14 @@
 extends SceneTree
 ## Integration contract for the anthology; preserves the user's preferences.
+# Fingerprints of the frog files. Updated when the frog gained hunt mode, the
+# stare threat timer and the choke catch (and the head tracker pose fix); edit
+# these on purpose whenever those files are meant to change.
 const PROTECTED_TEXT := {
-	"res://scripts/frog_watcher.gd":"cc2f6f431fcc906e0ab62383c80f09e4500773aa720f61f442ca7e2ca117d1bf",
-	"res://scripts/frog_head_tracker.gd":"2026ceddd95f530db638888cdaa3baad31823ac2f94a2a78fba7eb58cf390ac3",
-	"res://scripts/frog_test.gd":"dab7f3b614e11a1815781aeb74f10035270fd50e9475dd5c4da1f78f541a062a",
-	"res://tests/frog_watcher.gd":"2b1e6130d98decf7e27627b394e713da2fc84addf8faf466c81f73b9794f80ac",
-	"res://frog_test.tscn":"afa9a0cf886be014a3df5d92212a18f6813c36560cfe004fefe96c87c5aef556",
+	"res://scripts/frog_watcher.gd":"89bd3f9e15dd588ad84350490d8d59eff5cf4754ff3da00a42ce5db7462dc622",
+	"res://scripts/frog_head_tracker.gd":"fc502f04a267c2ebe8bce99fa012da4d6298660004114fb54ad4aa2a012df9f9",
+	"res://scripts/frog_test.gd":"f45ac5d12c86ef84771bc5424515d1d39acaa90b3e4260fe283caf008468fd03",
+	"res://tests/frog_watcher.gd":"8d06afb8428fca7d9214a2a440e2881041f1018e020aecc86f5c92cd6d2fb6a7",
+	"res://frog_test.tscn":"842cb776c7d79745e87816fb916a47132796711b9109a78003e78de95d039b4a",
 	"res://assets/models/enemy/frog.glb.import":"900fb7db8051c7d0c924392eeca7085fff561e11a636a76908c08c9c6efeec70"
 }
 const ORIGINAL_FROG_MODEL_SHA := "f3706fab50332c1fe96acb7621a68497e7eb149bbf6c4a6772f952a0d398a315"
