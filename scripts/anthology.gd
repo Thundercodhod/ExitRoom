@@ -37,7 +37,12 @@ func _ready() -> void:
 			AudioServer.set_bus_name(AudioServer.bus_count-1,title)
 	load_preferences()
 	apply_preferences()
-	set_fullscreen.call_deferred(bool(settings.fullscreen))
+	# Browsers require a direct click/key gesture for entering fullscreen.
+	if OS.has_feature("web"):
+		settings.fullscreen = is_fullscreen()
+		display_message = "กดสวิตช์เต็มหน้าจอ หรือ Alt + Enter · Esc เพื่อออก"
+	else:
+		set_fullscreen.call_deferred(bool(settings.fullscreen))
 	get_tree().node_added.connect(_node_added)
 	get_tree().scene_changed.connect(_scene_changed)
 
@@ -74,6 +79,15 @@ func apply_preferences() -> void:
 func is_fullscreen() -> bool:
 	return DisplayServer.window_get_mode() in [DisplayServer.WINDOW_MODE_FULLSCREEN,DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN]
 
+func _process(_delta: float) -> void:
+	# Esc can exit browser fullscreen without going through our settings toggle.
+	if OS.has_feature("web") and not display_busy:
+		var actual := is_fullscreen()
+		if actual!=bool(settings.fullscreen):
+			settings.fullscreen = actual
+			save_preferences()
+			display_mode_changed.emit(actual,display_message)
+
 func set_fullscreen(enabled: bool) -> void:
 	if display_busy or DisplayServer.get_name()=="headless": return
 	display_busy = true
@@ -86,16 +100,19 @@ func set_fullscreen(enabled: bool) -> void:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 		else:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
-			DisplayServer.window_set_size(windowed_size)
-			DisplayServer.window_set_position(windowed_position)
-			if windowed_mode==DisplayServer.WINDOW_MODE_MAXIMIZED:
-				DisplayServer.window_set_mode(windowed_mode)
+			if not OS.has_feature("web"):
+				DisplayServer.window_set_size(windowed_size)
+				DisplayServer.window_set_position(windowed_position)
+				if windowed_mode==DisplayServer.WINDOW_MODE_MAXIMIZED:
+					DisplayServer.window_set_mode(windowed_mode)
 	# The OS applies this asynchronously. Persist what actually happened.
 	for i in 3: await get_tree().process_frame
 	settings.fullscreen = is_fullscreen()
 	display_message = "F11 หรือ Alt + Enter เพื่อสลับเต็มหน้าจอ"
+	if OS.has_feature("web"):
+		display_message = "กดสวิตช์เต็มหน้าจอ หรือ Alt + Enter · Esc เพื่อออก"
 	if bool(settings.fullscreen)!=enabled:
-		display_message = "หากเล่นใน Godot ให้ปิด Embed Game on Next Play หรือเปิดเกมด้วย Play.cmd"
+		display_message = "คลิกสวิตช์อีกครั้งเพื่ออนุญาตเต็มหน้าจอ" if OS.has_feature("web") else "หากเล่นใน Godot ให้ปิด Embed Game on Next Play หรือเปิดเกมด้วย Play.cmd"
 	save_preferences()
 	display_busy = false
 	display_mode_changed.emit(bool(settings.fullscreen),display_message)
@@ -193,7 +210,16 @@ func configure_audio(node: Node) -> void:
 	if node.bus==&"Master": node.bus = &"Ambience" if ambient else &"SFX"
 
 func _scene_changed() -> void:
-	if get_tree().current_scene: apply_accessibility(get_tree().current_scene)
+	var scene := get_tree().current_scene
+	if scene:
+		apply_accessibility(scene)
+		if OS.has_feature("web"):
+			# Keep the authored field intact; limit only what the browser draws.
+			for grass in scene.find_children("Grass_*","MultiMeshInstance3D",true,false):
+				grass.multimesh = grass.multimesh.duplicate()
+				grass.multimesh.visible_instance_count = mini(grass.multimesh.instance_count,96)
+				grass.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+				grass.visibility_range_end = 36.0
 
 func play_sfx(key: String, volume_db := -18.0) -> void:
 	var path := "res://audio/anthology/"+key+".wav"

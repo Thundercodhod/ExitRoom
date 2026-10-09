@@ -54,6 +54,31 @@ func _ready() -> void:
 	ambient.play()
 
 func build_backdrop() -> void:
+	# Web needs a light menu: the full field is loaded only inside its episode.
+	if OS.has_feature("web"):
+		var backdrop := CanvasLayer.new()
+		add_child(backdrop)
+		var photo := TextureRect.new()
+		photo.texture = preload("res://ui/previews/passenger.png")
+		photo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		photo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		photo.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		photo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		backdrop.add_child(photo)
+	else:
+		build_field_backdrop()
+	var post := CanvasLayer.new()
+	post.layer = 1
+	add_child(post)
+	var image := ColorRect.new()
+	image.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	image.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	film = ShaderMaterial.new()
+	film.shader = load("res://ui/menu_film.gdshader")
+	image.material = film
+	post.add_child(image)
+
+func build_field_backdrop() -> void:
 	var world := (load("res://frog_field_world.tscn") as PackedScene).instantiate()
 	world.name = "MenuBackdrop"
 	add_child(world)
@@ -75,16 +100,6 @@ func build_backdrop() -> void:
 		tree.position = data[0]
 		tree.scale = Vector3.ONE*float(data[1])
 		add_child(tree)
-	var post := CanvasLayer.new()
-	post.layer = 1
-	add_child(post)
-	var image := ColorRect.new()
-	image.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	image.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	film = ShaderMaterial.new()
-	film.shader = load("res://ui/menu_film.gdshader")
-	image.material = film
-	post.add_child(image)
 
 func place(parent: Node, node: Control, pos: Vector2, size := Vector2.ZERO) -> Control:
 	node.position = pos
@@ -126,7 +141,10 @@ func build_home() -> void:
 	first.name = "EpisodesButton"
 	button(root,"02   ตั้งค่า",Vector2(884,344),Vector2(326,61),func(): show_page("options"),27)
 	button(root,"03   เครดิต",Vector2(884,416),Vector2(326,61),func(): show_page("credits"),27)
-	button(root,"04   ออกจากเกม",Vector2(884,488),Vector2(326,61),func(): get_tree().quit(),27)
+	if OS.has_feature("web"):
+		button(root,"04   เต็มหน้าจอ",Vector2(884,488),Vector2(326,61),func(): Anthology.set_fullscreen(not Anthology.is_fullscreen()),27)
+	else:
+		button(root,"04   ออกจากเกม",Vector2(884,488),Vector2(326,61),func(): get_tree().quit(),27)
 	line(root,Vector2(68,630),1144)
 	text(root,"AN ANTHOLOGY OF QUIET HORRORS",Vector2(68,649),16,Style.MUTED)
 	text(root,"หูฟังช่วยให้ได้ยินสิ่งที่อยู่พ้นสายตา",Vector2(840,649),16,Style.MUTED)
@@ -295,5 +313,6 @@ func _process(delta: float) -> void:
 	film.set_shader_parameter("reduced_motion",Anthology.settings.reduced_motion)
 	if not Anthology.settings.reduced_motion:
 		elapsed += delta
-		camera.position.x = 7.5+sin(elapsed*.12)*.08
-		camera.look_at(Vector3(-.5,1.8,-34))
+		if camera:
+			camera.position.x = 7.5+sin(elapsed*.12)*.08
+			camera.look_at(Vector3(-.5,1.8,-34))
