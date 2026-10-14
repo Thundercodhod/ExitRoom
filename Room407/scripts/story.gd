@@ -120,10 +120,7 @@ func menu_button(parent: Node, value: String, pos: Vector2, action: Callable) ->
 		style.content_margin_right = 18
 		button.add_theme_stylebox_override(state, style)
 	parent.add_child(button)
-	button.pressed.connect(func():
-		play_sound("ui_accept", -22)
-		action.call())
-	button.mouse_entered.connect(func(): play_sound("ui_move", -27))
+	button.pressed.connect(action)   # hover and press sounds come from the anthology
 	return button
 
 func make_ui() -> void:

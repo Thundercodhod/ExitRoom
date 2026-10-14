@@ -380,7 +380,6 @@ func style_button(button: Button) -> void:
 		button.add_theme_stylebox_override(state,style)
 	button.add_theme_color_override("font_color",Color(.91,.92,.79))
 	button.add_theme_color_override("font_hover_color",Color(1,.97,.78))
-	button.mouse_entered.connect(func(): play_cue("ui_move",-27.0))
 
 func play_cue(cue: String, volume := -20.0) -> void:
 	var anthology := get_node_or_null("/root/Anthology")
@@ -388,7 +387,6 @@ func play_cue(cue: String, volume := -20.0) -> void:
 		anthology.play_sfx(cue,volume)
 
 func return_to_menu() -> void:
-	play_cue("ui_accept",-22.0)
 	var anthology := get_node_or_null("/root/Anthology")
 	if anthology and anthology.has_method("return_to_menu"):
 		get_tree().paused = false
@@ -456,7 +454,6 @@ func panel_continue() -> void:
 		_continue_panel()
 
 func _continue_panel() -> void:
-	play_cue("ui_accept",-25.0)
 	if stage == Stage.END:
 		get_tree().reload_current_scene()
 		return

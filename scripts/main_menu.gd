@@ -121,9 +121,7 @@ func line(parent: Node, pos: Vector2, width: float, color := Color(.55,.6,.56,.3
 func button(parent: Node, words: String, pos: Vector2, size: Vector2, action: Callable, font_size := 23) -> Button:
 	var b := Style.button(words,font_size)
 	place(parent,b,pos,size)
-	b.pressed.connect(func(): Anthology.play_sfx("ui_accept",-21); action.call())
-	b.mouse_entered.connect(func(): Anthology.play_sfx("ui_move",-29))
-	b.focus_entered.connect(func(): Anthology.play_sfx("ui_move",-29))
+	b.pressed.connect(action)   # hover and press sounds come from Anthology.hook_ui_sounds
 	return b
 
 func build_home() -> void:
@@ -216,7 +214,6 @@ func select_episode(index: int, sound := true) -> void:
 	for i in episode_buttons.size():
 		var b := episode_buttons[i]
 		b.add_theme_stylebox_override("normal",Style.panel(Color(.14,.065,.07,.95) if i==selected else Color(.021,.033,.035,.92),Style.ACCENT if i==selected else Color(.3,.36,.34,.35)))
-	if sound: Anthology.play_sfx("ui_move",-25)
 
 func play_selected() -> void:
 	if loading or not Anthology.is_unlocked(Anthology.EPISODES[selected].id): return

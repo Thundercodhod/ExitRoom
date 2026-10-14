@@ -104,14 +104,48 @@ func test_menu() -> bool:
 	var instant := menu.pages.options.get_node("instant_textToggle") as CheckButton
 	instant.button_pressed = true
 	check(anthology.settings.instant_text,"reading toggle updates instant-text option")
+	await frames(2)
+	check_hover(slider,"options slider")
+	check_hover(instant,"options toggle")
 	menu.show_page("episodes")
+	await frames(2)
+	var box := menu.episode_buttons[1] as Button
+	check_hover(box,"episode box")
+	var ticks := sfx_count("ui_move")
+	box.mouse_entered.emit()
+	check(sfx_count("ui_move")==ticks,"sweeping quickly across boxes does not stutter")
+	var presses := sfx_count("ui_accept")
+	box.pressed.emit()
+	check(sfx_count("ui_accept")==presses+1,"pressing an episode box plays the press sound once")
+	box.disabled = true
+	anthology._last_ui_hover = -1000
+	ticks = sfx_count("ui_move")
+	box.mouse_entered.emit()
+	check(sfx_count("ui_move")==ticks,"a disabled button stays silent")
+	box.disabled = false
 	return true
+
+# UI sounds playing right now, by file name (each play_sfx adds one player).
+func sfx_count(key: String) -> int:
+	var n := 0
+	for child in anthology.get_children():
+		if child is AudioStreamPlayer and child.stream and String(child.stream.resource_path).ends_with("/"+key+".wav"): n += 1
+	return n
+
+# The cursor passing over `control` plays exactly one hover tick.
+func check_hover(control: Control, label: String) -> void:
+	anthology._last_ui_hover = -1000
+	var before := sfx_count("ui_move")
+	control.mouse_entered.emit()
+	check(sfx_count("ui_move")==before+1,"hover sound: "+label)
 
 func check_ending(id: String, original_scene: Node) -> void:
 	await wait_condition(func(): return anthology.modal_kind=="ending" and not anthology.changing,"ending transition completes: "+id)
 	check(current_scene==original_scene,"episode ending stays independent: "+id)
 	check(anthology.modal_kind=="ending" and anthology.modal!=null,"ending presents anthology overlay: "+id)
 	check(anthology.completed.has(id),"completion recorded: "+id)
+	var ending_button := anthology.modal.find_child("EpisodeMenuButton",true,false) as Button
+	if ending_button: check_hover(ending_button,"ending card button ("+id+")")
 	check(paused and Input.mouse_mode==Input.MOUSE_MODE_VISIBLE,"ending freezes play and releases mouse: "+id)
 	var persisted := ConfigFile.new()
 	check(persisted.load("user://anthology.cfg")==OK and id in persisted.get_value("progress","completed",[]),"completion persisted: "+id)

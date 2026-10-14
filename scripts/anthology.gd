@@ -30,6 +30,11 @@ var transition_layer: CanvasLayer
 var curtain: ColorRect
 var transition_title: Label
 var transition_gain := 1.0
+# UI sounds for every button, toggle and slider in every scene (see hook_ui_sounds).
+const UI_HOVER_DB := -14.0
+const UI_PRESS_DB := -12.0
+const UI_HOVER_GAP_MS := 50      # sweeping across several buttons does not stutter
+var _last_ui_hover := -1000
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -215,6 +220,36 @@ func apply_accessibility(scene: Node) -> void:
 func _node_added(node: Node) -> void:
 	if node is AudioStreamPlayer or node is AudioStreamPlayer3D:
 		configure_audio.call_deferred(node)
+	elif node is BaseButton or node is Slider:
+		hook_ui_sounds.call_deferred(node)
+
+# Cursor passing over a control (or keyboard focus moving to it): the hover tick.
+# Pressing a button or flipping a toggle: the press sound. Scenes do not add their own.
+func hook_ui_sounds(node: Control) -> void:
+	if not is_instance_valid(node) or node.has_meta("ui_sounds"): return
+	node.set_meta("ui_sounds", true)
+	node.mouse_entered.connect(_on_ui_mouse_entered.bind(node))
+	node.focus_entered.connect(_on_ui_focus_entered)
+	if node is BaseButton:
+		node.pressed.connect(_on_ui_pressed)
+
+func _on_ui_mouse_entered(node: Control) -> void:
+	if node is BaseButton and (node as BaseButton).disabled: return
+	ui_hover()
+
+# A click also gives focus: only keyboard/gamepad focus moves play the tick.
+func _on_ui_focus_entered() -> void:
+	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT): return
+	ui_hover()
+
+func _on_ui_pressed() -> void:
+	play_sfx("ui_accept",UI_PRESS_DB)
+
+func ui_hover() -> void:
+	var now := Time.get_ticks_msec()
+	if now-_last_ui_hover < UI_HOVER_GAP_MS: return
+	_last_ui_hover = now
+	play_sfx("ui_move",UI_HOVER_DB)
 
 func configure_audio(node: Node) -> void:
 	if not is_instance_valid(node): return
