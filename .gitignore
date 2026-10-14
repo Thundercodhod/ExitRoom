@@ -16,6 +16,7 @@ preview-*.png
 !3Dmodel_import/original_backrooms.glb
 !3Dmodel_import/backrooms_rigged_hazmat.glb
 !3Dmodel_import/low-poly_furnished_abandoned_house.glb
+!3Dmodel_import/pladuk.glb
 assets/*
 !assets/abandoned_house_playable.glb
 !assets/textures/
@@ -40,3 +41,4 @@ tree/tree_ps1psx_style_*.png
 /.claude/
 *.zip
 *.blend1
+/assets_src/
