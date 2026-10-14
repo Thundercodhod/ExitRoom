@@ -4,6 +4,7 @@ extends Node3D
 ## Add as a child of the player's camera, then call setup(player).
 
 const PladukScene = preload("res://3Dmodel_import/pladuk.glb")
+const HelloSound = preload("res://audio/forest/pladuk_hello.wav")
 
 signal leaned_in
 signal leaned_out
@@ -28,6 +29,7 @@ var _hold := 0.0
 var _tween: Tween
 var leaning := false
 var face_light: OmniLight3D
+var voice: AudioStreamPlayer3D
 
 func setup(p: CharacterBody3D) -> void:
 	player = p
@@ -51,6 +53,14 @@ func setup(p: CharacterBody3D) -> void:
 	face_light.omni_attenuation = 1.6
 	face_light.visible = false
 	add_child(face_light)
+	# Its sound comes from right beside his ear, where the face slides in.
+	voice = AudioStreamPlayer3D.new()
+	voice.name = "Voice"
+	voice.stream = HelloSound
+	voice.position = FACE_SHOWN
+	voice.unit_size = 2.0
+	voice.volume_db = -3.0
+	add_child(voice)
 	anim = rig.find_child("AnimationPlayer", true, false) as AnimationPlayer
 	if anim and anim.has_animation("Idle_Crawl"):
 		anim.get_animation("Idle_Crawl").loop_mode = Animation.LOOP_LINEAR
@@ -71,6 +81,7 @@ func lean_in() -> void:
 	leaning = true
 	_hold = rng.randf_range(1.2, 2.0)
 	_tween_to(1.0, LEAN_IN_TIME)
+	voice.play()
 	leaned_in.emit()
 
 func lean_out() -> void:
@@ -83,6 +94,7 @@ func lean_out() -> void:
 # Gone at once (cutscene, catch, third person); the timer starts over.
 func hide_now() -> void:
 	if _tween: _tween.kill()
+	if voice and voice.playing: voice.stop()
 	leaning = false
 	lean = 0.0
 	_wait = next_wait()

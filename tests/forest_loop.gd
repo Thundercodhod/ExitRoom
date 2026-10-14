@@ -76,6 +76,7 @@ func run() -> void:
 	check(chapter.stage == chapter.Stage.WAKE and chapter.overlay.color.a > .9, "starts on black, waking up")
 	check(chapter.forest_silent, "silence before the gasp")
 	await create_timer(1.6).timeout
+	check(chapter.sound.playing and chapter.sound.stream.resource_path.ends_with("player_gasp.wav"), "waking up plays the recorded gasp")
 	await shot("wake-blink")
 	if not await wait_until(func(): return chapter.stage == chapter.Stage.WALK, 20, "wake-up finishes and hands control back"): return finish()
 	check(chapter.peek_active and chapter.frog.mode != chapter.frog.Mode.GONE, "frog is peeking from behind the giant tree")
@@ -99,6 +100,8 @@ func run() -> void:
 	await chapter.look_at_point(chapter.player.global_position + Vector3(0, 1.5, -10), .2)
 	check(not shoulder.is_showing(), "Pladuk is not in view between leans")
 	shoulder.lean_in()
+	check(shoulder.voice.playing and shoulder.voice.stream.resource_path.ends_with("pladuk_hello.wav"), "Pladuk's sound plays as it leans in")
+	check(shoulder.voice.position.x > 0.0, "the sound comes from the right side, beside his ear")
 	await create_timer(1.8).timeout
 	check(shoulder.is_showing() and shoulder.lean > .99, "Pladuk leans in at the right shoulder in first person")
 	var face: Vector3 = chapter.player.camera.global_transform.affine_inverse() * (shoulder.rig.global_transform * shoulder._face_in_rig())
@@ -153,12 +156,15 @@ func run() -> void:
 	await place(chapter.campfire_spot + Vector3(0, .05, 2.4))
 	await frames(4)
 	check(chapter.prompt.text.contains("กองไฟ"), "sleep prompt beside the fire")
+	chapter.player.set_third_person(true)
+	await frames(2)
 	var press := InputEventAction.new()
 	press.action = "interact"
 	press.pressed = true
 	Input.parse_input_event(press)
 	await frames(4)
 	check(chapter.stage == chapter.Stage.CAMP and chapter.busy, "E: sits down by the fire")
+	check(not chapter.player.third_person, "the campfire ending switches to first person")
 	await wait_until(func(): return chapter.ending_presented, 30, "falls asleep: episode ends")
 	var anthology := root.get_node_or_null("Anthology")
 	if anthology:

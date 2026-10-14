@@ -504,7 +504,7 @@ func wake(first: bool) -> void:
 	var look: ShaderMaterial = player.get_node("RetroHorrorLook").get_child(0).material
 	look.set_shader_parameter("softness",1.0)
 	await wait_for(1.4 if first else 1.0)
-	play_sound("gasp",-4.0)
+	play_sound("player_gasp",-2.0)
 	var t := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP)
 	for step in [[.25,.07],[1.0,.16],[.45,.22],[1.0,.12],[.15,.35],[.9,.14],[0.0,.8]]:
 		t.tween_property(overlay,"color:a",step[0],step[1])
@@ -720,6 +720,8 @@ func flicker_fire(_delta: float) -> void:
 func sleep_by_fire() -> void:
 	stage = Stage.CAMP
 	lock_scene()
+	# The ending is seen through his own eyes, whatever view he walked here in.
+	player.set_third_person(false)
 	prompt.text = ""
 	objective.text = ""
 	shoulder.enabled = false

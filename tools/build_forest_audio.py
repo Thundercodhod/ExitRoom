@@ -65,13 +65,6 @@ def croak(t):
     return s * .8
 save("croak", .85, croak)
 
-# A sharp gasp: a fast inhale that cuts off.
-gasp_lp = lowpass(.35)
-def gasp(t):
-    env = min(1, t / .08) * (1 if t < .55 else max(0, 1 - (t - .55) / .12))
-    return gasp_lp(noise()) * env * .9 + math.sin(TAU * (700 + 500 * t) * t) * .03 * env
-save("gasp", .75, gasp, edge=400)
-
 # Heavy breathing after waking, slowing down.
 pant_lp = lowpass(.18)
 def pant(t):
@@ -91,4 +84,5 @@ def fire(t):
             s += noise() * .7 * (1 - x / .03)
     return s
 save("fire", 12, fire, edge=200)
-print("Created 6 original forest sounds")
+print("Created 5 original forest sounds")
+# player_gasp.wav and pladuk_hello.wav are recorded effects (Epidemic Sound), not generated here.
