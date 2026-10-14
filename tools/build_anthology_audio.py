@@ -38,17 +38,5 @@ write("sting", 2.7, lambda t: (tone(t, 67)+tone(t, 71)*.6+tone(t, 138)*.3)*.18*m
 write("fluorescent", 4, lambda t: (tone(t, 100)*.22+tone(t, 200)*.06+noise()*.035)*(.7+.3*math.sin(t*17)**2))
 write("low_pulse", 3.1, lambda t: tone(t, 47)*.32*(math.sin(t*math.pi*1.4)**8) + noise()*.012)
 
-# No sampled music: filtered wind, low beating tones and sparse distant chimes.
-wind = 0.0
-def ambience(t):
-    global wind
-    wind = .988*wind + .012*noise()
-    pad = (tone(t, 49)+tone(t, 49.23)*.6)*.048
-    chime = 0
-    for start, hz in [(2, 196), (7.3, 233.08), (13.8, 146.83), (18, 185)]:
-        if t >= start:
-            u = t-start
-            chime += (tone(u, hz)+.18*tone(u, hz*2.01))*.055*math.exp(-u*.85)
-    return wind*.9+pad+chime+noise()*.012
-write("menu_ambience", 24, ambience)
-print("Created 10 original anthology sound effects and ambience tracks.")
+# The menu music (menu_music.mp3) is a recorded Epidemic Sound track, not generated here.
+print("Created the original anthology sound effects.")

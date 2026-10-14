@@ -14,7 +14,6 @@ var start_button: Button
 var camera: Camera3D
 var film: ShaderMaterial
 var elapsed := 0.0
-var ambient: AudioStreamPlayer
 var loading := false
 
 func _ready() -> void:
@@ -44,14 +43,7 @@ func _ready() -> void:
 	select_episode(selected,false)
 	show_page(Anthology.menu_page)
 	Anthology.menu_page = "home"
-	ambient = AudioStreamPlayer.new()
-	var loop := load("res://audio/anthology/menu_ambience.wav") as AudioStreamWAV
-	ambient.stream = loop
-	ambient.bus = &"Ambience"
-	ambient.volume_db = -19
-	add_child(ambient)
-	ambient.finished.connect(ambient.play)
-	ambient.play()
+	Anthology.play_menu_music()   # resumes where it was if we came back from an episode
 
 func build_backdrop() -> void:
 	# Web needs a light menu: the full field is loaded only inside its episode.
@@ -231,8 +223,8 @@ func build_options() -> void:
 	var root: Control = pages.options
 	header(root,"OPTIONS","ปรับเสียงและการแสดงผลให้เล่นได้สบาย · บันทึกอัตโนมัติ")
 	text(root,"AUDIO",Vector2(220,170),22,Style.GOLD,true)
-	var row := 215
-	for data in [["เสียงทั้งหมด","master"],["เสียงบรรยากาศ","ambience"],["เสียงประกอบ","sfx"]]:
+	var row := 212
+	for data in [["เสียงทั้งหมด","master"],["เสียงบรรยากาศ","ambience"],["เพลง","music"],["เสียงประกอบ","sfx"]]:
 		text(root,data[0],Vector2(220,row+3),22)
 		var slider := HSlider.new()
 		slider.name = data[1]+"Slider"
@@ -247,7 +239,7 @@ func build_options() -> void:
 			value.text = str(int(v))+"%"
 			Anthology.apply_preferences()
 			Anthology.save_preferences())
-		row += 62
+		row += 50
 	line(root,Vector2(220,418),825)
 	text(root,"DISPLAY & READING",Vector2(220,446),22,Style.GOLD,true)
 	row = 493

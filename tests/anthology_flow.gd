@@ -66,7 +66,7 @@ func finish() -> void:
 	quit(1 if failures else 0)
 
 func verify_resources() -> void:
-	for key in ["ui_move","ui_accept","tape","knock","message","door","sting","fluorescent","low_pulse","menu_ambience"]:
+	for key in ["ui_move","ui_accept","tape","knock","message","door","sting","fluorescent","low_pulse"]:
 		var path: String = "res://audio/anthology/"+key+".wav"
 		check(ResourceLoader.exists(path),"sound resource exists: "+key)
 		if ResourceLoader.exists(path):
@@ -97,7 +97,17 @@ func test_menu() -> bool:
 		menu.show_page(section)
 		await frames()
 		check(menu.page==section and menu.pages[section].visible,"menu opens "+section)
+	var music: AudioStreamPlayer = anthology.menu_music
+	check(music!=null and music.playing and not music.stream_paused,"main menu plays background music")
+	check(music!=null and String(music.stream.resource_path).ends_with("menu_music.mp3") and (music.stream as AudioStreamMP3).loop,"menu music is the recorded track and loops")
+	check(music!=null and music.bus==&"Music","menu music plays on its own Music bus")
 	menu.show_page("options")
+	var music_slider := menu.pages.options.get_node("musicSlider") as HSlider
+	check(music_slider!=null,"options has a music volume slider")
+	if music_slider:
+		music_slider.value = 45
+		check(is_equal_approx(anthology.settings.music,.45) and is_equal_approx(db_to_linear(AudioServer.get_bus_volume_db(AudioServer.get_bus_index("Music"))),.45),"music slider sets the Music bus volume")
+		music_slider.value = 70
 	var slider := menu.pages.options.get_node("masterSlider") as HSlider
 	slider.value = 37
 	check(is_equal_approx(anthology.settings.master,.37),"settings slider updates master volume")
@@ -253,16 +263,19 @@ func test_persistence() -> void:
 	var expected_completed: Array = anthology.completed.duplicate()
 	anthology.settings.master = .37
 	anthology.settings.ambience = .28
+	anthology.settings.music = .33
 	anthology.settings.instant_text = true
 	anthology.settings.reduced_motion = true
 	anthology.save_preferences()
 	anthology.settings.master = .8
 	anthology.settings.ambience = .7
+	anthology.settings.music = .7
 	anthology.settings.instant_text = false
 	anthology.settings.reduced_motion = false
 	anthology.completed.clear()
 	anthology.load_preferences()
 	check(is_equal_approx(anthology.settings.master,.37) and is_equal_approx(anthology.settings.ambience,.28),"saved audio preferences reload")
+	check(is_equal_approx(anthology.settings.music,.33),"saved music volume reloads")
 	check(anthology.settings.instant_text and anthology.settings.reduced_motion,"saved readability preferences reload")
 	check(anthology.completed==expected_completed and anthology.completed.size()==anthology.EPISODES.size(),"all completions reload without duplicates")
 	anthology.apply_preferences()
@@ -297,6 +310,8 @@ func run() -> void:
 		check(anthology.selected_id==entry.id,"second launch is ignored during transition")
 		if not await wait_scene(entry.scene): break
 		check(anthology.selected_id==entry.id,"selection launches requested episode: "+entry.id)
+		await wait_condition(func(): return anthology.menu_music.stream_paused,"menu music fades out and pauses in the episode: "+entry.id,4.0)
+		var music_at: float = anthology.menu_music.get_playback_position()
 		match entry.id:
 			"last_visit": await test_last_visit(current_scene)
 			"after_hours": await test_after_hours(current_scene)
@@ -304,5 +319,8 @@ func run() -> void:
 			"passenger": await test_passenger(current_scene)
 			"forest": await test_forest(current_scene)
 		if not await ending_menu(): break
+		check(not anthology.menu_music.stream_paused and anthology.menu_music.playing,"menu music comes back with the menu: "+entry.id)
+		check(anthology.menu_music.get_playback_position() >= music_at - .05,"menu music carries on instead of restarting: "+entry.id)
+		check(anthology.find_children("*","AudioStreamPlayer",false,false).filter(func(n): return n.name.begins_with("MenuMusic")).size()==1,"only one menu music player after returning: "+entry.id)
 	test_persistence()
 	finish()

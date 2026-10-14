@@ -12,7 +12,7 @@ const EPISODES := [
 	# Continues Episode 04 (same Phakin): locked until 04 has been finished once.
 	{"id":"forest","number":"05","title":"REALIZATION","thai":"การตกตะกอน","scene":"res://forest_chapter.tscn","requires":"passenger","tag":"ภาคิน / ป่าที่ไม่มีชื่อ / 23:52 น.","hook":"ผมจำได้ว่ากำลังจะถึงปั๊ม\nพอลืมตาอีกที รอบตัวมีแต่ต้นไม้","summary":"ภาคินสะดุ้งตื่นกลางป่าที่ไม่รู้จัก ไกลออกไปมีแสงกองไฟอยู่ดวงเดียว ทางดินพาไปถึงที่นั่น แต่หลังต้นไม้ใหญ่ กบตัวเดิมยืนเอียงคอมองเขาอยู่"}
 ]
-var settings := {"master":.8,"ambience":.7,"sfx":.85,"fullscreen":false,"reduced_motion":false,"instant_text":false}
+var settings := {"master":.8,"ambience":.7,"music":.7,"sfx":.85,"fullscreen":false,"reduced_motion":false,"instant_text":false}
 var completed: Array[String] = []
 var selected_id := "last_visit"
 var menu_page := "home"
@@ -35,10 +35,16 @@ const UI_HOVER_DB := -14.0
 const UI_PRESS_DB := -12.0
 const UI_HOVER_GAP_MS := 50      # sweeping across several buttons does not stutter
 var _last_ui_hover := -1000
+# Main-menu music: owned here (this node outlives scenes), so leaving for an
+# episode pauses it and coming back to the menu carries on from the same spot.
+const MENU_MUSIC := "res://audio/anthology/menu_music.mp3"
+const MENU_MUSIC_DB := -10.0
+var menu_music: AudioStreamPlayer
+var _music_tween: Tween
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	for title in ["Ambience","SFX"]:
+	for title in ["Ambience","SFX","Music"]:
 		if AudioServer.get_bus_index(title)<0:
 			AudioServer.add_bus()
 			AudioServer.set_bus_name(AudioServer.bus_count-1,title)
@@ -87,7 +93,7 @@ func save_preferences() -> void:
 	config.save("user://anthology.cfg")
 
 func apply_preferences() -> void:
-	for pair in [["Master","master"],["Ambience","ambience"],["SFX","sfx"]]:
+	for pair in [["Master","master"],["Ambience","ambience"],["Music","music"],["SFX","sfx"]]:
 		var volume := clampf(float(settings[pair[1]]),0.0,1.0)
 		if pair[0]=="Master": volume *= transition_gain
 		AudioServer.set_bus_volume_db(AudioServer.get_bus_index(pair[0]),linear_to_db(volume))
@@ -280,8 +286,35 @@ func play_sfx(key: String, volume_db := -18.0) -> void:
 	sound.finished.connect(sound.queue_free)
 	sound.play()
 
+func play_menu_music() -> void:
+	if menu_music == null:
+		menu_music = AudioStreamPlayer.new()
+		menu_music.name = "MenuMusic"
+		var stream := load(MENU_MUSIC) as AudioStreamMP3
+		stream.loop = true
+		menu_music.stream = stream
+		menu_music.bus = &"Music"
+		menu_music.volume_db = -60.0
+		add_child(menu_music)
+		menu_music.play()
+	menu_music.stream_paused = false
+	if not menu_music.playing: menu_music.play()
+	_fade_music(MENU_MUSIC_DB, 1.5)
+
+func pause_menu_music(seconds := .8) -> void:
+	if menu_music == null or menu_music.stream_paused: return
+	await _fade_music(-60.0, seconds)
+	if menu_music.volume_db <= -59.0: menu_music.stream_paused = true
+
+func _fade_music(db: float, seconds: float) -> void:
+	if _music_tween: _music_tween.kill()
+	_music_tween = create_tween()
+	_music_tween.tween_property(menu_music,"volume_db",db,seconds)
+	await _music_tween.finished
+
 func launch_episode(id: String) -> void:
 	if changing: return
+	pause_menu_music()
 	selected_id = episode(id).id
 	save_preferences()
 	var entry := episode(selected_id)
