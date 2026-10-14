@@ -1,5 +1,14 @@
 # Asset credits for the abandoned-house revision
 
+## Level 06 — Dream Field / sunset valley
+
+- **Handpainted Fat Cat Statue – Ghibli Style** by **Stylized Station**, supplied by the user: https://sketchfab.com/3d-models/handpainted-fat-cat-statue-ghibli-style-b86833c9e84041d38e169eaad86afc27 — CC BY 4.0 (identified in the GLB metadata). The original model's upright transform and UVs are preserved; runtime geometry is baked to `assets/dream_field/cat_mesh.res`, scaled to 5.6 metres, with a separate stone shader that brightens and desaturates the supplied handpainted albedo. No endorsement is implied.
+- **PSX Skyboxes Free** by **heyheythere** — https://heyheythere.itch.io/psx-skyboxes-free — CC BY 4.0. Bundled license: `assets/dream_field/LICENSE-PSX-Skyboxes.txt`. Uses the supplied Sunset Clouds panorama with a level-specific sky shader, colour treatment and aligned larger sun disc.
+- **PSX Natural Ground Textures SAMPLE** by **CipriEnt** — https://ciprient.itch.io/psx-natural-ground-textures. Uses the user-supplied Grass 01, Dirt 01, Stone 01 and Forest Floor 01 textures. The author's terms allow use in finished personal/commercial games and modification; raw texture redistribution is restricted. Original downloads stay local and are not an asset pack for redistribution.
+- **Dry Grass Rustle.wav** by **TheSupremeMuffinPooter** — https://freesound.org/people/TheSupremeMuffinPooter/sounds/525268/ — CC0. The supplied recording is crossfaded into a loop and excerpted into four footstep sounds. Original recording preserved locally under `source_assets/dream_field/`.
+- The terrain, meadow grass geometry/material, autumn trees, leaves, rocks, flowers, lake shader, wind bed and interaction code are authored for ExitRoom. Wind synthesis and grass-audio preparation: `tools/prepare_dream_field_audio.py`.
+- The supplied screaming-face scan, overcast EXR, dry-mud Blender source and chapel sample are retained locally as alternatives; they are not used in the final sunset/cat scene.
+
 ## Anthology menu and story presentation — October 2026
 
 - **Chakra Petch**, Regular and Bold, by **Cadson Demak**: https://github.com/google/fonts/tree/main/ofl/chakrapetch — SIL Open Font License 1.1. Bundled license: `ui/fonts/OFL-ChakraPetch.txt`. Used for Thai and Latin menu, subtitle and narrative text.

@@ -9,6 +9,8 @@ Open `project.godot` with **Godot 4.7.2**. F5 opens `main_menu.tscn`.
 | `backrooms_level.tscn` | Episode 02: After Hours |
 | `Room407/main.tscn`, `Room407/scripts/`, `Room407/assets/`, `Room407/audio/` | Episode 03: Room 407 and its own resources |
 | `frog_chapter.tscn`, `frog_field_world.tscn` | Episode 04: The Passenger; keep the authored world intact |
+| `dream_field.tscn`, `scenes/dream_field/`, `scripts/dream_field*.gd` | Level 06: sunset free roam; E at the cat fades back to the selector |
+| `assets/dream_field/`, `audio/dream_field/` | Selected level-06 runtime resources; original downloads stay local |
 | `scripts/` | Shared player, enemies and episode story code |
 | `assets/`, `3Dmodel_import/`, `tree/` | Textures and models referenced by the playable scenes |
 | `Grass/` | Binbun grass shader, its include and the two grass textures |
@@ -18,6 +20,7 @@ Open `project.godot` with **Godot 4.7.2**. F5 opens `main_menu.tscn`.
 | `STORY.md`, `HANDOFF.md`, `FROG_CHAPTER.md`, `ASSET_CREDITS.md` | Story, handoff and credits |
 | `.github/workflows/web.yml`, `export_presets.cfg` | Web export and GitHub Pages deployment |
 | `.godot/`, `.buildtmp/`, `build/` | Local generated files; never commit |
+| `source_assets/`, downloaded PSX packs | Local source/reference packs, ignored by Godot and Git |
 
 Scene paths stay at their current locations so existing references and the frog
 system remain valid. The web menu uses the existing Passenger photo; the native

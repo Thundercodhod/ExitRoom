@@ -5,10 +5,11 @@ signal transition_finished
 const Style = preload("res://scripts/anthology_style.gd")
 const MENU := "res://main_menu.tscn"
 const EPISODES := [
-	{"id":"last_visit","number":"01","title":"THE LAST VISIT","thai":"บ้านที่ยังรอ","scene":"res://prologue_village.tscn","tag":"ธาม / งานซ่อมไฟ / 23:48 น.","hook":"เพื่อนฝากให้แวะไปเช็กไฟ\nผมกะว่าแป๊บเดียวก็เสร็จ","summary":"ธามรับงานตรวจบ้านก่อนขายหลังปิดร้าน เจ้าของย้ายออกไปหลายเดือนแล้ว แต่พอเขาไปถึง ไฟในบ้านกลับเปิดอยู่ และมีเสียงคนเคาะประตูจากข้างใน"},
-	{"id":"after_hours","number":"02","title":"AFTER HOURS","thai":"กะสุดท้าย","scene":"res://backrooms_level.tscn","tag":"ริน / ช่างซ่อมบำรุง / 22:06 น.","hook":"ฉันเข้าไปเพราะนึกว่ามีคนติดอยู่\nตอนนั้นยังห่วงว่าเขาจะกลับบ้านยังไง","summary":"รินมารับกะดึกแทนเพื่อนที่ลาป่วย ก่อนเลิกงานเธอได้ยินคนเรียกจากห้องเก็บของ จึงหยิบไฟฉายเข้าไปดู พอจะเดินกลับ ทางเดินที่คุ้นเคยกลับไม่พาเธอไปที่เดิม"},
+	{"id":"last_visit","number":"01","title":"THE LAST VISIT","thai":"บ้านที่ยังรอ","scene":"res://prologue_village.tscn","tag":"ธาม / งานซ่อมไฟ / 23:48 น.","hook":"แค่เช็กไฟแล้วล็อกบ้าน\nผมรับปากเพื่อนไปแค่นั้นเอง","summary":"หลังปิดร้าน ธามแวะไปเช็กไฟบ้านที่เพื่อนฝากไว้ เจ้าของย้ายออกไปสามเดือนแล้ว แต่ไฟยังเปิดอยู่ พอเขาเดินเข้าใกล้ ก็มีเสียงเคาะจากข้างใน"},
+	{"id":"after_hours","number":"02","title":"AFTER HOURS","thai":"กะสุดท้าย","scene":"res://backrooms_level.tscn","tag":"ริน / ช่างซ่อมบำรุง / 22:06 น.","hook":"ฉันนึกว่ามีคนโดนล็อกไว้ข้างใน\nเลยเดินเข้าไปดู แค่นั้นเลย","summary":"รินมารับกะดึกแทนเพื่อน เก็บเครื่องมือเสร็จก็ได้ยินคนเรียกจากห้องเก็บของ เธอนึกว่าเป็นพี่แม่บ้าน เลยหยิบไฟฉายเข้าไปดู แต่พอหันกลับมา ประตูที่เพิ่งเดินผ่านกลับหายไป"},
 	{"id":"room407","number":"03","title":"ROOM 407","thai":"ห้องที่ไม่มีใครเช่า","scene":"res://Room407/main.tscn","tag":"ธีร์ / ห้องเช่าชั่วคราว / เจ็ดคืน","hook":"ห้องเก่าท่อน้ำแตก ผมเลยต้องย้ายมาอยู่ชั่วคราว\nคืนแรกก็มีข้อความจากคนที่ผมไม่รู้จัก","summary":"ธีร์เช่าห้องใกล้ที่ทำงานระหว่างรอช่างซ่อมท่อน้ำ เขาขนมาแค่เสื้อผ้ากับนาฬิกาปลุก แต่คนห้องข้าง ๆ กลับรู้ทั้งชื่อและเวลาที่เขาตื่น"},
-	{"id":"passenger","number":"04","title":"THE PASSENGER","thai":"ผู้โดยสาร","scene":"res://frog_chapter.tscn","tag":"ภาคิน / ทางเลียบทุ่ง / 23:46 น.","hook":"ถนนใหญ่ปิดซ่อม ผมเลยอ้อมมาทางนี้\nขับอยู่ดี ๆ รถก็ดับ","summary":"ภาคินกำลังขับรถกลับหลังเก็บของออกจากห้องเช่าของพ่อ รถเสียบนถนนเลียบทุ่งที่ไม่มีสัญญาณโทรศัพท์ เขาจึงเดินไปขอความช่วยเหลือที่บ้านหลังเดียวซึ่งยังเปิดไฟอยู่"}
+	{"id":"passenger","number":"04","title":"THE PASSENGER","thai":"ผู้โดยสาร","scene":"res://frog_chapter.tscn","tag":"ภาคิน / ทางเลียบทุ่ง / 23:46 น.","hook":"ถนนใหญ่ปิดซ่อม ผมเลยอ้อมมาทางนี้\nขับอยู่ดี ๆ รถก็ดับ","summary":"ภาคินกำลังขับรถกลับหลังเก็บของออกจากห้องเช่าของพ่อ รถเสียบนถนนเลียบทุ่งที่ไม่มีสัญญาณโทรศัพท์ เขาจึงเดินไปขอความช่วยเหลือที่บ้านหลังเดียวซึ่งยังเปิดไฟอยู่"},
+	{"id":"dream_field","number":"06","title":"DREAM FIELD","thai":"ทุ่งในฝัน","scene":"res://dream_field.tscn","free_roam":true,"tag":"ด่าน 06 / ฉากอิสระ / พระอาทิตย์ตก","hook":"ทุ่งยามเย็น\nเดินเล่นได้จนกว่าจะอยากตื่น","summary":"เดินสำรวจทุ่งสีทอง เนินเขา และทะเลสาบใต้ท้องฟ้าสีส้ม–ม่วง เมื่อพร้อมกลับ ให้เข้าไปใกล้รูปปั้นแมวแล้วกด E ภาพและเสียงจะค่อย ๆ เฟดกลับเมนู"}
 ]
 var settings := {"master":.8,"ambience":.7,"sfx":.85,"fullscreen":false,"reduced_motion":false,"instant_text":false}
 var completed: Array[String] = []
@@ -237,7 +238,8 @@ func launch_episode(id: String) -> void:
 	selected_id = episode(id).id
 	save_preferences()
 	var entry := episode(selected_id)
-	await _change_episode_scene(entry.scene,"EPISODE "+entry.number+"\n"+entry.title)
+	var heading: String = ("ด่าน " if entry.get("free_roam",false) else "EPISODE ")+entry.number+"\n"+entry.title
+	await _change_episode_scene(entry.scene,heading)
 
 func return_to_menu() -> void:
 	if changing: return
