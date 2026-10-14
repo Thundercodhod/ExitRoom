@@ -1,4 +1,4 @@
-# Episode 05 — THE CAMPFIRE / กองไฟกลางป่า
+# Episode 05 — REALIZATION / การตกตะกอน
 
 เปิด `forest_chapter.tscn` แล้วกด **F6** หรือเลือก Episode 05 จากเมนู (เปิดให้เล่นหลังเล่น Episode 04 จบ)
 

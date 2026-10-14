@@ -1,5 +1,5 @@
 extends Node3D
-## Episode 05 — THE CAMPFIRE / กองไฟกลางป่า
+## Episode 05 — REALIZATION / การตกตะกอน
 ## Phakin wakes in a forest after blacking out at the wheel (end of Episode 04).
 ## Goal: walk the trail to the campfire. Leave the trail and the frog hunts him;
 ## when it catches him he wakes at the start again, but the night has moved on.
@@ -20,11 +20,11 @@ const CAMP_REACH := 3.2
 const START_MINUTES := 23 * 60 + 52
 const MINUTES_PER_CATCH := 37
 const REAL_SECONDS_PER_MINUTE := 6.0
-const WAKE_LINES := ["ที่ไหนเนี่ย... เมื่อกี้ผมยังขับรถอยู่เลย",
-	"ตื่นอีกแล้ว... ตรงเดิม ต้นไม้ต้นเดิม",
-	"กองไฟนั่นเล็กลงกว่าเดิม ผมหลับไปนานแค่ไหนกัน",
-	"คอไม่เจ็บเลยสักนิด ทั้งที่มันบีบแน่นขนาดนั้น"]
-const EPILOGUE := "ที่กองไฟไม่มีใครนั่งอยู่ แต่ฟืนเพิ่งถูกเติม\nขอนไม้ข้าง ๆ ยังอุ่น เหมือนมีคนเพิ่งลุกไป\n\nผมนอนลงตรงนั้น ฟังเสียงไฟแตกเปาะแปะ\nก่อนหลับ ผมได้ยินเสียงคนคุยกันเบา ๆ อยู่อีกฝั่งกองไฟ\nหนึ่งในนั้นหัวเราะเหมือนพ่อ\n\nEPISODE 06 — เร็ว ๆ นี้"
+const WAKE_LINES := ["ที่ไหนอีกแล้วเนี่ย... เมื่อกี้ยังขับรถอยู่เลย",
+	"อ่ยยย... มึนไปหมดเลยย",
+	"กองไฟเล็กลงกว่าเดิมรึเปล่า แล้วเราหลับไปนานแค่ไหนเนี่ย",
+	"ไม่รู้สึกเจ็บเลยสักนิด ทั้งที่มันบีบแน่นขนาดนั้น"]
+const EPILOGUE := "ที่กองไฟไม่มีใครนั่งอยู่ แต่ฟืนเพิ่งถูกเติม\nขอนไม้ข้าง ๆ ยังอุ่น เหมือนมีคนเพิ่งลุกไป\n\nผมสลบลงตรงนั้น ฟังเสียงฟืนแตกเปาะแปะ\nก่อนหลับ ผมได้ยินเสียงคนคุยกันเบาๆ อยู่อีกฝั่งกองไฟ\nเสียงหัวเราะนั้นชวนคิดถึงจริงๆ\n\nEPISODE 06 — เร็ว ๆ นี้"
 enum Stage { INTRO, WAKE, WALK, WARNED, HUNTED, CAUGHT, CAMP, END }
 var stage := Stage.INTRO
 var playing := false
@@ -103,7 +103,7 @@ func _ready() -> void:
 	setup_audio()
 	setup_ui()
 	update_clock()
-	show_panel("THE CAMPFIRE  /  กองไฟกลางป่า","ภาคิน / ทางกลับจากห้องเช่าของพ่อ / 23:52\n\n“ใกล้ถึงปั๊มแล้วใช่ไหมนะ.....”\nผมจำได้แค่นั้น ไฟปั๊มอยู่ข้างหน้า\nแล้วตาก็กะพริบ ครั้งแล้วครั้งเล่า\n\nWASD เดิน · เมาส์มอง · Shift วิ่ง\nF ไฟฉาย · V มุมกล้อง · Esc พัก · F1 เมนู","ลืมตา")
+	show_panel("REALIZATION  /  การตกตะกอน","ภาคิน / ทางกลับจากห้องเช่าของพ่อ / 23:52\n\n“ใกล้ถึงปั๊มแล้วใช่ไหมนะ.....”\nผมจำได้แค่นั้น ไฟปั๊มอยู่ข้างหน้า\nแล้วตาก็กะพริบ ครั้งแล้วครั้งเล่า\n\nWASD เดิน · เมาส์มอง · Shift วิ่ง\nF ไฟฉาย · V มุมกล้อง · Esc พัก · F1 เมนู","ลืมตา")
 	play_cue("tape",-23.0)
 
 # Far trees fade into the fog anyway: stop drawing them past it. Tree crowns
@@ -278,7 +278,7 @@ func setup_ui() -> void:
 	var stack := VBoxContainer.new()
 	margin.add_child(stack)
 	var chapter := make_label(15,Color(.64,.76,.62))
-	chapter.text = "EPISODE 05  /  THE CAMPFIRE"
+	chapter.text = "EPISODE 05  /  REALIZATION"
 	stack.add_child(chapter)
 	objective = make_label(22)
 	stack.add_child(objective)
@@ -470,7 +470,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			panel_continue()
 		else:
 			paused = true
-			show_panel("พักเกม","THE CAMPFIRE  /  กองไฟกลางป่า\n\n"+objective.text+"\n\nWASD เดิน · F ไฟฉาย · Shift วิ่ง · V มุมกล้อง","เล่นต่อ")
+			show_panel("พักเกม","REALIZATION  /  การตกตะกอน\n\n"+objective.text+"\n\nWASD เดิน · F ไฟฉาย · Shift วิ่ง · V มุมกล้อง","เล่นต่อ")
 			get_tree().paused = true
 		get_viewport().set_input_as_handled()
 		return
@@ -728,14 +728,14 @@ func sleep_by_fire() -> void:
 	if frog.mode != frog.Mode.GONE: frog.vanish()
 	breath.stop()
 	await look_at_point(campfire_spot + Vector3(0,.4,0), 1.4)
-	say("อุ่นจัง... กลิ่นควันแบบนี้ เหมือนตอนเด็ก ๆ ที่ไปตั้งแคมป์กับพ่อ", 6)
+	say("อุ่นจัง... กลิ่นควันแบบนี้ เหมือนตอนสมัยเด็กๆเลย", 6)
 	await wait_for(5.0)
 	# Lies down beside the fire.
 	var t := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP).set_parallel(true)
 	t.tween_property(player.pivot,"position:y",.4,2.4).set_trans(Tween.TRANS_SINE)
 	t.tween_property(player.camera,"rotation:z",-.38,2.4).set_trans(Tween.TRANS_SINE)
 	await t.finished
-	say("หลับตาลงแป๊บเดียว... คงไม่เป็นไร", 4)
+	say("มึนหัวอีกแล้ว...เหมือนตอนอยู่บนรถเลย", 4)
 	# Slow, heavy blinks, each one a little longer, until they stay shut.
 	t = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP)
 	for step in [[1.0,.5],[0.2,.7],[1.0,.6],[.45,.9],[1.0,.8],[.75,1.1],[1.0,1.2]]:
@@ -752,4 +752,4 @@ func sleep_by_fire() -> void:
 	if anthology and anthology.has_method("complete_episode"):
 		anthology.complete_episode(EPISODE_ID, EPILOGUE)
 	else:
-		show_panel("THE CAMPFIRE  /  กองไฟกลางป่า", EPILOGUE, "เล่นตอนนี้อีกครั้ง")
+		show_panel("REALIZATION  /  การตกตะกอน", EPILOGUE, "เล่นตอนนี้อีกครั้ง")

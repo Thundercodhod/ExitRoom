@@ -57,7 +57,7 @@ func run() -> void:
 	chapter = current_scene
 	await frames()
 	print("scene ready in ", Time.get_ticks_msec() - started_at, " ms")
-	check(chapter.EPISODE_ID == "forest" and chapter.panel_title.text.contains("THE CAMPFIRE"), "forest episode opens with its own introduction")
+	check(chapter.EPISODE_ID == "forest" and chapter.panel_title.text.contains("REALIZATION"), "forest episode opens with its own introduction")
 	check(chapter.panel_text.text.contains("ใกล้ถึงปั๊มแล้วใช่ไหมนะ"), "introduction picks up from the end of Episode 04")
 	check(chapter.get_node("World/Trees").get_child_count() > 100, "forest is planted (%d trees)" % chapter.get_node("World/Trees").get_child_count())
 	check(chapter.trail.get_baked_length() > 80, "trail leads to the campfire")
