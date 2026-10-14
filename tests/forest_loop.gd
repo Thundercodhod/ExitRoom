@@ -61,6 +61,10 @@ func run() -> void:
 	check(chapter.panel_text.text.contains("ใกล้ถึงปั๊มแล้วใช่ไหมนะ"), "introduction picks up from the end of Episode 04")
 	check(chapter.get_node("World/Trees").get_child_count() > 100, "forest is planted (%d trees)" % chapter.get_node("World/Trees").get_child_count())
 	check(chapter.trail.get_baked_length() > 80, "trail leads to the campfire")
+	var turn_before: float = chapter.flames.rotation.y
+	await create_timer(.3).timeout
+	check(absf(chapter.flames.rotation.y - turn_before) > .01, "the campfire flames move (burn animation runs)")
+	check((chapter.flames.material_override as StandardMaterial3D).disable_fog, "the flames are not tinted by the night fog")
 	# The pieces get their atlas texture from props.tres through their .import files.
 	var tree_mesh := chapter.get_node("World/Trees").find_children("*", "MeshInstance3D", true, false)[0] as MeshInstance3D
 	var tree_mat := tree_mesh.get_active_material(0) as StandardMaterial3D
@@ -143,6 +147,7 @@ func run() -> void:
 	check(chapter.player.global_position.distance_to(chapter.START) < .5, "back at the start of the trail")
 	check(chapter.clock_minutes - minutes_before > 25, "the clock moved on (%s)" % chapter.clock_label.text)
 	check(chapter.fire_energy < energy_before, "the campfire burned down")
+	check(chapter.flames.scale.y < .99, "the flames themselves are smaller")
 	check(not chapter.player.held and chapter.player.camera.current, "control and view restored after the catch")
 	check(chapter.objective.visible and chapter.objective.text == chapter.OBJECTIVE, "objective back")
 

@@ -119,7 +119,13 @@ func tune_world() -> void:
 			if String(body.get_parent().name).ends_with("_crown"): body.queue_free()
 	# The pack's own loops: the fire burns, trees sway (each from its own point in the loop).
 	var fire_anim := $World/Campsite/Campfire.find_child("AnimationPlayer", true, false) as AnimationPlayer
-	if fire_anim and fire_anim.has_animation("burn"): fire_anim.play("burn")
+	if fire_anim and fire_anim.has_animation("burn"): fire_anim.play("burn")   # the flames turn
+	if flames:
+		# Flames glow through the night fog in warm colours instead of taking its green tint.
+		var flame_mat := (flames.get_active_material(0) as StandardMaterial3D).duplicate() as StandardMaterial3D
+		flame_mat.disable_fog = true
+		flame_mat.albedo_color = Color(1.6, 1.15, .6)
+		flames.material_override = flame_mat
 	for anim in get_node("World").find_children("AnimationPlayer","AnimationPlayer",true,false):
 		var player_anim := anim as AnimationPlayer
 		if player_anim.has_animation("sway"):
@@ -695,6 +701,7 @@ func _on_choke_finished() -> void:
 	# The night has moved on while he was out, and the fire has burned down.
 	clock_minutes += MINUTES_PER_CATCH + rng.randf_range(-6.0, 8.0)
 	fire_energy = maxf(.8, fire_energy * .78)
+	set_flame_size(.45 + .55 * fire_energy / 2.4)
 	frog.stop_hunt()
 	frog.clear_scene_rules()
 	frog.threat_enabled = false
@@ -703,6 +710,10 @@ func _on_choke_finished() -> void:
 	objective.visible = true
 	busy = false
 	wake(false)
+
+# Smaller flames after each catch (the burn loop only turns them, so their size is free).
+func set_flame_size(size: float) -> void:
+	if flames: flames.scale = Vector3.ONE * size
 
 func flicker_fire(_delta: float) -> void:
 	var t := Time.get_ticks_msec() / 1000.0
@@ -713,7 +724,6 @@ func flicker_fire(_delta: float) -> void:
 	# A beacon from far away; up close the real light takes over.
 	var away := player.global_position.distance_to(campfire_spot) if player else 99.0
 	fire_glow.transparency = clampf(1.0 - (away - 6.0) / 14.0, 0.0, .92)
-	if flames: flames.scale = Vector3.ONE * (.45 + .55 * size)
 
 # ---------------------------------------------------------------- the campfire
 
