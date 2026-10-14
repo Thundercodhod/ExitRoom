@@ -277,7 +277,7 @@ func test_persistence() -> void:
 	check(is_equal_approx(anthology.settings.master,.37) and is_equal_approx(anthology.settings.ambience,.28),"saved audio preferences reload")
 	check(is_equal_approx(anthology.settings.music,.33),"saved music volume reloads")
 	check(anthology.settings.instant_text and anthology.settings.reduced_motion,"saved readability preferences reload")
-	check(anthology.completed==expected_completed and anthology.completed.size()==anthology.EPISODES.size(),"all completions reload without duplicates")
+	check(anthology.completed==expected_completed and anthology.completed.size()==anthology.EPISODES.filter(func(e): return not e.get("free_roam",false)).size(),"all completions reload without duplicates")
 	anthology.apply_preferences()
 	check(is_equal_approx(db_to_linear(AudioServer.get_bus_volume_db(AudioServer.get_bus_index("Master"))),.37),"master volume preference reaches audio mixer")
 	check(is_equal_approx(db_to_linear(AudioServer.get_bus_volume_db(AudioServer.get_bus_index("Ambience"))),.28),"ambience preference reaches separate mixer bus")

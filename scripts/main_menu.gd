@@ -126,7 +126,7 @@ func build_home() -> void:
 	shadow.add_theme_constant_override("outline_size",1)
 	text(root,"EXITROOM",Vector2(61,250),100,Style.INK,true)
 	text(root,"ประตูปิดแล้ว\nแต่บางอย่างยังตามออกมา",Vector2(72,377),25,Style.INK)
-	text(root,"4 เรื่องเล่า  ·  4 คืนที่ไม่มีใครอยากกลับไป",Vector2(72,469),17,Style.MUTED)
+	text(root,"4 เรื่องเล่า  ·  และทุ่งที่ยังอยู่ในความฝัน",Vector2(72,469),17,Style.MUTED)
 	var first := button(root,"01   เลือกเรื่อง",Vector2(884,272),Vector2(326,61),func(): show_page("episodes"),27)
 	first.name = "EpisodesButton"
 	button(root,"02   ตั้งค่า",Vector2(884,344),Vector2(326,61),func(): show_page("options"),27)
@@ -151,16 +151,16 @@ func header(root: Control, title: String, sub: String) -> void:
 
 func build_episodes() -> void:
 	var root: Control = pages.episodes
-	header(root,"EPISODES","เลือกเรื่องใดก่อนก็ได้ · EPISODE 05 เล่นต่อจาก 04")
-	# The list fills the same 450 px column however many episodes there are.
-	var step := minf(111.0, 450.0/Anthology.EPISODES.size())
+	header(root,"EPISODES","เลือกเรื่องใดก่อนก็ได้ · EPISODE 05 และด่าน 06 เล่นต่อกันจาก 04")
+	var row_height := minf(96.0, (448.0 - (Anthology.EPISODES.size()-1)*12.0) / Anthology.EPISODES.size())
 	for i in Anthology.EPISODES.size():
 		var data: Dictionary = Anthology.EPISODES[i]
-		var b := button(root,"",Vector2(64,160+i*step),Vector2(412,step-15),func(): select_episode(i),20)
+		var b := button(root,"",Vector2(64,160+i*(row_height+12)),Vector2(412,row_height),func(): select_episode(i),20)
 		b.name = "Episode"+data.number
-		text(b,data.number,Vector2(18,8),24,Style.ACCENT,true)
-		text(b,data.title,Vector2(64,8),23,Style.INK,true)
-		text(b,data.thai if Anthology.is_unlocked(data.id) else "ล็อกอยู่ · เล่น EPISODE 04 ให้จบก่อน",Vector2(64,step-58),19,Style.MUTED)
+		text(b,data.number,Vector2(18,10),24,Style.ACCENT,true)
+		text(b,data.title,Vector2(64,14),23,Style.INK,true)
+		var locked_text: String = "ล็อกอยู่ · เล่น "+Anthology.episode(data.get("requires","")).number+" ให้จบก่อน"
+		text(b,data.thai if Anthology.is_unlocked(data.id) else locked_text,Vector2(64,44),18,Style.MUTED)
 		episode_buttons.append(b)
 	preview = TextureRect.new()
 	preview.name = "EpisodePreview"
@@ -195,12 +195,12 @@ func select_episode(index: int, sound := true) -> void:
 	tag.text = entry.tag
 	hook.text = entry.hook
 	summary.text = entry.summary
-	start_button.text = ("เล่นอีกครั้ง" if Anthology.completed.has(entry.id) else "เริ่มเรื่อง")+"   /   EPISODE "+entry.number+"  →"
+	start_button.text = "เข้าไปเดินเล่น   /   ด่าน "+entry.number+"  →" if entry.get("free_roam",false) else ("เล่นอีกครั้ง" if Anthology.completed.has(entry.id) else "เริ่มเรื่อง")+"   /   EPISODE "+entry.number+"  →"
 	var unlocked: bool = Anthology.is_unlocked(entry.id)
 	start_button.disabled = not unlocked or loading
 	if not unlocked:
 		# No spoilers before the episode it continues has been played.
-		start_button.text = "เล่น EPISODE "+Anthology.episode(entry.requires).number+" ให้จบก่อน แล้วตอนนี้จะเปิดให้เล่น"
+		start_button.text = "เล่น "+Anthology.episode(entry.requires).number+" ให้จบก่อน แล้วตอนนี้จะเปิดให้เล่น"
 		hook.text = "ตอนต่อจาก "+Anthology.episode(entry.requires).title
 		summary.text = ""
 	for i in episode_buttons.size():
@@ -210,7 +210,7 @@ func select_episode(index: int, sound := true) -> void:
 func play_selected() -> void:
 	if loading or not Anthology.is_unlocked(Anthology.EPISODES[selected].id): return
 	loading = true
-	start_button.text = "กำลังเปิดเรื่อง..."
+	start_button.text = "กำลังเปิดฉาก..."
 	start_button.disabled = true
 	Anthology.launch_episode(Anthology.EPISODES[selected].id)
 
@@ -267,7 +267,7 @@ func build_options() -> void:
 
 func build_credits() -> void:
 	var root: Control = pages.credits
-	header(root,"CREDITS","EXITROOM · เรื่องสั้นสยองขวัญ 4 ตอน")
+	header(root,"CREDITS","EXITROOM · เรื่องสั้นสยองขวัญ 4 ตอน และทุ่งในฝัน")
 	var scroll := ScrollContainer.new()
 	place(root,scroll,Vector2(190,163),Vector2(900,495))
 	var stack := VBoxContainer.new()
@@ -277,7 +277,8 @@ func build_credits() -> void:
 	for data in [
 		["THE STORIES","THE LAST VISIT · AFTER HOURS · ROOM 407 · THE PASSENGER\nเรื่องแต่งแนวจิตวิทยาสยองขวัญ แต่ละตอนเล่นได้อย่างอิสระ"],
 		["ART & CHARACTERS","โมเดลกบและระบบตัวละครจากทีมผู้สร้างโปรเจกต์\nห้องและเฟอร์นิเจอร์: Vicious Potato Studios · กล่อง: PomidorkaStudios\nLow-poly Furnished Abandoned House: NeoKG (CC BY 4.0)\nพื้นผิว: Poly Haven · Godot Grass Shader: Binbun (CC0)"],
-		["TYPE & SOUND","Chakra Petch: Cadson Demak · VT323: Peter Hull (SIL OFL)\nเสียงบรรยากาศและเอฟเฟกต์เพิ่มเติม: สังเคราะห์ขึ้นสำหรับ ExitRoom\nเสียงและสินทรัพย์เดิม: ดู ASSET_CREDITS.md และ Room407/ASSET_CREDITS.md"],
+		["DREAM FIELD","รูปปั้นแมว: Stylized Station (CC BY 4.0)\nPSX Skyboxes Free: heyheythere (CC BY 4.0)\nPSX Natural Ground Textures: CipriEnt\nต้นไม้ ใบไม้ หิน ดอกไม้ และระบบทุ่ง: ExitRoom"],
+		["TYPE & SOUND","Chakra Petch: Cadson Demak · VT323: Peter Hull (SIL OFL)\nเสียงหญ้าแห้ง: TheSupremeMuffinPooter (CC0) · เสียงลมในทุ่ง: ExitRoom\nเสียงและสินทรัพย์เพิ่มเติม: ดู ASSET_CREDITS.md และ Room407/ASSET_CREDITS.md"],
 		["THANK YOU FOR PLAYING","ขอบคุณที่เล่น ExitRoom\nกลับมาเลือกเรื่องอื่นได้จากเมนูหลัก"]]:
 		stack.add_child(Style.label(data[0],23,Style.GOLD,true))
 		var copy := Style.label(data[1],20)

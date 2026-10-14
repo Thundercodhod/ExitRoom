@@ -43,5 +43,25 @@ func verify() -> void:
 		push_error("Grass cutout shader settings lost during export")
 		failures += 1
 	world.free()
+	# Level 06 is independently selectable, including the baked cat and sunset.
+	var dream := (load("res://scenes/dream_field/world.tscn") as PackedScene).instantiate()
+	if dream.get_node_or_null("WakeMonument/StatueSocket/CatStatue")==null:
+		push_error("Missing dream-field cat statue")
+		failures += 1
+	var sky_material: ShaderMaterial = dream.get_node("SunsetAtmosphere").environment.sky.sky_material
+	if not sky_material.get_shader_parameter("panorama") is Texture2D:
+		push_error("Missing sunset sky texture")
+		failures += 1
+	dream.free()
+	for path in ["cat_albedo.png","psx_grass.png","psx_dirt.png","psx_stone.png","psx_forest_floor.png"]:
+		var texture := load("res://assets/dream_field/"+path) as Texture2D
+		if texture==null or not texture.get_image().has_mipmaps():
+			push_error("Missing dream-field texture/mipmaps: "+path)
+			failures += 1
+	for path in ["wind_loop","dry_grass_loop","grass_step_1","grass_step_2","grass_step_3","grass_step_4"]:
+		var clip := load("res://audio/dream_field/"+path+".wav") as AudioStream
+		if clip==null or clip.get_length()<=0:
+			push_error("Missing dream-field audio: "+path)
+			failures += 1
 	print("RELEASE_RESOURCE_FAILURES=",failures)
 	quit(1 if failures else 0)

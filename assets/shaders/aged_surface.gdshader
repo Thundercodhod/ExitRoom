@@ -35,11 +35,17 @@ void fragment() {
     vec3 n = normalize(world_normal);
     vec3 w = pow(abs(n),vec3(8.0));
     w /= max(w.x+w.y+w.z,0.001);
-    vec3 p = world_position / metres_per_tile;
+    vec3 p = world_position / max(metres_per_tile, 0.01);
     vec3 c = tri_color(albedo_map,p,w);
     c = mix(vec3(dot(c,vec3(0.299,0.587,0.114))),c,saturation);
     float broad = noise3(world_position*0.63+vec3(4.7,2.1,1.3));
-    float mottling = broad*0.65 + noise3(world_position*2.2)*0.25 + noise3(world_position*6.0)*0.10;
+    // Let sub-pixel stains average out instead of sparkling under a moving torch.
+    float footprint = length(fwidth(world_position));
+    float medium_detail = 1.0 - smoothstep(0.15, 0.65, footprint * 2.2);
+    float fine_detail = 1.0 - smoothstep(0.15, 0.65, footprint * 6.0);
+    float mottling = broad*0.65
+        + mix(0.5, noise3(world_position*2.2), medium_detail)*0.25
+        + mix(0.5, noise3(world_position*6.0), fine_detail)*0.10;
     float damp = smoothstep(0.39,0.73,mottling);
     float foot = (1.0-smoothstep(0.05,0.9,world_position.y))*0.35;
     ALBEDO = c*tint.rgb*mix(vec3(1.0),vec3(0.29,0.31,0.27),clamp((damp+foot)*grime,0.0,0.85));
@@ -49,6 +55,12 @@ void fragment() {
     vec3 tx = texture(normal_map_tex,p.yz).rgb*2.0-1.0;
     vec3 ty = texture(normal_map_tex,p.xz).rgb*2.0-1.0;
     vec3 tz = texture(normal_map_tex,p.xy).rgb*2.0-1.0;
-    vec3 mapped = normalize(vec3(tx.z*sign(n.x),tx.x,tx.y)*w.x + vec3(ty.x,ty.z*sign(n.y),ty.y)*w.y + vec3(tz.x,tz.y,tz.z*sign(n.z))*w.z);
-    NORMAL = normalize(mat3(VIEW_MATRIX)*normalize(mix(n,mapped,normal_strength)));
+    // Blend surface slopes rather than the three projection-axis normals.
+    // A flat normal map must keep the mesh normal, including on bevels and seams.
+    vec3 slope = vec3(0.0, tx.x, tx.y) / max(tx.z, 0.35) * w.x
+        + vec3(ty.x, 0.0, ty.y) / max(ty.z, 0.35) * w.y
+        + vec3(tz.x, tz.y, 0.0) / max(tz.z, 0.35) * w.z;
+    slope -= n * dot(slope, n);
+    vec3 mapped = normalize(n + slope * normal_strength);
+    NORMAL = normalize(mat3(VIEW_MATRIX) * mapped);
 }
