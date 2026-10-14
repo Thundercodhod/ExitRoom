@@ -1,7 +1,7 @@
 # 3D_game_project
 
 **Current project (2026-10-09):** use `PROJECT_LAYOUT.md` and `README.md` for the
-current file structure and Web deployment. There are four independent episodes,
+current file structure and Web deployment. There are five episodes (05 continues 04; the others stand alone),
 launched from `main_menu.tscn`, built with Godot 4.7.2. The notes below describe
 older prototypes. Their scene sequence and model paths are historical; do not
 apply them to the current anthology or regenerate the authored frog world.
@@ -18,7 +18,7 @@ Always present a written plan for review before writing or editing any code.
 ## Current state (team repo Thundercodhod/ExitRoom, branch main)
 
 - The project is the team's ExitRoom repo (Godot 4.7, GL Compatibility): village prologue -> garden lobby -> Backrooms -> abandoned school. Main scene `res://prologue_village.tscn`.
-- All four levels create the player with `CharacterBody3D.new()` + `res://scripts/player.gd`. Keep its public API: `pivot` (yaw), `camera`, `torch`, `body_visual`, `game.playing`, `set_hiding()`.
+- All levels create the player with `CharacterBody3D.new()` + `res://scripts/player.gd`. Keep its public API: `pivot` (yaw), `camera`, `torch`, `body_visual`, `game.playing`, `set_hiding()`.
   Input actions (`forward/back/left/right/sprint/interact/flashlight`) are registered in each level script, not in project.godot.
 - **Player is now third-person** (SpringArm3D camera 2.4 m behind, shoulder offset, shortens at walls) using `res://assets/models/player/main_character.glb` at real scale (1.64 m, replaces the Hazmat demo).
   Press **V** to toggle first/third person; default is `THIRD_PERSON_DEFAULT` in `player.gd`.

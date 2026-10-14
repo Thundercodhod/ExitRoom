@@ -5,6 +5,8 @@ const MainCharacterScene = preload("res://assets/models/player/player_better_rig
 
 # A heel touched the ground (also plays the footstep sound). Enemies can listen.
 signal stepped(running: bool)
+# First/third-person switched (V, or a scene calling set_third_person / set_hiding).
+signal view_changed(third_person: bool)
 
 # Third-person by default. Press V in game to switch to first-person and back.
 const THIRD_PERSON_DEFAULT := true
@@ -202,6 +204,7 @@ func _apply_view() -> void:
 	camera.fov = FOV_THIRD if third_person else FOV_FIRST
 	# Hide the body in first-person (it would block the view) and while hiding.
 	body_visual.visible = third_person and not hiding
+	view_changed.emit(third_person)
 
 # Idle, walk and run are the generated clips. anim_names maps idle/walk/run to
 # the clip names (other scripts and tests use it).

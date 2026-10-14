@@ -161,14 +161,16 @@ func header(root: Control, title: String, sub: String) -> void:
 
 func build_episodes() -> void:
 	var root: Control = pages.episodes
-	header(root,"EPISODES","เลือกเรื่องใดก่อนก็ได้ · ตัวละครและเหตุการณ์ของแต่ละตอนไม่ต่อกัน")
+	header(root,"EPISODES","เลือกเรื่องใดก่อนก็ได้ · EPISODE 05 เล่นต่อจาก 04")
+	# The list fills the same 450 px column however many episodes there are.
+	var step := minf(111.0, 450.0/Anthology.EPISODES.size())
 	for i in Anthology.EPISODES.size():
 		var data: Dictionary = Anthology.EPISODES[i]
-		var b := button(root,"",Vector2(64,160+i*111),Vector2(412,96),func(): select_episode(i),20)
+		var b := button(root,"",Vector2(64,160+i*step),Vector2(412,step-15),func(): select_episode(i),20)
 		b.name = "Episode"+data.number
-		text(b,data.number,Vector2(18,10),24,Style.ACCENT,true)
-		text(b,data.title,Vector2(64,14),23,Style.INK,true)
-		text(b,data.thai,Vector2(64,51),19,Style.MUTED)
+		text(b,data.number,Vector2(18,8),24,Style.ACCENT,true)
+		text(b,data.title,Vector2(64,8),23,Style.INK,true)
+		text(b,data.thai if Anthology.is_unlocked(data.id) else "ล็อกอยู่ · เล่น EPISODE 04 ให้จบก่อน",Vector2(64,step-58),19,Style.MUTED)
 		episode_buttons.append(b)
 	preview = TextureRect.new()
 	preview.name = "EpisodePreview"
@@ -204,13 +206,20 @@ func select_episode(index: int, sound := true) -> void:
 	hook.text = entry.hook
 	summary.text = entry.summary
 	start_button.text = ("เล่นอีกครั้ง" if Anthology.completed.has(entry.id) else "เริ่มเรื่อง")+"   /   EPISODE "+entry.number+"  →"
+	var unlocked: bool = Anthology.is_unlocked(entry.id)
+	start_button.disabled = not unlocked or loading
+	if not unlocked:
+		# No spoilers before the episode it continues has been played.
+		start_button.text = "เล่น EPISODE "+Anthology.episode(entry.requires).number+" ให้จบก่อน แล้วตอนนี้จะเปิดให้เล่น"
+		hook.text = "ตอนต่อจาก "+Anthology.episode(entry.requires).title
+		summary.text = ""
 	for i in episode_buttons.size():
 		var b := episode_buttons[i]
 		b.add_theme_stylebox_override("normal",Style.panel(Color(.14,.065,.07,.95) if i==selected else Color(.021,.033,.035,.92),Style.ACCENT if i==selected else Color(.3,.36,.34,.35)))
 	if sound: Anthology.play_sfx("ui_move",-25)
 
 func play_selected() -> void:
-	if loading: return
+	if loading or not Anthology.is_unlocked(Anthology.EPISODES[selected].id): return
 	loading = true
 	start_button.text = "กำลังเปิดเรื่อง..."
 	start_button.disabled = true

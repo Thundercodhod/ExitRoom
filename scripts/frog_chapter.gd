@@ -7,7 +7,8 @@ const RETURN_START := Vector3(0,.05,-39)       # just outside the bedroom door
 const RETURN_FROG := Vector3(-4,.05,-23)
 const RETURN_OBJECTIVE := "กลับไปที่รถ · ไม่ต้องรับสาย"
 const EPISODE_ID := "passenger"
-const EPILOGUE := "ผมขับต่อไป ไม่กล้าหันไปดูอีกจนถึงปั๊มที่มีคนอยู่\nพอเปิดไฟในรถ เบาะข้าง ๆ ก็ว่าง แต่เปียกจนชุ่ม\n\nวันต่อมาผมพาเพื่อนไปดู เราขับวนอยู่สองรอบก็หาทางเข้าบ้านไม่เจอ\nเครื่องจั๊มพ์แบตยังอยู่ท้ายรถ ผมยังไม่กล้าเอามาใช้\n\nมีเรื่องหนึ่งที่ผมไม่ได้บอกเพื่อน\nบางคืน ตอนดับเครื่อง ผมยังได้ยินเสียงปลดเข็มขัดจากเบาะข้าง ๆ"
+# Episode 05 picks up from this blackout: he never reaches the station.
+const EPILOGUE := "ผมขับต่อไป ไม่กล้าหันไปมองเบาะข้าง ๆ อีก\nไฟปั๊มอยู่ข้างหน้าแล้ว อีกไม่ไกล\n\nแต่ตามันหนักขึ้นเรื่อย ๆ\nกะพริบครั้งหนึ่ง ถนนยังอยู่\nกะพริบอีกครั้ง ไฟปั๊มหายไป\n\nครั้งสุดท้าย ผมไม่แน่ใจว่าลืมตาขึ้นมาอีกหรือเปล่า"
 enum Stage { CAR, FIELD, HOUSE, NOTE, BATTERY, RECOGNITION, RETURN, REPAIRED, END }
 var stage := Stage.CAR
 var playing := false
@@ -573,6 +574,20 @@ func repair_car() -> void:
 	await t.finished
 	say("“ไม่ต้องมองหาแล้ว”",4)
 	await wait_for(3)
+	# Eyes back on the road. The station lights are ahead... and he starts to nod off.
+	t = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP)
+	t.tween_property(cut_camera,"rotation",Vector3.ZERO,1.4 if reduced_motion_enabled() else .9)
+	await t.finished
+	say("ใกล้ถึงปั๊มแล้วใช่ไหมนะ.....",5)
+	await wait_for(2.2)
+	# Blinks that come faster and stay shut longer, like dozing at the wheel (วูบ).
+	t = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP)
+	for blink in [[.07,.35],[.09,.55],[.12,.3],[.16,.45],[.22,.22],[.3,.3],[.4,.12]]:
+		t.tween_property(overlay,"color:a",1.0,blink[0])
+		t.tween_property(overlay,"color:a",0.0,blink[0]*1.4)
+		t.tween_interval(blink[1])
+	t.tween_property(overlay,"color:a",1.0,.12)
+	await t.finished
 	overlay.color.a = 1
 	subtitle.text = ""
 	engine.stop()

@@ -39,6 +39,10 @@ Additional CC0 texture sources used for village buildings and generated props:
 - https://polyhaven.com/a/wood_table_001
 - https://polyhaven.com/a/asphalt_06
 
+## Forest chapter (Episode 05)
+
+**PSX Forest Free** by heyheythere - https://heyheythere.itch.io/psx-forest-free - CC BY 4.0 (`assets/psx_forest/`, license in `assets/psx_forest/LICENSE.txt`). Changes: the Godot addon's runtime models, prop scenes, atlas and material were moved from `addons/psx_forest/` to `assets/psx_forest/` and their resource paths rewritten; the demo, icons, FBX/OBJ copies and the .blend were left out of the game.
+
 ## Enemy models
 
 **The Frog** (`assets/models/enemy/frog.glb`): generated with Meshy AI from the project's own concept sheet (`Meshy_AI_Character_Frog.glb`, auto-rigged by Meshy). Changes: renamed the 50 bones, scaled to 1.9 m, baked idle / walk / sit animations in Blender (`assets_src/frog/build_frog.py`). Check the Meshy plan used for the download: assets from the free plan are CC BY 4.0 and need attribution to Meshy; paid plans grant their own terms.

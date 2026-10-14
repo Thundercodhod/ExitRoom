@@ -22,6 +22,7 @@ assets/*
 !assets/textures/
 !assets/shaders/
 !assets/models/
+!assets/psx_forest/
 # Textures Godot extracts next to a GLB stay local (the GLB embeds them).
 assets/models/**/*.png
 assets/models/**/*.jpg

@@ -14,6 +14,7 @@
 | 02 | After Hours — กะสุดท้าย | `backrooms_level.tscn` |
 | 03 | Room 407 — ห้องที่ไม่มีใครเช่า | `Room407/main.tscn` |
 | 04 | The Passenger — ผู้โดยสาร | `frog_chapter.tscn` |
+| 05 | The Campfire — กองไฟกลางป่า (ต่อจาก 04, เปิดหลังเล่น 04 จบ) | `forest_chapter.tscn` |
 
 เนื้อเรื่องฉบับปัจจุบันอยู่ใน [STORY.md](STORY.md) ไม่มีการส่งจากตอนหนึ่งไปอีกตอนโดยอัตโนมัติ เมื่อจบจะเลือกกลับเมนูหรือเล่นตอนเดิมอีกครั้งได้ `PlayFrog.cmd` และ `Room407/Play.cmd` ยังใช้เปิดตอนนั้นโดยตรงได้
 

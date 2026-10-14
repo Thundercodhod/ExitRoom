@@ -197,9 +197,23 @@ func test_passenger(scene: Node) -> void:
 	scene.stage = scene.Stage.RETURN
 	scene.player.position = Vector3(.3,.05,1.8)
 	scene.interact("car")
-	await wait_condition(func(): return scene.ending_presented,"Passenger repair and passenger cinematic reach ending")
+	await wait_condition(func(): return scene.ending_presented,"Passenger repair and passenger cinematic reach ending",40.0)
 	check(scene.stage==scene.Stage.END and scene.frog.mode==scene.frog.Mode.SITTING,"Passenger preserves repaired-car/frog-seat final sequence")
 	await check_ending("passenger",scene)
+	check(anthology.modal.find_child("NextEpisodeButton",true,false)!=null,"Passenger ending offers to continue into Episode 05")
+	check(anthology.is_unlocked("forest"),"finishing Passenger unlocks Episode 05")
+
+func test_forest(scene: Node) -> void:
+	check(scene.panel.visible and not scene.playing,"Forest starts at its own introduction")
+	check(scene.panel_text.text.contains("ภาคิน") and scene.panel_text.text.contains("ปั๊ม"),"Forest continues Phakin's story from Passenger")
+	await scene.panel_continue()
+	await wait_condition(func(): return scene.stage==scene.Stage.WALK,"Forest wake-up hands control to the player")
+	# The full loop (warning, hunt, catch, restart) is covered by tests/forest_loop.gd.
+	scene.player.global_position = scene.campfire_spot+Vector3(0,.05,2.4)
+	await frames(4)
+	scene.sleep_by_fire()
+	await wait_condition(func(): return scene.ending_presented,"Forest campfire sleep reaches ending")
+	await check_ending("forest",scene)
 
 func test_persistence() -> void:
 	var expected_completed: Array = anthology.completed.duplicate()
@@ -216,14 +230,14 @@ func test_persistence() -> void:
 	anthology.load_preferences()
 	check(is_equal_approx(anthology.settings.master,.37) and is_equal_approx(anthology.settings.ambience,.28),"saved audio preferences reload")
 	check(anthology.settings.instant_text and anthology.settings.reduced_motion,"saved readability preferences reload")
-	check(anthology.completed==expected_completed and anthology.completed.size()==4,"all four completions reload without duplicates")
+	check(anthology.completed==expected_completed and anthology.completed.size()==anthology.EPISODES.size(),"all completions reload without duplicates")
 	anthology.apply_preferences()
 	check(is_equal_approx(db_to_linear(AudioServer.get_bus_volume_db(AudioServer.get_bus_index("Master"))),.37),"master volume preference reaches audio mixer")
 	check(is_equal_approx(db_to_linear(AudioServer.get_bus_volume_db(AudioServer.get_bus_index("Ambience"))),.28),"ambience preference reaches separate mixer bus")
 
 func run() -> void:
 	keep_preferences()
-	create_timer(100.0).timeout.connect(func(): check(false,"suite finishes within 100 seconds"); finish())
+	create_timer(160.0).timeout.connect(func(): check(false,"suite finishes within 160 seconds"); finish())
 	anthology = root.get_node_or_null("Anthology")
 	if not anthology:
 		check(false,"Anthology autoload is configured")
@@ -234,6 +248,7 @@ func run() -> void:
 	anthology.settings.reduced_motion = false
 	check(ProjectSettings.get_setting("application/run/main_scene")==anthology.MENU,"F5 opens the anthology menu")
 	change_scene_to_file(anthology.MENU)
+	check(not anthology.is_unlocked("forest"),"Episode 05 is locked until Episode 04 is finished")
 	if not await test_menu():
 		finish()
 		return
@@ -253,6 +268,7 @@ func run() -> void:
 			"after_hours": await test_after_hours(current_scene)
 			"room407": await test_room407(current_scene)
 			"passenger": await test_passenger(current_scene)
+			"forest": await test_forest(current_scene)
 		if not await ending_menu(): break
 	test_persistence()
 	finish()
