@@ -40,17 +40,10 @@ def skitter(t):
     return s * .9
 save("skitter", 1.2, skitter, edge=400)
 
-# Scrape: legs dragging down the wall paper, a falling hiss.
-prev = [0.0]
-def scrape(t):
-    prev[0] += (noise() - prev[0]) * (.55 - .35 * t / .7)
-    env = min(1, t / .05) * max(0, 1 - t / .7)
-    return prev[0] * env * .8
-save("scrape", .7, scrape, edge=200)
-
 # Thud: a heavy body landing on the floor.
 def thud(t):
     env = math.exp(-t * 11)
     return (math.sin(TAU * (78 - 30 * t) * t) * .8 + noise() * .25 * math.exp(-t * 40)) * env
 save("thud", .55, thud, edge=400)
-print("Created 3 original spider sounds")
+print("Created 2 original spider sounds")
+# aggro.wav and climb.wav are recorded effects (Epidemic Sound), not generated here.

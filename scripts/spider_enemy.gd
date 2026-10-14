@@ -19,7 +19,8 @@ signal caught_player
 
 const SpiderModel = preload("res://assets/models/enemy/spider.glb")
 const SkitterSound = preload("res://audio/spider/skitter.wav")
-const ScrapeSound = preload("res://audio/spider/scrape.wav")
+const AggroSound = preload("res://audio/spider/aggro.wav")   # it has seen you
+const ClimbSound = preload("res://audio/spider/climb.wav")   # legs on the wall
 const ThudSound = preload("res://audio/spider/thud.wav")
 
 enum State { PATROL, CHASE, SEARCH, ATTACK, CAUGHT }
@@ -88,6 +89,7 @@ var _climb_to_ceiling := false
 var _climb_sound_at_end: AudioStream
 var skitter: AudioStreamPlayer3D
 var thump: AudioStreamPlayer3D
+var screech: AudioStreamPlayer3D
 
 
 func _ready() -> void:
@@ -120,6 +122,13 @@ func _ready() -> void:
 	thump.unit_size = 5.0
 	thump.max_distance = 30.0
 	model.add_child(thump)
+	screech = AudioStreamPlayer3D.new()
+	screech.name = "Screech"
+	screech.stream = AggroSound
+	screech.unit_size = 6.0
+	screech.max_distance = 40.0
+	screech.volume_db = -2.0
+	model.add_child(screech)
 	if ceiling_crawl:
 		_hang_on_ceiling()
 	player_animation = model.find_child("AnimationPlayer", true, false) as AnimationPlayer
@@ -564,6 +573,7 @@ func _start_climb(keys: Array[Transform3D], times: Array[float], end_body: Vecto
 
 # Noticed the player: to the nearest wall and down it head first, or straight down.
 func _begin_descent() -> void:
+	screech.play()
 	var face := _flat_offset_to_target() if target != null else -global_transform.basis.z
 	var upright := _yaw_basis(face)
 	var start := model.global_transform
@@ -586,7 +596,7 @@ func _begin_descent() -> void:
 		Transform3D(upright, foot + n * WALL_GAP)]
 	var times: Array[float] = [CEILING_TO_WALL_TIME, 0.2, WALL_DESCENT_TIME, TURN_UPRIGHT_TIME]
 	_start_climb(keys, times, foot + n * WALL_GAP, false, null)
-	thump.stream = ScrapeSound
+	thump.stream = ClimbSound
 	thump.play()
 
 
@@ -598,6 +608,8 @@ func _begin_ascent() -> void:
 	if wall.is_empty():
 		var up := Transform3D(_yaw_basis(-global_transform.basis.z) * flip, global_position + Vector3.UP * ceiling_height)
 		_start_climb([start, up] as Array[Transform3D], [DROP_TIME * 2.5] as Array[float], global_position, true, null)
+		thump.stream = ClimbSound
+		thump.play()
 		return
 	var n: Vector3 = wall.normal
 	var foot: Vector3 = wall.point
@@ -613,6 +625,8 @@ func _begin_ascent() -> void:
 	for t in [TURN_UPRIGHT_TIME, WALL_DESCENT_TIME, 0.2, CEILING_TO_WALL_TIME]:
 		times.append(t / ASCENT_SPEED)
 	_start_climb(keys, times, end_body, true, null)
+	thump.stream = ClimbSound
+	thump.play()
 
 
 func _update_climb(delta: float) -> void:

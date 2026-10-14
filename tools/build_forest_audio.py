@@ -73,16 +73,5 @@ def pant(t):
     return pant_lp(noise()) * env * .55 * max(0, 1 - t / 8)
 save("pant", 8, pant)
 
-# The campfire: a low rumble with crackles and pops.
-fire_lp = lowpass(.05)
-pops = sorted(rng.uniform(0, 12) for _ in range(70))
-def fire(t):
-    s = fire_lp(noise()) * .5
-    for p in pops:
-        x = t - p
-        if 0 < x < .03:
-            s += noise() * .7 * (1 - x / .03)
-    return s
-save("fire", 12, fire, edge=200)
-print("Created 5 original forest sounds")
-# player_gasp.wav and pladuk_hello.wav are recorded effects (Epidemic Sound), not generated here.
+print("Created 4 original forest sounds")
+# player_gasp, pladuk_hello, campfire and wind_gust are recorded effects (Epidemic Sound), not generated here.

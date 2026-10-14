@@ -73,6 +73,9 @@ func run() -> void:
 	if DisplayServer.get_name() != "headless":   # the headless renderer does not keep MultiMesh data
 		check(ground.instance_count > 500 and ground.get_instance_transform(ground.instance_count - 1).origin.length() > 10, "ground tiles kept their positions")
 	check(chapter.frog.mode == chapter.frog.Mode.GONE, "frog hidden before waking up")
+	var fire_stream := chapter.fire_sound.stream as AudioStreamWAV
+	check(fire_stream.resource_path.ends_with("campfire.wav") or fire_stream.loop_mode == AudioStreamWAV.LOOP_FORWARD, "the campfire plays the recorded crackle")
+	check(fire_stream.loop_mode == AudioStreamWAV.LOOP_FORWARD and chapter.fire_sound.playing, "the crackle loops at the fire")
 	await shot("title")
 
 	# ---- waking up
@@ -98,6 +101,15 @@ func run() -> void:
 	check(not chapter.peek_active and chapter.head_tilt.tilt == 0.0, "peek ends and the tilt is cleared")
 	await create_timer(.5).timeout
 	check(not chapter.forest_silent and chapter.night.volume_db > -79, "forest sounds start coming back")
+	chapter.wind_timer = 0.0
+	await frames(3)
+	check(chapter.wind.playing, "a wind gust comes through the trees on the walk")
+	chapter.silence_forest()
+	check(not chapter.wind.playing, "the gust stops when the forest goes silent")
+	chapter.wind_timer = 0.0
+	await frames(3)
+	check(not chapter.wind.playing, "no gusts while the forest is silent")
+	chapter.wake_forest(.1)
 
 	# ---- Pladuk on the shoulder
 	var shoulder = chapter.shoulder
@@ -147,6 +159,7 @@ func run() -> void:
 	check(chapter.player.global_position.distance_to(chapter.START) < .5, "back at the start of the trail")
 	check(chapter.clock_minutes - minutes_before > 25, "the clock moved on (%s)" % chapter.clock_label.text)
 	check(chapter.fire_energy < energy_before, "the campfire burned down")
+	check(chapter.fire_sound.volume_db < chapter.FIRE_DB, "the smaller fire crackles more quietly")
 	check(chapter.flames.scale.y < .99, "the flames themselves are smaller")
 	check(not chapter.player.held and chapter.player.camera.current, "control and view restored after the catch")
 	check(chapter.objective.visible and chapter.objective.text == chapter.OBJECTIVE, "objective back")

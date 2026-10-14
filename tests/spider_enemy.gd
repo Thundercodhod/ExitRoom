@@ -103,6 +103,7 @@ func run() -> void:
 	await frames(20)
 	check(spider.state_name() == "CHASE", "Spider starts chasing")
 	check(spider.climbing or not spider.on_ceiling, "It comes down from the ceiling first")
+	check(spider.screech.playing, "It screeches when it notices the player")
 	await frames(100)
 	check(not spider.on_ceiling and not spider.climbing and spider.model.transform.is_equal_approx(Transform3D.IDENTITY), "Within 2 s it is down on the floor, upright")
 	check(spider.last_descent == "drop", "No wall within 3 m: it drops straight down")
@@ -129,6 +130,7 @@ func run() -> void:
 	spider.state = spider.State.CHASE
 	await frames(4)
 	check(spider.climbing and spider.last_descent == "wall", "A wall 3 m away: it climbs down the wall")
+	check(spider.thump.playing and spider.thump.stream.resource_path.ends_with("climb.wav"), "Its legs are heard on the wall")
 	await frames(60)
 	var on_wall: bool = spider.climbing and absf(spider.model.global_transform.basis.y.y) < 0.4
 	check(on_wall, "Mid-descent it is on the wall, head down")
@@ -170,10 +172,13 @@ func run() -> void:
 	await frames(60)
 	check(not spider.on_ceiling and not spider.climbing, "Down on the floor for the chase")
 	player.set_hiding(true)
+	spider.screech.stop()   # the screech from when it first noticed the player
 	spider.state = spider.State.SEARCH
 	spider.search_timer = 0.1
 	await frames(20)
 	check(spider.state_name() == "PATROL" and spider.climbing, "Search over: it starts climbing back up")
+	check(spider.thump.playing and spider.thump.stream.resource_path.ends_with("climb.wav"), "Climbing back up is heard too")
+	check(not spider.screech.playing, "No screech when it gives up")
 	await frames(120)
 	check(spider.on_ceiling and not spider.climbing and spider.model.global_position.y > 2.0, "Back on the ceiling")
 	spider.path.clear()

@@ -51,6 +51,8 @@ var rng := RandomNumberGenerator.new()
 var frog_leaving := false
 var leave_unseen := 0.0
 var bird_timer := 6.0
+var wind_timer := 18.0             # first gust a little after waking
+const FIRE_DB := -6.0
 var croak_timer := 4.0
 # UI (same look as Episode 04)
 var objective: Label
@@ -69,6 +71,7 @@ var caption_reveal := 0.0
 # Sound
 var night: AudioStreamPlayer
 var fire_sound: AudioStreamPlayer3D
+var wind: AudioStreamPlayer3D
 var bird: AudioStreamPlayer3D
 var far_croak: AudioStreamPlayer3D
 var croak: AudioStreamPlayer3D
@@ -208,14 +211,22 @@ func setup_audio() -> void:
 	add_child(night)
 	night.play()
 	fire_sound = AudioStreamPlayer3D.new()
-	fire_sound.stream = looped("res://audio/forest/fire.wav")
+	fire_sound.stream = looped("res://audio/forest/campfire.wav")   # recorded, cut to loop seamlessly
 	fire_sound.position = campfire_spot + Vector3(0,.6,0)
 	fire_sound.unit_size = 4
 	fire_sound.max_distance = 40
-	fire_sound.volume_db = -6
+	fire_sound.volume_db = FIRE_DB
 	fire_sound.process_mode = Node.PROCESS_MODE_PAUSABLE
 	add_child(fire_sound)
 	fire_sound.play()
+	# Now and then a gust moves through the trees, from somewhere around him.
+	wind = AudioStreamPlayer3D.new()
+	wind.stream = load("res://audio/forest/wind_gust.wav")
+	wind.unit_size = 18
+	wind.volume_db = -9
+	wind.process_mode = Node.PROCESS_MODE_PAUSABLE
+	if AudioServer.get_bus_index("Ambience") >= 0: wind.bus = &"Ambience"
+	add_child(wind)
 	bird = AudioStreamPlayer3D.new()
 	bird.stream = load("res://audio/forest/bird.wav")
 	bird.unit_size = 14
@@ -237,6 +248,7 @@ func setup_audio() -> void:
 
 # The whole forest stops at once (crickets, birds, frogs). Only the fire keeps going.
 func silence_forest() -> void:
+	if wind and wind.playing: wind.stop()
 	forest_silent = true
 	if night_tween: night_tween.kill()
 	night.volume_db = -80
@@ -595,6 +607,14 @@ func trail_distance() -> float:
 
 # Birds and far-off frogs, from random directions, unless the forest has gone quiet.
 func ambient_calls(delta: float) -> void:
+	# Wind only on the calm walk: never in the silence, a hunt, the wake-up or the ending.
+	if not forest_silent and stage == Stage.WALK:
+		wind_timer -= delta
+		if wind_timer <= 0.0:
+			wind_timer = rng.randf_range(25.0, 50.0)
+			var a := rng.randf() * TAU
+			wind.global_position = player.global_position + Vector3(cos(a), 0, sin(a)) * 16.0 + Vector3.UP * 6
+			wind.play()
 	if forest_silent: return
 	bird_timer -= delta
 	if bird_timer <= 0.0:
@@ -663,6 +683,7 @@ func calm() -> void:
 
 func hunt() -> void:
 	stage = Stage.HUNTED
+	if wind.playing: wind.stop()
 	if frog.mode == frog.Mode.GONE:
 		var p := player.global_position
 		frog.appear_at(p + (p - trail.get_closest_point(Vector3(p.x,0,p.z))).normalized() * 9.0)
@@ -699,6 +720,8 @@ func _on_choke_finished() -> void:
 	clock_minutes += MINUTES_PER_CATCH + rng.randf_range(-6.0, 8.0)
 	fire_energy = maxf(.8, fire_energy * .78)
 	set_flame_size(.45 + .55 * fire_energy / 2.4)
+	# A smaller fire crackles more quietly.
+	fire_sound.volume_db = FIRE_DB + linear_to_db(clampf(fire_energy / 2.4, .2, 1.0))
 	frog.stop_hunt()
 	frog.clear_scene_rules()
 	frog.threat_enabled = false
@@ -736,6 +759,7 @@ func sleep_by_fire() -> void:
 	frog_leaving = false
 	if frog.mode != frog.Mode.GONE: frog.vanish()
 	breath.stop()
+	if wind.playing: wind.stop()
 	await look_at_point(campfire_spot + Vector3(0,.4,0), 1.4)
 	say("อุ่นจัง... กลิ่นควันแบบนี้ เหมือนตอนสมัยเด็กๆเลย", 6)
 	await wait_for(5.0)
