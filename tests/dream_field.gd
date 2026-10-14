@@ -119,6 +119,8 @@ func run()->void:
 	check(field.grass.centre.x>10,"grass follows exploration beyond the starting area")
 	for sound in field.ambient:
 		check(sound.playing and sound.stream.get_length()>8.0,"ambient recording remains playable and looped")
+	check(field.music.playing and field.music.bus==&"Music" and (field.music.stream as AudioStreamMP3).loop,"field music loops on the Music bus")
+	check(field.music.volume_db > -20.0,"field music has faded in")
 	player.position=field.monument.position+Vector3(0,.08,2.85)
 	player.rotation.y=0
 	player.pitch=0
@@ -137,6 +139,7 @@ func run()->void:
 	await settle(.8)
 	check(field.waking and player.locked and field.curtain.color.a>.1 and field.curtain.color.a<1.0,"E starts a visible fade and locks movement")
 	check(field.ambient[0].volume_db < -25.0,"wind fades with the picture")
+	check(field.music.volume_db < -25.0,"music fades with the picture")
 	await shot("wake-fade")
 	while current_scene==field or manager.changing: await process_frame
 	check(current_scene.scene_file_path==manager.MENU and current_scene.page=="episodes","waking returns directly to selection")

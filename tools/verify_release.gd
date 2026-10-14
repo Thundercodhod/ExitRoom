@@ -31,6 +31,10 @@ func verify() -> void:
 	if music==null or music.get_length()<=0:
 		push_error("Missing audio: menu_music")
 		failures += 1
+	var field_music := load("res://audio/dream_field/field_music.mp3") as AudioStream
+	if field_music==null or field_music.get_length()<=0:
+		push_error("Missing audio: field_music")
+		failures += 1
 	# A failed shader include during export can silently strip material uniforms.
 	var world := (load("res://frog_field_world.tscn") as PackedScene).instantiate()
 	var grass := world.get_node("BinbunGrass/Grass_0_0") as MultiMeshInstance3D

@@ -13,6 +13,10 @@ var hint: Label
 var heading: Control
 var curtain: ColorRect
 var ambient: Array[AudioStreamPlayer] = []
+const MUSIC := "res://audio/dream_field/field_music.mp3"
+const MUSIC_DB := -14.0
+var music: AudioStreamPlayer
+var music_fade: Tween
 var time_in_field := 0.0
 var was_captured := false
 
@@ -91,6 +95,19 @@ func start_ambience() -> void:
 		add_child(sound)
 		ambient.append(sound)
 		sound.play()
+	# Quiet score over the wind (Epidemic Sound). Its own fade-in/out makes it loop cleanly.
+	music = AudioStreamPlayer.new()
+	music.name = "FieldMusic"
+	var score := (load(MUSIC) as AudioStreamMP3).duplicate() as AudioStreamMP3
+	score.loop = true
+	music.stream = score
+	music.bus = &"Music" if AudioServer.get_bus_index("Music") >= 0 else &"Master"
+	music.volume_db = -60.0
+	add_child(music)
+	ambient.append(music)
+	music.play()
+	music_fade = create_tween()
+	music_fade.tween_property(music, "volume_db", MUSIC_DB, 4.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 
 func on_entry_finished() -> void:
 	if not is_inside_tree() or waking: return
@@ -146,6 +163,7 @@ func wake_up() -> void:
 	prompt.text = ""
 	hint.hide()
 	player.footstep.stop()
+	if music_fade and music_fade.is_valid(): music_fade.kill()
 	var fade := create_tween().set_parallel(true)
 	fade.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	fade.tween_property(curtain, "color:a", 1.0, 1.8)
