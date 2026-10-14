@@ -22,11 +22,15 @@ func verify() -> void:
 		if photo==null:
 			push_error("Missing preview: "+entry.id)
 			failures += 1
-	for key in ["ui_move","ui_accept","tape","knock","message","door","sting","fluorescent","low_pulse","menu_ambience"]:
+	for key in ["ui_move","ui_accept","tape","knock","message","door","sting","fluorescent","low_pulse"]:
 		var sound := load("res://audio/anthology/"+key+".wav") as AudioStream
 		if sound==null or sound.get_length()<=0:
 			push_error("Missing audio: "+key)
 			failures += 1
+	var music := load("res://audio/anthology/menu_music.mp3") as AudioStream
+	if music==null or music.get_length()<=0:
+		push_error("Missing audio: menu_music")
+		failures += 1
 	# A failed shader include during export can silently strip material uniforms.
 	var world := (load("res://frog_field_world.tscn") as PackedScene).instantiate()
 	var grass := world.get_node("BinbunGrass/Grass_0_0") as MultiMeshInstance3D

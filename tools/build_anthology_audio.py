@@ -27,8 +27,9 @@ def write(name, seconds, sample):
             values.extend(struct.pack("<h", int(value * 28000)))
         out.writeframes(values)
 
-write("ui_move", .11, lambda t: tone(t, 480) * .18 * math.exp(-t*34) + noise() * .04 * math.exp(-t*55))
-write("ui_accept", .27, lambda t: (tone(t, 230) + tone(t, 460)*.25)*.23*math.exp(-t*15))
+# Hover: a short, dry tick (a soft click with a little pitch), clearly audible over ambience.
+write("ui_move", .09, lambda t: (tone(t, 1250 - 2600*t) * .5 + tone(t, 2500) * .18) * math.exp(-t*60) + noise() * .22 * math.exp(-t*190))
+# ui_accept.wav (press) is a recorded Epidemic Sound effect, not generated here.
 write("tape", 3.4, lambda t: noise()*.14 + tone(t, 57)*.07 + (noise()*.3 if t % .79 < .03 else 0))
 write("knock", 1.55, lambda t: sum((noise()*.5+tone(t-s, 105)*.6)*math.exp(-(t-s)*32) if 0 <= t-s < .24 else 0 for s in [.04,.52,1.02]))
 write("message", .8, lambda t: sum((tone(t-s, 640)+tone(t-s, 840)*.2)*.22*math.exp(-(t-s)*10) if 0<=t-s<.3 else 0 for s in [.03,.32]))
@@ -37,17 +38,5 @@ write("sting", 2.7, lambda t: (tone(t, 67)+tone(t, 71)*.6+tone(t, 138)*.3)*.18*m
 write("fluorescent", 4, lambda t: (tone(t, 100)*.22+tone(t, 200)*.06+noise()*.035)*(.7+.3*math.sin(t*17)**2))
 write("low_pulse", 3.1, lambda t: tone(t, 47)*.32*(math.sin(t*math.pi*1.4)**8) + noise()*.012)
 
-# No sampled music: filtered wind, low beating tones and sparse distant chimes.
-wind = 0.0
-def ambience(t):
-    global wind
-    wind = .988*wind + .012*noise()
-    pad = (tone(t, 49)+tone(t, 49.23)*.6)*.048
-    chime = 0
-    for start, hz in [(2, 196), (7.3, 233.08), (13.8, 146.83), (18, 185)]:
-        if t >= start:
-            u = t-start
-            chime += (tone(u, hz)+.18*tone(u, hz*2.01))*.055*math.exp(-u*.85)
-    return wind*.9+pad+chime+noise()*.012
-write("menu_ambience", 24, ambience)
-print("Created 10 original anthology sound effects and ambience tracks.")
+# The menu music (menu_music.mp3) is a recorded Epidemic Sound track, not generated here.
+print("Created the original anthology sound effects.")

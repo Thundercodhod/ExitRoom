@@ -104,7 +104,6 @@ func make_button(words: String, callback: Callable) -> Button:
 	button.add_theme_stylebox_override("hover", hover)
 	button.add_theme_stylebox_override("focus", hover)
 	button.pressed.connect(callback)
-	button.mouse_entered.connect(func(): sound("ui_move", -25))
 	return button
 
 
@@ -199,7 +198,6 @@ func _begin_game() -> void:
 	playing = true
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	was_captured = true
-	sound("ui_accept", -24)
 	if not started:
 		started = true
 		clue.show_clue("23:48 น.\nไฟเปิดอยู่แฮะ ไหนเพื่อนบอกว่าบ้านนี้ไม่มีใครอยู่แล้ว")

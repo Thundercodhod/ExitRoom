@@ -50,6 +50,12 @@ func make_spider(fixture: Node, player: Node3D, pos: Vector3, yaw: float) -> Cha
 	s.caught_player.connect(func(): catches += 1)
 	return s
 
+func model_bottom(s: Node3D) -> float:
+	var lo := INF
+	for m in s.find_children("*", "MeshInstance3D", true, false):
+		lo = minf(lo, ((m as MeshInstance3D).global_transform * (m as MeshInstance3D).get_aabb()).position.y)
+	return lo
+
 func new_fixture(wall: bool) -> TestGame:
 	var fixture := TestGame.new()
 	root.add_child(fixture)
@@ -75,10 +81,15 @@ func run() -> void:
 	check(spider.state_name() == "PATROL", "Spider patrols while the player is far away")
 	check(spider.global_position.distance_to(start) > 0.5, "Patrolling spider actually moves")
 	check(spider.is_on_floor(), "Spider stands on the floor")
+	check(spider.on_ceiling and spider.model.global_position.y > 2.0, "Patrolling spider hangs upside down on the ceiling")
+	check(model_bottom(spider) > 1.6, "It hangs above head height, so the player can walk under it")
+	check(player.collision_mask & spider.collision_layer == 0, "Its floor collider never blocks the player")
+	check(spider.skitter.playing and spider.skitter.volume_db < -10.0, "Quiet skittering while it crawls on the ceiling")
 	fx.playing = false
 	var frozen := spider.global_position
 	await frames(30)
 	check(spider.global_position.distance_to(frozen) < 0.2, "Spider stops while the game is paused")
+	check(not spider.skitter.playing, "No skittering while the game is paused")
 	fx.queue_free()
 	await frames(2)
 
@@ -91,6 +102,11 @@ func run() -> void:
 	check(spider.can_see_target(), "Spider sees a player in the open")
 	await frames(20)
 	check(spider.state_name() == "CHASE", "Spider starts chasing")
+	check(spider.climbing or not spider.on_ceiling, "It comes down from the ceiling first")
+	check(spider.screech.playing, "It screeches when it notices the player")
+	await frames(100)
+	check(not spider.on_ceiling and not spider.climbing and spider.model.transform.is_equal_approx(Transform3D.IDENTITY), "Within 2 s it is down on the floor, upright")
+	check(spider.last_descent == "drop", "No wall within 3 m: it drops straight down")
 	await frames(240)
 	check(catches == 1, "Spider catches the player (signal emitted once)")
 	check(spider.state_name() == "CAUGHT", "Spider stays in the caught state afterwards")
@@ -112,7 +128,13 @@ func run() -> void:
 	check(found and detour, "Path goes around the wall instead of through it")
 	spider.last_known = player.global_position
 	spider.state = spider.State.CHASE
-	await frames(330)
+	await frames(4)
+	check(spider.climbing and spider.last_descent == "wall", "A wall 3 m away: it climbs down the wall")
+	check(spider.thump.playing and spider.thump.stream.resource_path.ends_with("climb.wav"), "Its legs are heard on the wall")
+	await frames(60)
+	var on_wall: bool = spider.climbing and absf(spider.model.global_transform.basis.y.y) < 0.4
+	check(on_wall, "Mid-descent it is on the wall, head down")
+	await frames(400)
 	check(catches == 1, "Spider reaches the player around the wall")
 	fx.queue_free()
 	await frames(2)
@@ -137,6 +159,32 @@ func run() -> void:
 	check(not spider.can_hear_target(), "Walking is silent")
 	player.sprinting = true
 	check(spider.can_hear_target(), "Sprinting nearby is heard even from behind")
+	fx.queue_free()
+	await frames(2)
+
+	# 5. Loses the player: climbs back up to the ceiling.
+	fx = new_fixture(false)
+	player = make_player(fx, Vector3(6, 0.15, 6))
+	spider = make_spider(fx, player, Vector3(0, 0.05, 0), 0.0)
+	await frames(8)
+	spider.ceiling_crawl = true
+	spider.state = spider.State.CHASE
+	await frames(60)
+	check(not spider.on_ceiling and not spider.climbing, "Down on the floor for the chase")
+	player.set_hiding(true)
+	spider.screech.stop()   # the screech from when it first noticed the player
+	spider.state = spider.State.SEARCH
+	spider.search_timer = 0.1
+	await frames(20)
+	check(spider.state_name() == "PATROL" and spider.climbing, "Search over: it starts climbing back up")
+	check(spider.thump.playing and spider.thump.stream.resource_path.ends_with("climb.wav"), "Climbing back up is heard too")
+	check(not spider.screech.playing, "No screech when it gives up")
+	await frames(120)
+	check(spider.on_ceiling and not spider.climbing and spider.model.global_position.y > 2.0, "Back on the ceiling")
+	spider.path.clear()
+	spider.wait_timer = 5.0   # standing still between patrol points
+	await frames(12)
+	check(not spider.skitter.playing, "Silent when it is not moving")
 	fx.queue_free()
 	await frames(2)
 

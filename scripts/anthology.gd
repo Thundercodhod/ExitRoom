@@ -8,9 +8,11 @@ const EPISODES := [
 	{"id":"last_visit","number":"01","title":"THE LAST VISIT","thai":"บ้านที่ยังรอ","scene":"res://prologue_village.tscn","tag":"ธาม / งานซ่อมไฟ / 23:48 น.","hook":"เพื่อนฝากให้แวะไปเช็กไฟ\nผมกะว่าแป๊บเดียวก็เสร็จ","summary":"ธามรับงานตรวจบ้านก่อนขายหลังปิดร้าน เจ้าของย้ายออกไปหลายเดือนแล้ว แต่พอเขาไปถึง ไฟในบ้านกลับเปิดอยู่ และมีเสียงคนเคาะประตูจากข้างใน"},
 	{"id":"after_hours","number":"02","title":"AFTER HOURS","thai":"กะสุดท้าย","scene":"res://backrooms_level.tscn","tag":"ริน / ช่างซ่อมบำรุง / 22:06 น.","hook":"ฉันเข้าไปเพราะนึกว่ามีคนติดอยู่\nตอนนั้นยังห่วงว่าเขาจะกลับบ้านยังไง","summary":"รินมารับกะดึกแทนเพื่อนที่ลาป่วย ก่อนเลิกงานเธอได้ยินคนเรียกจากห้องเก็บของ จึงหยิบไฟฉายเข้าไปดู พอจะเดินกลับ ทางเดินที่คุ้นเคยกลับไม่พาเธอไปที่เดิม"},
 	{"id":"room407","number":"03","title":"ROOM 407","thai":"ห้องที่ไม่มีใครเช่า","scene":"res://Room407/main.tscn","tag":"ธีร์ / ห้องเช่าชั่วคราว / เจ็ดคืน","hook":"ห้องเก่าท่อน้ำแตก ผมเลยต้องย้ายมาอยู่ชั่วคราว\nคืนแรกก็มีข้อความจากคนที่ผมไม่รู้จัก","summary":"ธีร์เช่าห้องใกล้ที่ทำงานระหว่างรอช่างซ่อมท่อน้ำ เขาขนมาแค่เสื้อผ้ากับนาฬิกาปลุก แต่คนห้องข้าง ๆ กลับรู้ทั้งชื่อและเวลาที่เขาตื่น"},
-	{"id":"passenger","number":"04","title":"THE PASSENGER","thai":"ผู้โดยสาร","scene":"res://frog_chapter.tscn","tag":"ภาคิน / ทางเลียบทุ่ง / 23:46 น.","hook":"ถนนใหญ่ปิดซ่อม ผมเลยอ้อมมาทางนี้\nขับอยู่ดี ๆ รถก็ดับ","summary":"ภาคินกำลังขับรถกลับหลังเก็บของออกจากห้องเช่าของพ่อ รถเสียบนถนนเลียบทุ่งที่ไม่มีสัญญาณโทรศัพท์ เขาจึงเดินไปขอความช่วยเหลือที่บ้านหลังเดียวซึ่งยังเปิดไฟอยู่"}
+	{"id":"passenger","number":"04","title":"THE PASSENGER","thai":"ผู้โดยสาร","scene":"res://frog_chapter.tscn","tag":"ภาคิน / ทางเลียบทุ่ง / 23:46 น.","hook":"ถนนใหญ่ปิดซ่อม ผมเลยอ้อมมาทางนี้\nขับอยู่ดี ๆ รถก็ดับ","summary":"ภาคินกำลังขับรถกลับหลังเก็บของออกจากห้องเช่าของพ่อ รถเสียบนถนนเลียบทุ่งที่ไม่มีสัญญาณโทรศัพท์ เขาจึงเดินไปขอความช่วยเหลือที่บ้านหลังเดียวซึ่งยังเปิดไฟอยู่"},
+	# Continues Episode 04 (same Phakin): locked until 04 has been finished once.
+	{"id":"forest","number":"05","title":"REALIZATION","thai":"การตกตะกอน","scene":"res://forest_chapter.tscn","requires":"passenger","tag":"ภาคิน / ป่าที่ไม่มีชื่อ / 23:52 น.","hook":"ผมจำได้ว่ากำลังจะถึงปั๊ม\nพอลืมตาอีกที รอบตัวมีแต่ต้นไม้","summary":"ภาคินสะดุ้งตื่นกลางป่าที่ไม่รู้จัก ไกลออกไปมีแสงกองไฟอยู่ดวงเดียว ทางดินพาไปถึงที่นั่น แต่หลังต้นไม้ใหญ่ กบตัวเดิมยืนเอียงคอมองเขาอยู่"}
 ]
-var settings := {"master":.8,"ambience":.7,"sfx":.85,"fullscreen":false,"reduced_motion":false,"instant_text":false}
+var settings := {"master":.8,"ambience":.7,"music":.7,"sfx":.85,"fullscreen":false,"reduced_motion":false,"instant_text":false}
 var completed: Array[String] = []
 var selected_id := "last_visit"
 var menu_page := "home"
@@ -28,10 +30,21 @@ var transition_layer: CanvasLayer
 var curtain: ColorRect
 var transition_title: Label
 var transition_gain := 1.0
+# UI sounds for every button, toggle and slider in every scene (see hook_ui_sounds).
+const UI_HOVER_DB := -14.0
+const UI_PRESS_DB := -12.0
+const UI_HOVER_GAP_MS := 50      # sweeping across several buttons does not stutter
+var _last_ui_hover := -1000
+# Main-menu music: owned here (this node outlives scenes), so leaving for an
+# episode pauses it and coming back to the menu carries on from the same spot.
+const MENU_MUSIC := "res://audio/anthology/menu_music.mp3"
+const MENU_MUSIC_DB := -10.0
+var menu_music: AudioStreamPlayer
+var _music_tween: Tween
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	for title in ["Ambience","SFX"]:
+	for title in ["Ambience","SFX","Music"]:
 		if AudioServer.get_bus_index(title)<0:
 			AudioServer.add_bus()
 			AudioServer.set_bus_name(AudioServer.bus_count-1,title)
@@ -51,6 +64,17 @@ func episode(id: String) -> Dictionary:
 		if entry.id==id: return entry
 	return EPISODES[0]
 
+# An episode that continues another opens once that one has been finished.
+func is_unlocked(id: String) -> bool:
+	var required: String = episode(id).get("requires","")
+	return required.is_empty() or completed.has(required)
+
+# The episode that continues `id`, or {} when there is none.
+func next_episode(id: String) -> Dictionary:
+	for entry in EPISODES:
+		if entry.get("requires","")==id: return entry
+	return {}
+
 func load_preferences() -> void:
 	var config := ConfigFile.new()
 	if config.load("user://anthology.cfg")!=OK: return
@@ -69,7 +93,7 @@ func save_preferences() -> void:
 	config.save("user://anthology.cfg")
 
 func apply_preferences() -> void:
-	for pair in [["Master","master"],["Ambience","ambience"],["SFX","sfx"]]:
+	for pair in [["Master","master"],["Ambience","ambience"],["Music","music"],["SFX","sfx"]]:
 		var volume := clampf(float(settings[pair[1]]),0.0,1.0)
 		if pair[0]=="Master": volume *= transition_gain
 		AudioServer.set_bus_volume_db(AudioServer.get_bus_index(pair[0]),linear_to_db(volume))
@@ -202,6 +226,36 @@ func apply_accessibility(scene: Node) -> void:
 func _node_added(node: Node) -> void:
 	if node is AudioStreamPlayer or node is AudioStreamPlayer3D:
 		configure_audio.call_deferred(node)
+	elif node is BaseButton or node is Slider:
+		hook_ui_sounds.call_deferred(node)
+
+# Cursor passing over a control (or keyboard focus moving to it): the hover tick.
+# Pressing a button or flipping a toggle: the press sound. Scenes do not add their own.
+func hook_ui_sounds(node: Control) -> void:
+	if not is_instance_valid(node) or node.has_meta("ui_sounds"): return
+	node.set_meta("ui_sounds", true)
+	node.mouse_entered.connect(_on_ui_mouse_entered.bind(node))
+	node.focus_entered.connect(_on_ui_focus_entered)
+	if node is BaseButton:
+		node.pressed.connect(_on_ui_pressed)
+
+func _on_ui_mouse_entered(node: Control) -> void:
+	if node is BaseButton and (node as BaseButton).disabled: return
+	ui_hover()
+
+# A click also gives focus: only keyboard/gamepad focus moves play the tick.
+func _on_ui_focus_entered() -> void:
+	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT): return
+	ui_hover()
+
+func _on_ui_pressed() -> void:
+	play_sfx("ui_accept",UI_PRESS_DB)
+
+func ui_hover() -> void:
+	var now := Time.get_ticks_msec()
+	if now-_last_ui_hover < UI_HOVER_GAP_MS: return
+	_last_ui_hover = now
+	play_sfx("ui_move",UI_HOVER_DB)
 
 func configure_audio(node: Node) -> void:
 	if not is_instance_valid(node): return
@@ -232,8 +286,35 @@ func play_sfx(key: String, volume_db := -18.0) -> void:
 	sound.finished.connect(sound.queue_free)
 	sound.play()
 
+func play_menu_music() -> void:
+	if menu_music == null:
+		menu_music = AudioStreamPlayer.new()
+		menu_music.name = "MenuMusic"
+		var stream := load(MENU_MUSIC) as AudioStreamMP3
+		stream.loop = true
+		menu_music.stream = stream
+		menu_music.bus = &"Music"
+		menu_music.volume_db = -60.0
+		add_child(menu_music)
+		menu_music.play()
+	menu_music.stream_paused = false
+	if not menu_music.playing: menu_music.play()
+	_fade_music(MENU_MUSIC_DB, 1.5)
+
+func pause_menu_music(seconds := .8) -> void:
+	if menu_music == null or menu_music.stream_paused: return
+	await _fade_music(-60.0, seconds)
+	if menu_music.volume_db <= -59.0: menu_music.stream_paused = true
+
+func _fade_music(db: float, seconds: float) -> void:
+	if _music_tween: _music_tween.kill()
+	_music_tween = create_tween()
+	_music_tween.tween_property(menu_music,"volume_db",db,seconds)
+	await _music_tween.finished
+
 func launch_episode(id: String) -> void:
 	if changing: return
+	pause_menu_music()
 	selected_id = episode(id).id
 	save_preferences()
 	var entry := episode(selected_id)
@@ -312,14 +393,22 @@ func _present_ending(id: String, narrative: String) -> void:
 	var stack := make_modal("EPISODE "+entry.number+" — "+entry.title,narrative)
 	modal_kind = "ending"
 	stack.add_child(Style.label("จบเรื่อง  /  END OF RECORDING",17,Style.GOLD))
-	var menu := Style.button("กลับไปเลือก Episode  →")
+	var next := next_episode(id)
+	var next_button: Button = null
+	if not next.is_empty():
+		next_button = Style.button("ไปต่อ  EPISODE "+next.number+" — "+next.title+"  →")
+		next_button.name = "NextEpisodeButton"
+		next_button.pressed.connect(func(): launch_episode(next.id))
+		stack.add_child(next_button)
+	var menu := Style.button("กลับไปเลือก Episode  →",23 if next.is_empty() else 19)
 	menu.name = "EpisodeMenuButton"
 	menu.pressed.connect(return_to_menu)
 	stack.add_child(menu)
 	var replay := Style.button("เล่นเรื่องนี้อีกครั้ง",19)
 	replay.pressed.connect(func(): launch_episode(id))
 	stack.add_child(replay)
-	menu.grab_focus()
+	if next_button: next_button.grab_focus()
+	else: menu.grab_focus()
 
 func show_pause() -> void:
 	var stack := make_modal("พักเกม","กลับไปหน้าเลือกเรื่องได้ทุกเมื่อ\nเมื่อเริ่มเล่นใหม่ เรื่องนั้นจะเริ่มจากต้นตอน")

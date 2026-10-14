@@ -14,7 +14,6 @@ var start_button: Button
 var camera: Camera3D
 var film: ShaderMaterial
 var elapsed := 0.0
-var ambient: AudioStreamPlayer
 var loading := false
 
 func _ready() -> void:
@@ -44,14 +43,7 @@ func _ready() -> void:
 	select_episode(selected,false)
 	show_page(Anthology.menu_page)
 	Anthology.menu_page = "home"
-	ambient = AudioStreamPlayer.new()
-	var loop := load("res://audio/anthology/menu_ambience.wav") as AudioStreamWAV
-	ambient.stream = loop
-	ambient.bus = &"Ambience"
-	ambient.volume_db = -19
-	add_child(ambient)
-	ambient.finished.connect(ambient.play)
-	ambient.play()
+	Anthology.play_menu_music()   # resumes where it was if we came back from an episode
 
 func build_backdrop() -> void:
 	# Web needs a light menu: the full field is loaded only inside its episode.
@@ -121,9 +113,7 @@ func line(parent: Node, pos: Vector2, width: float, color := Color(.55,.6,.56,.3
 func button(parent: Node, words: String, pos: Vector2, size: Vector2, action: Callable, font_size := 23) -> Button:
 	var b := Style.button(words,font_size)
 	place(parent,b,pos,size)
-	b.pressed.connect(func(): Anthology.play_sfx("ui_accept",-21); action.call())
-	b.mouse_entered.connect(func(): Anthology.play_sfx("ui_move",-29))
-	b.focus_entered.connect(func(): Anthology.play_sfx("ui_move",-29))
+	b.pressed.connect(action)   # hover and press sounds come from Anthology.hook_ui_sounds
 	return b
 
 func build_home() -> void:
@@ -161,14 +151,16 @@ func header(root: Control, title: String, sub: String) -> void:
 
 func build_episodes() -> void:
 	var root: Control = pages.episodes
-	header(root,"EPISODES","เลือกเรื่องใดก่อนก็ได้ · ตัวละครและเหตุการณ์ของแต่ละตอนไม่ต่อกัน")
+	header(root,"EPISODES","เลือกเรื่องใดก่อนก็ได้ · EPISODE 05 เล่นต่อจาก 04")
+	# The list fills the same 450 px column however many episodes there are.
+	var step := minf(111.0, 450.0/Anthology.EPISODES.size())
 	for i in Anthology.EPISODES.size():
 		var data: Dictionary = Anthology.EPISODES[i]
-		var b := button(root,"",Vector2(64,160+i*111),Vector2(412,96),func(): select_episode(i),20)
+		var b := button(root,"",Vector2(64,160+i*step),Vector2(412,step-15),func(): select_episode(i),20)
 		b.name = "Episode"+data.number
-		text(b,data.number,Vector2(18,10),24,Style.ACCENT,true)
-		text(b,data.title,Vector2(64,14),23,Style.INK,true)
-		text(b,data.thai,Vector2(64,51),19,Style.MUTED)
+		text(b,data.number,Vector2(18,8),24,Style.ACCENT,true)
+		text(b,data.title,Vector2(64,8),23,Style.INK,true)
+		text(b,data.thai if Anthology.is_unlocked(data.id) else "ล็อกอยู่ · เล่น EPISODE 04 ให้จบก่อน",Vector2(64,step-58),19,Style.MUTED)
 		episode_buttons.append(b)
 	preview = TextureRect.new()
 	preview.name = "EpisodePreview"
@@ -204,13 +196,19 @@ func select_episode(index: int, sound := true) -> void:
 	hook.text = entry.hook
 	summary.text = entry.summary
 	start_button.text = ("เล่นอีกครั้ง" if Anthology.completed.has(entry.id) else "เริ่มเรื่อง")+"   /   EPISODE "+entry.number+"  →"
+	var unlocked: bool = Anthology.is_unlocked(entry.id)
+	start_button.disabled = not unlocked or loading
+	if not unlocked:
+		# No spoilers before the episode it continues has been played.
+		start_button.text = "เล่น EPISODE "+Anthology.episode(entry.requires).number+" ให้จบก่อน แล้วตอนนี้จะเปิดให้เล่น"
+		hook.text = "ตอนต่อจาก "+Anthology.episode(entry.requires).title
+		summary.text = ""
 	for i in episode_buttons.size():
 		var b := episode_buttons[i]
 		b.add_theme_stylebox_override("normal",Style.panel(Color(.14,.065,.07,.95) if i==selected else Color(.021,.033,.035,.92),Style.ACCENT if i==selected else Color(.3,.36,.34,.35)))
-	if sound: Anthology.play_sfx("ui_move",-25)
 
 func play_selected() -> void:
-	if loading: return
+	if loading or not Anthology.is_unlocked(Anthology.EPISODES[selected].id): return
 	loading = true
 	start_button.text = "กำลังเปิดเรื่อง..."
 	start_button.disabled = true
@@ -225,8 +223,8 @@ func build_options() -> void:
 	var root: Control = pages.options
 	header(root,"OPTIONS","ปรับเสียงและการแสดงผลให้เล่นได้สบาย · บันทึกอัตโนมัติ")
 	text(root,"AUDIO",Vector2(220,170),22,Style.GOLD,true)
-	var row := 215
-	for data in [["เสียงทั้งหมด","master"],["เสียงบรรยากาศ","ambience"],["เสียงประกอบ","sfx"]]:
+	var row := 212
+	for data in [["เสียงทั้งหมด","master"],["เสียงบรรยากาศ","ambience"],["เพลง","music"],["เสียงประกอบ","sfx"]]:
 		text(root,data[0],Vector2(220,row+3),22)
 		var slider := HSlider.new()
 		slider.name = data[1]+"Slider"
@@ -241,7 +239,7 @@ func build_options() -> void:
 			value.text = str(int(v))+"%"
 			Anthology.apply_preferences()
 			Anthology.save_preferences())
-		row += 62
+		row += 50
 	line(root,Vector2(220,418),825)
 	text(root,"DISPLAY & READING",Vector2(220,446),22,Style.GOLD,true)
 	row = 493

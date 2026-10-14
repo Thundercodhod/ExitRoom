@@ -1,0 +1,829 @@
+{
+ "atlas": 1024,
+ "atlas_used": 192,
+ "fps": 30,
+ "props": [
+  {
+   "name": "pine_small",
+   "title": "Pine, Small",
+   "group": "trees",
+   "place": "floor",
+   "note": "3.5 m",
+   "tris": 226,
+   "size": [
+    3.164,
+    3.145,
+    4.608
+   ],
+   "min": [
+    -1.523,
+    -1.438,
+    -0.104
+   ],
+   "max": [
+    1.641,
+    1.707,
+    4.505
+   ],
+   "parts": [
+    {
+     "name": "pine_small",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 42,
+     "min": [
+      -0.2006,
+      -0.1854,
+      -0.1037
+     ],
+     "max": [
+      0.2006,
+      0.2058,
+      1.343
+     ]
+    },
+    {
+     "name": "pine_small_crown",
+     "parent": "pine_small",
+     "pivot": [
+      0.0269,
+      -0.0218,
+      1.34
+     ],
+     "tris": 184,
+     "min": [
+      -1.5228,
+      -1.4384,
+      0.1591
+     ],
+     "max": [
+      1.6413,
+      1.7067,
+      4.5045
+     ]
+    }
+   ],
+   "anims": [
+    {
+     "name": "sway",
+     "seconds": 4.0,
+     "loop": true
+    }
+   ]
+  },
+  {
+   "name": "pine",
+   "title": "Pine",
+   "group": "trees",
+   "place": "floor",
+   "note": "7 m",
+   "tris": 270,
+   "size": [
+    5.892,
+    5.354,
+    8.71
+   ],
+   "min": [
+    -2.604,
+    -2.717,
+    -0.102
+   ],
+   "max": [
+    3.288,
+    2.637,
+    8.607
+   ],
+   "parts": [
+    {
+     "name": "pine",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 42,
+     "min": [
+      -0.3057,
+      -0.2825,
+      -0.1024
+     ],
+     "max": [
+      0.3057,
+      0.3136,
+      2.7471
+     ]
+    },
+    {
+     "name": "pine_crown",
+     "parent": "pine",
+     "pivot": [
+      0.0732,
+      -0.0364,
+      2.74
+     ],
+     "tris": 228,
+     "min": [
+      -2.6044,
+      -2.717,
+      0.4398
+     ],
+     "max": [
+      3.288,
+      2.6373,
+      8.6072
+     ]
+    }
+   ],
+   "anims": [
+    {
+     "name": "sway",
+     "seconds": 4.0,
+     "loop": true
+    }
+   ]
+  },
+  {
+   "name": "oak",
+   "title": "Oak",
+   "group": "trees",
+   "place": "floor",
+   "note": "6.5 m",
+   "tris": 430,
+   "size": [
+    7.449,
+    6.823,
+    7.182
+   ],
+   "min": [
+    -3.454,
+    -3.847,
+    -0.108
+   ],
+   "max": [
+    3.995,
+    2.976,
+    7.075
+   ],
+   "parts": [
+    {
+     "name": "oak",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 42,
+     "min": [
+      -0.4094,
+      -0.3784,
+      -0.1076
+     ],
+     "max": [
+      0.4094,
+      0.42,
+      2.5533
+     ]
+    },
+    {
+     "name": "oak_crown",
+     "parent": "oak",
+     "pivot": [
+      0.0924,
+      -0.0596,
+      2.54
+     ],
+     "tris": 388,
+     "min": [
+      -3.4544,
+      -3.8471,
+      2.1321
+     ],
+     "max": [
+      3.9949,
+      2.9764,
+      7.0747
+     ]
+    }
+   ],
+   "anims": [
+    {
+     "name": "sway",
+     "seconds": 4.0,
+     "loop": true
+    }
+   ]
+  },
+  {
+   "name": "tree_dead",
+   "title": "Dead Tree",
+   "group": "trees",
+   "place": "floor",
+   "note": "5 m",
+   "tris": 432,
+   "size": [
+    4.163,
+    4.233,
+    5.629
+   ],
+   "min": [
+    -1.772,
+    -2.19,
+    -0.108
+   ],
+   "max": [
+    2.391,
+    2.043,
+    5.521
+   ],
+   "parts": [
+    {
+     "name": "tree_dead",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 36,
+     "min": [
+      -0.2182,
+      -0.252,
+      -0.1079
+     ],
+     "max": [
+      0.2182,
+      0.252,
+      1.947
+     ]
+    },
+    {
+     "name": "tree_dead_crown",
+     "parent": "tree_dead",
+     "pivot": [
+      0.06,
+      -0.0776,
+      1.94
+     ],
+     "tris": 396,
+     "min": [
+      -1.7723,
+      -2.1902,
+      1.6273
+     ],
+     "max": [
+      2.3911,
+      2.0431,
+      5.5213
+     ]
+    }
+   ],
+   "anims": [
+    {
+     "name": "sway",
+     "seconds": 4.0,
+     "loop": true
+    }
+   ]
+  },
+  {
+   "name": "bush",
+   "title": "Bush",
+   "group": "plants",
+   "place": "floor",
+   "note": "1.4 m across",
+   "tris": 144,
+   "size": [
+    1.561,
+    1.692,
+    1.475
+   ],
+   "min": [
+    -0.819,
+    -0.716,
+    -0.462
+   ],
+   "max": [
+    0.742,
+    0.976,
+    1.013
+   ],
+   "parts": [
+    {
+     "name": "bush",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 144,
+     "min": [
+      -0.8187,
+      -0.7163,
+      -0.4624
+     ],
+     "max": [
+      0.7419,
+      0.9757,
+      1.0126
+     ]
+    }
+   ],
+   "anims": []
+  },
+  {
+   "name": "grass",
+   "title": "Grass",
+   "group": "plants",
+   "place": "floor",
+   "note": "0.35 m tall",
+   "tris": 156,
+   "size": [
+    0.486,
+    0.476,
+    0.311
+   ],
+   "min": [
+    -0.246,
+    -0.215,
+    -0.0
+   ],
+   "max": [
+    0.24,
+    0.261,
+    0.311
+   ],
+   "parts": [
+    {
+     "name": "grass",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 156,
+     "min": [
+      -0.2459,
+      -0.215,
+      -0.0
+     ],
+     "max": [
+      0.2402,
+      0.2614,
+      0.3106
+     ]
+    }
+   ],
+   "anims": [],
+   "solid": false
+  },
+  {
+   "name": "fern",
+   "title": "Fern",
+   "group": "plants",
+   "place": "floor",
+   "note": "0.8 m across",
+   "tris": 272,
+   "size": [
+    1.485,
+    1.669,
+    0.541
+   ],
+   "min": [
+    -0.734,
+    -0.834,
+    -0.127
+   ],
+   "max": [
+    0.75,
+    0.835,
+    0.414
+   ],
+   "parts": [
+    {
+     "name": "fern",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 272,
+     "min": [
+      -0.7342,
+      -0.8337,
+      -0.1274
+     ],
+     "max": [
+      0.7505,
+      0.8348,
+      0.414
+     ]
+    }
+   ],
+   "anims": [],
+   "solid": false
+  },
+  {
+   "name": "boulder",
+   "title": "Boulder",
+   "group": "rocks",
+   "place": "floor",
+   "note": "1.2 m",
+   "tris": 64,
+   "size": [
+    1.234,
+    1.081,
+    0.936
+   ],
+   "min": [
+    -0.599,
+    -0.604,
+    -0.132
+   ],
+   "max": [
+    0.635,
+    0.476,
+    0.805
+   ],
+   "parts": [
+    {
+     "name": "boulder",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 64,
+     "min": [
+      -0.5988,
+      -0.6043,
+      -0.1315
+     ],
+     "max": [
+      0.6352,
+      0.4763,
+      0.805
+     ]
+    }
+   ],
+   "anims": []
+  },
+  {
+   "name": "stump",
+   "title": "Stump",
+   "group": "wood",
+   "place": "floor",
+   "note": "0.6 m across",
+   "tris": 138,
+   "size": [
+    1.651,
+    1.585,
+    0.492
+   ],
+   "min": [
+    -0.709,
+    -0.657,
+    -0.092
+   ],
+   "max": [
+    0.942,
+    0.928,
+    0.4
+   ],
+   "parts": [
+    {
+     "name": "stump",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 138,
+     "min": [
+      -0.7089,
+      -0.657,
+      -0.092
+     ],
+     "max": [
+      0.9417,
+      0.9277,
+      0.4
+     ]
+    }
+   ],
+   "anims": []
+  },
+  {
+   "name": "log",
+   "title": "Log",
+   "group": "wood",
+   "place": "floor",
+   "note": "3 m long",
+   "tris": 60,
+   "size": [
+    3.0,
+    0.462,
+    0.462
+   ],
+   "min": [
+    -1.5,
+    -0.231,
+    -0.011
+   ],
+   "max": [
+    1.5,
+    0.231,
+    0.451
+   ],
+   "parts": [
+    {
+     "name": "log",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 60,
+     "min": [
+      -1.5,
+      -0.231,
+      -0.011
+     ],
+     "max": [
+      1.5,
+      0.231,
+      0.451
+     ]
+    }
+   ],
+   "anims": []
+  },
+  {
+   "name": "fence",
+   "title": "Fence",
+   "group": "buildings",
+   "place": "floor",
+   "note": "2.5 m",
+   "tris": 80,
+   "size": [
+    2.702,
+    0.127,
+    1.25
+   ],
+   "min": [
+    -1.351,
+    -0.057,
+    -0.1
+   ],
+   "max": [
+    1.351,
+    0.07,
+    1.15
+   ],
+   "parts": [
+    {
+     "name": "fence",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 80,
+     "min": [
+      -1.3511,
+      -0.0566,
+      -0.1
+     ],
+     "max": [
+      1.351,
+      0.07,
+      1.15
+     ]
+    }
+   ],
+   "anims": []
+  },
+  {
+   "name": "tent",
+   "title": "Tent",
+   "group": "camp",
+   "place": "floor",
+   "note": "2.2 m long",
+   "tris": 66,
+   "size": [
+    1.7,
+    3.749,
+    1.353
+   ],
+   "min": [
+    -0.85,
+    -1.875,
+    -0.003
+   ],
+   "max": [
+    0.85,
+    1.875,
+    1.35
+   ],
+   "parts": [
+    {
+     "name": "tent",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 66,
+     "min": [
+      -0.85,
+      -1.8745,
+      -0.0026
+     ],
+     "max": [
+      0.85,
+      1.8745,
+      1.35
+     ]
+    }
+   ],
+   "anims": []
+  },
+  {
+   "name": "campfire",
+   "title": "Campfire",
+   "group": "camp",
+   "place": "floor",
+   "note": "1.1 m across; its flames flicker",
+   "tris": 323,
+   "size": [
+    1.192,
+    1.177,
+    0.816
+   ],
+   "min": [
+    -0.583,
+    -0.59,
+    -0.066
+   ],
+   "max": [
+    0.609,
+    0.587,
+    0.75
+   ],
+   "parts": [
+    {
+     "name": "campfire",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 305,
+     "min": [
+      -0.583,
+      -0.5899,
+      -0.0661
+     ],
+     "max": [
+      0.6093,
+      0.5866,
+      0.3559
+     ]
+    },
+    {
+     "name": "campfire_flames",
+     "parent": "campfire",
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 18,
+     "min": [
+      -0.28,
+      -0.2426,
+      0.05
+     ],
+     "max": [
+      0.28,
+      0.2426,
+      0.75
+     ]
+    }
+   ],
+   "anims": [
+    {
+     "name": "burn",
+     "seconds": 1.0,
+     "loop": true
+    }
+   ]
+  },
+  {
+   "name": "ground_grass",
+   "title": "Ground, Grass",
+   "group": "ground",
+   "place": "floor",
+   "note": "4 by 4 m, to lay any way round",
+   "tris": 24,
+   "size": [
+    4.0,
+    4.0,
+    0.11
+   ],
+   "min": [
+    -2.0,
+    -2.0,
+    -0.1
+   ],
+   "max": [
+    2.0,
+    2.0,
+    0.01
+   ],
+   "parts": [
+    {
+     "name": "ground_grass",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 24,
+     "min": [
+      -2.0,
+      -2.0,
+      -0.1
+     ],
+     "max": [
+      2.0,
+      2.0,
+      0.01
+     ]
+    }
+   ],
+   "anims": []
+  },
+  {
+   "name": "path_straight",
+   "title": "Path, Straight",
+   "group": "ground",
+   "place": "floor",
+   "note": "4 by 4 m, to lay any way round; the path crosses its edges at their middle",
+   "tris": 24,
+   "size": [
+    4.0,
+    4.0,
+    0.11
+   ],
+   "min": [
+    -2.0,
+    -2.0,
+    -0.1
+   ],
+   "max": [
+    2.0,
+    2.0,
+    0.01
+   ],
+   "parts": [
+    {
+     "name": "path_straight",
+     "parent": null,
+     "pivot": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tris": 24,
+     "min": [
+      -2.0,
+      -2.0,
+      -0.1
+     ],
+     "max": [
+      2.0,
+      2.0,
+      0.01
+     ]
+    }
+   ],
+   "anims": []
+  }
+ ]
+}

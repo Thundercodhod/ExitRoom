@@ -226,7 +226,6 @@ func make_button(words: String, callback: Callable) -> Button:
 	hover.border_color = Color(0.87, 0.78, 0.43)
 	button.add_theme_stylebox_override("hover", hover)
 	button.add_theme_stylebox_override("focus", hover)
-	button.mouse_entered.connect(func(): sound("ui_move", -25))
 	button.pressed.connect(callback)
 	return button
 
@@ -379,7 +378,6 @@ func _begin_game() -> void:
 	playing = true
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	was_captured = true
-	sound("ui_accept", -24)
 	if not started:
 		started = true
 		sound("fluorescent", -22)

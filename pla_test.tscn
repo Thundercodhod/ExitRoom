@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://da1rt5mcyfjcg"]
+
+[ext_resource type="Script" uid="uid://bmoxjirapes17" path="res://scripts/pla_test.gd" id="1_ku100"]
+[ext_resource type="PackedScene" uid="uid://clbkfgo2exdt4" path="res://3Dmodel_import/pladuk.glb" id="2_l54oh"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_f4vr1"]
+sky_top_color = Color(0.02, 0.02, 0.07, 1)
+sky_horizon_color = Color(0.05, 0.07, 0.15, 1)
+ground_bottom_color = Color(0, 0, 0.02, 1)
+ground_horizon_color = Color(0.04, 0.05, 0.1, 1)
+
+[sub_resource type="Sky" id="Sky_0lcmm"]
+sky_material = SubResource("ProceduralSkyMaterial_f4vr1")
+
+[sub_resource type="Environment" id="Environment_qmcnf"]
+background_mode = 2
+sky = SubResource("Sky_0lcmm")
+ambient_light_source = 2
+ambient_light_color = Color(0.2, 0.22, 0.35, 1)
+ambient_light_energy = 0.5
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1jlmm"]
+size = Vector3(10, 0.2, 10)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_hwdiv"]
+size = Vector2(10, 10)
+
+[node name="PlaTest" type="Node3D" unique_id=232711415]
+script = ExtResource("1_ku100")
+
+[node name="Pladuk" parent="." unique_id=1098018985 instance=ExtResource("2_l54oh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1009793, 0)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1709989585]
+environment = SubResource("Environment_qmcnf")
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=293944865]
+transform = Transform3D(0.81915206, -0.43938506, 0.36868784, 0, 0.64278764, 0.76604444, -0.57357645, -0.62750685, 0.5265408, 0, 0, 0)
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=800774272]
+transform = Transform3D(1, 0, 0, 0, 0.9848078, 0.1736482, 0, -0.1736482, 0.9848078, 0, 3.2099657, 2.5517087)
+current = true
+
+[node name="Floor" type="StaticBody3D" parent="." unique_id=949236037]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor" unique_id=1700575237]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+shape = SubResource("BoxShape3D_1jlmm")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor" unique_id=308839220]
+mesh = SubResource("PlaneMesh_hwdiv")

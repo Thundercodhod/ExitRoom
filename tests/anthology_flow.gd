@@ -66,7 +66,7 @@ func finish() -> void:
 	quit(1 if failures else 0)
 
 func verify_resources() -> void:
-	for key in ["ui_move","ui_accept","tape","knock","message","door","sting","fluorescent","low_pulse","menu_ambience"]:
+	for key in ["ui_move","ui_accept","tape","knock","message","door","sting","fluorescent","low_pulse"]:
 		var path: String = "res://audio/anthology/"+key+".wav"
 		check(ResourceLoader.exists(path),"sound resource exists: "+key)
 		if ResourceLoader.exists(path):
@@ -97,21 +97,65 @@ func test_menu() -> bool:
 		menu.show_page(section)
 		await frames()
 		check(menu.page==section and menu.pages[section].visible,"menu opens "+section)
+	var music: AudioStreamPlayer = anthology.menu_music
+	check(music!=null and music.playing and not music.stream_paused,"main menu plays background music")
+	check(music!=null and String(music.stream.resource_path).ends_with("menu_music.mp3") and (music.stream as AudioStreamMP3).loop,"menu music is the recorded track and loops")
+	check(music!=null and music.bus==&"Music","menu music plays on its own Music bus")
 	menu.show_page("options")
+	var music_slider := menu.pages.options.get_node("musicSlider") as HSlider
+	check(music_slider!=null,"options has a music volume slider")
+	if music_slider:
+		music_slider.value = 45
+		check(is_equal_approx(anthology.settings.music,.45) and is_equal_approx(db_to_linear(AudioServer.get_bus_volume_db(AudioServer.get_bus_index("Music"))),.45),"music slider sets the Music bus volume")
+		music_slider.value = 70
 	var slider := menu.pages.options.get_node("masterSlider") as HSlider
 	slider.value = 37
 	check(is_equal_approx(anthology.settings.master,.37),"settings slider updates master volume")
 	var instant := menu.pages.options.get_node("instant_textToggle") as CheckButton
 	instant.button_pressed = true
 	check(anthology.settings.instant_text,"reading toggle updates instant-text option")
+	await frames(2)
+	check_hover(slider,"options slider")
+	check_hover(instant,"options toggle")
 	menu.show_page("episodes")
+	await frames(2)
+	var box := menu.episode_buttons[1] as Button
+	check_hover(box,"episode box")
+	var ticks := sfx_count("ui_move")
+	box.mouse_entered.emit()
+	check(sfx_count("ui_move")==ticks,"sweeping quickly across boxes does not stutter")
+	var presses := sfx_count("ui_accept")
+	box.pressed.emit()
+	check(sfx_count("ui_accept")==presses+1,"pressing an episode box plays the press sound once")
+	box.disabled = true
+	anthology._last_ui_hover = -1000
+	ticks = sfx_count("ui_move")
+	box.mouse_entered.emit()
+	check(sfx_count("ui_move")==ticks,"a disabled button stays silent")
+	box.disabled = false
 	return true
+
+# UI sounds playing right now, by file name (each play_sfx adds one player).
+func sfx_count(key: String) -> int:
+	var n := 0
+	for child in anthology.get_children():
+		if child is AudioStreamPlayer and child.stream and String(child.stream.resource_path).ends_with("/"+key+".wav"): n += 1
+	return n
+
+# The cursor passing over `control` plays exactly one hover tick.
+func check_hover(control: Control, label: String) -> void:
+	anthology._last_ui_hover = -1000
+	var before := sfx_count("ui_move")
+	control.mouse_entered.emit()
+	check(sfx_count("ui_move")==before+1,"hover sound: "+label)
 
 func check_ending(id: String, original_scene: Node) -> void:
 	await wait_condition(func(): return anthology.modal_kind=="ending" and not anthology.changing,"ending transition completes: "+id)
 	check(current_scene==original_scene,"episode ending stays independent: "+id)
 	check(anthology.modal_kind=="ending" and anthology.modal!=null,"ending presents anthology overlay: "+id)
 	check(anthology.completed.has(id),"completion recorded: "+id)
+	var ending_button := anthology.modal.find_child("EpisodeMenuButton",true,false) as Button
+	if ending_button: check_hover(ending_button,"ending card button ("+id+")")
 	check(paused and Input.mouse_mode==Input.MOUSE_MODE_VISIBLE,"ending freezes play and releases mouse: "+id)
 	var persisted := ConfigFile.new()
 	check(persisted.load("user://anthology.cfg")==OK and id in persisted.get_value("progress","completed",[]),"completion persisted: "+id)
@@ -197,33 +241,50 @@ func test_passenger(scene: Node) -> void:
 	scene.stage = scene.Stage.RETURN
 	scene.player.position = Vector3(.3,.05,1.8)
 	scene.interact("car")
-	await wait_condition(func(): return scene.ending_presented,"Passenger repair and passenger cinematic reach ending")
+	await wait_condition(func(): return scene.ending_presented,"Passenger repair and passenger cinematic reach ending",40.0)
 	check(scene.stage==scene.Stage.END and scene.frog.mode==scene.frog.Mode.SITTING,"Passenger preserves repaired-car/frog-seat final sequence")
 	await check_ending("passenger",scene)
+	check(anthology.modal.find_child("NextEpisodeButton",true,false)!=null,"Passenger ending offers to continue into Episode 05")
+	check(anthology.is_unlocked("forest"),"finishing Passenger unlocks Episode 05")
+
+func test_forest(scene: Node) -> void:
+	check(scene.panel.visible and not scene.playing,"Forest starts at its own introduction")
+	check(scene.panel_text.text.contains("ภาคิน") and scene.panel_text.text.contains("ปั๊ม"),"Forest continues Phakin's story from Passenger")
+	await scene.panel_continue()
+	await wait_condition(func(): return scene.stage==scene.Stage.WALK,"Forest wake-up hands control to the player")
+	# The full loop (warning, hunt, catch, restart) is covered by tests/forest_loop.gd.
+	scene.player.global_position = scene.campfire_spot+Vector3(0,.05,2.4)
+	await frames(4)
+	scene.sleep_by_fire()
+	await wait_condition(func(): return scene.ending_presented,"Forest campfire sleep reaches ending")
+	await check_ending("forest",scene)
 
 func test_persistence() -> void:
 	var expected_completed: Array = anthology.completed.duplicate()
 	anthology.settings.master = .37
 	anthology.settings.ambience = .28
+	anthology.settings.music = .33
 	anthology.settings.instant_text = true
 	anthology.settings.reduced_motion = true
 	anthology.save_preferences()
 	anthology.settings.master = .8
 	anthology.settings.ambience = .7
+	anthology.settings.music = .7
 	anthology.settings.instant_text = false
 	anthology.settings.reduced_motion = false
 	anthology.completed.clear()
 	anthology.load_preferences()
 	check(is_equal_approx(anthology.settings.master,.37) and is_equal_approx(anthology.settings.ambience,.28),"saved audio preferences reload")
+	check(is_equal_approx(anthology.settings.music,.33),"saved music volume reloads")
 	check(anthology.settings.instant_text and anthology.settings.reduced_motion,"saved readability preferences reload")
-	check(anthology.completed==expected_completed and anthology.completed.size()==4,"all four completions reload without duplicates")
+	check(anthology.completed==expected_completed and anthology.completed.size()==anthology.EPISODES.size(),"all completions reload without duplicates")
 	anthology.apply_preferences()
 	check(is_equal_approx(db_to_linear(AudioServer.get_bus_volume_db(AudioServer.get_bus_index("Master"))),.37),"master volume preference reaches audio mixer")
 	check(is_equal_approx(db_to_linear(AudioServer.get_bus_volume_db(AudioServer.get_bus_index("Ambience"))),.28),"ambience preference reaches separate mixer bus")
 
 func run() -> void:
 	keep_preferences()
-	create_timer(100.0).timeout.connect(func(): check(false,"suite finishes within 100 seconds"); finish())
+	create_timer(160.0).timeout.connect(func(): check(false,"suite finishes within 160 seconds"); finish())
 	anthology = root.get_node_or_null("Anthology")
 	if not anthology:
 		check(false,"Anthology autoload is configured")
@@ -234,6 +295,7 @@ func run() -> void:
 	anthology.settings.reduced_motion = false
 	check(ProjectSettings.get_setting("application/run/main_scene")==anthology.MENU,"F5 opens the anthology menu")
 	change_scene_to_file(anthology.MENU)
+	check(not anthology.is_unlocked("forest"),"Episode 05 is locked until Episode 04 is finished")
 	if not await test_menu():
 		finish()
 		return
@@ -248,11 +310,17 @@ func run() -> void:
 		check(anthology.selected_id==entry.id,"second launch is ignored during transition")
 		if not await wait_scene(entry.scene): break
 		check(anthology.selected_id==entry.id,"selection launches requested episode: "+entry.id)
+		await wait_condition(func(): return anthology.menu_music.stream_paused,"menu music fades out and pauses in the episode: "+entry.id,4.0)
+		var music_at: float = anthology.menu_music.get_playback_position()
 		match entry.id:
 			"last_visit": await test_last_visit(current_scene)
 			"after_hours": await test_after_hours(current_scene)
 			"room407": await test_room407(current_scene)
 			"passenger": await test_passenger(current_scene)
+			"forest": await test_forest(current_scene)
 		if not await ending_menu(): break
+		check(not anthology.menu_music.stream_paused and anthology.menu_music.playing,"menu music comes back with the menu: "+entry.id)
+		check(anthology.menu_music.get_playback_position() >= music_at - .05,"menu music carries on instead of restarting: "+entry.id)
+		check(anthology.find_children("*","AudioStreamPlayer",false,false).filter(func(n): return n.name.begins_with("MenuMusic")).size()==1,"only one menu music player after returning: "+entry.id)
 	test_persistence()
 	finish()

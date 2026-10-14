@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/psx_forest/models/oak_model.glb" id="1"]
+
+[sub_resource type="BoxShape3D" id="box0"]
+size = Vector3(0.8188, 2.6609, 0.7984)
+
+[sub_resource type="BoxShape3D" id="box1"]
+size = Vector3(7.4493, 4.9426, 6.8235)
+
+[node name="oak" instance=ExtResource("1")]
+
+[node name="Collision" type="StaticBody3D" parent="oak"]
+
+[node name="Box" type="CollisionShape3D" parent="oak/Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.2228, -0.0208)
+shape = SubResource("box0")
+
+[node name="Collision" type="StaticBody3D" parent="oak/oak_crown"]
+
+[node name="Box" type="CollisionShape3D" parent="oak/oak_crown/Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1778, 2.0634, 0.3758)
+shape = SubResource("box1")

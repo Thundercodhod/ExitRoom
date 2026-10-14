@@ -7,7 +7,8 @@ const RETURN_START := Vector3(0,.05,-39)       # just outside the bedroom door
 const RETURN_FROG := Vector3(-4,.05,-23)
 const RETURN_OBJECTIVE := "กลับไปที่รถ · ไม่ต้องรับสาย"
 const EPISODE_ID := "passenger"
-const EPILOGUE := "ผมขับต่อไป ไม่กล้าหันไปดูอีกจนถึงปั๊มที่มีคนอยู่\nพอเปิดไฟในรถ เบาะข้าง ๆ ก็ว่าง แต่เปียกจนชุ่ม\n\nวันต่อมาผมพาเพื่อนไปดู เราขับวนอยู่สองรอบก็หาทางเข้าบ้านไม่เจอ\nเครื่องจั๊มพ์แบตยังอยู่ท้ายรถ ผมยังไม่กล้าเอามาใช้\n\nมีเรื่องหนึ่งที่ผมไม่ได้บอกเพื่อน\nบางคืน ตอนดับเครื่อง ผมยังได้ยินเสียงปลดเข็มขัดจากเบาะข้าง ๆ"
+# Episode 05 picks up from this blackout: he never reaches the station.
+const EPILOGUE := "ผมขับต่อไป ไม่กล้าหันไปมองเบาะข้าง ๆ อีก\nไฟปั๊มอยู่ข้างหน้าแล้ว อีกไม่ไกล\n\nแต่ตามันหนักขึ้นเรื่อย ๆ\nกะพริบครั้งหนึ่ง ถนนยังอยู่\nกะพริบอีกครั้ง ไฟปั๊มหายไป\n\nครั้งสุดท้าย ผมไม่แน่ใจว่าลืมตาขึ้นมาอีกหรือเปล่า"
 enum Stage { CAR, FIELD, HOUSE, NOTE, BATTERY, RECOGNITION, RETURN, REPAIRED, END }
 var stage := Stage.CAR
 var playing := false
@@ -117,6 +118,35 @@ func _ready() -> void:
 	setup_ui()
 	show_panel("THE PASSENGER  /  ผู้โดยสาร","ภาคิน / กลับจากเก็บของที่ห้องเช่าของพ่อ / 23:46\n\nพ่อเสียไปเกือบปี ผมจ่ายค่าเช่าทิ้งไว้จนไม่ไหว\nวันนั้นเลยต้องไปขนของออก แล้วคืนกุญแจเสียที\n\nขากลับถนนใหญ่ปิดซ่อม ผมเลยใช้ทางเลียบทุ่ง\nขับมาได้พักหนึ่ง ไฟหน้าก็หรี่ลง แล้วเครื่องก็ดับ\nมองไปรอบ ๆ มีบ้านเปิดไฟอยู่แค่หลังเดียว\n\nWASD เดิน · เมาส์มอง · Shift วิ่ง\nE สำรวจ · F ไฟฉาย · Esc พัก · F1 เมนู","เริ่มเรื่อง")
 	play_cue("tape",-23.0)
+	lighten_field()
+
+# The see-through grass is drawn many times over per pixel, which at Retina
+# resolution drops this episode to ~12 FPS. EP4 only: draw 3D at ~720p and
+# keep 70% of the blades within 40 m. Web already has its own cut in Anthology.
+const GRASS_RENDER_HEIGHT := 720.0
+const GRASS_KEEP := .7
+const GRASS_RANGE := 40.0
+
+func lighten_field() -> void:
+	if OS.has_feature("web"): return
+	_fit_render_scale()
+	get_viewport().size_changed.connect(_fit_render_scale)
+	for grass in find_children("Grass_*","MultiMeshInstance3D",true,false):
+		if grass.multimesh == null: continue
+		grass.multimesh = grass.multimesh.duplicate()
+		grass.multimesh.visible_instance_count = int(grass.multimesh.instance_count * GRASS_KEEP)
+		grass.visibility_range_end = GRASS_RANGE
+
+func _fit_render_scale() -> void:
+	var vp := get_viewport()
+	vp.scaling_3d_mode = Viewport.SCALING_3D_MODE_BILINEAR
+	vp.scaling_3d_scale = clampf(GRASS_RENDER_HEIGHT / maxf(float(DisplayServer.window_get_size().y), 1.0), .25, 1.0)
+
+func _exit_tree() -> void:
+	var vp := get_viewport()
+	if vp == null: return
+	if vp.size_changed.is_connected(_fit_render_scale): vp.size_changed.disconnect(_fit_render_scale)
+	vp.scaling_3d_scale = 1.0
 
 func episode_font(bold := false) -> Font:
 	var path := "res://ui/fonts/ChakraPetch-Bold.ttf" if bold else "res://ui/fonts/ChakraPetch-Regular.ttf"
@@ -238,7 +268,6 @@ func style_button(button: Button) -> void:
 		button.add_theme_stylebox_override(state,style)
 	button.add_theme_color_override("font_color",Color(.91,.92,.79))
 	button.add_theme_color_override("font_hover_color",Color(1,.97,.78))
-	button.mouse_entered.connect(func(): play_cue("ui_move",-27.0))
 
 func play_cue(cue: String, volume := -20.0) -> void:
 	var anthology := get_node_or_null("/root/Anthology")
@@ -246,7 +275,6 @@ func play_cue(cue: String, volume := -20.0) -> void:
 		anthology.play_sfx(cue,volume)
 
 func return_to_menu() -> void:
-	play_cue("ui_accept",-22.0)
 	var anthology := get_node_or_null("/root/Anthology")
 	if anthology and anthology.has_method("return_to_menu"):
 		get_tree().paused = false
@@ -273,7 +301,6 @@ func panel_continue() -> void:
 		_continue_panel()
 
 func _continue_panel() -> void:
-	play_cue("ui_accept",-25.0)
 	if stage == Stage.END:
 		get_tree().reload_current_scene()
 		return
@@ -573,6 +600,20 @@ func repair_car() -> void:
 	await t.finished
 	say("“ไม่ต้องมองหาแล้ว”",4)
 	await wait_for(3)
+	# Eyes back on the road. The station lights are ahead... and he starts to nod off.
+	t = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP)
+	t.tween_property(cut_camera,"rotation",Vector3.ZERO,1.4 if reduced_motion_enabled() else .9)
+	await t.finished
+	say("ใกล้ถึงปั๊มแล้วใช่ไหมนะ.....",5)
+	await wait_for(2.2)
+	# Blinks that come faster and stay shut longer, like dozing at the wheel (วูบ).
+	t = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP)
+	for blink in [[.07,.35],[.09,.55],[.12,.3],[.16,.45],[.22,.22],[.3,.3],[.4,.12]]:
+		t.tween_property(overlay,"color:a",1.0,blink[0])
+		t.tween_property(overlay,"color:a",0.0,blink[0]*1.4)
+		t.tween_interval(blink[1])
+	t.tween_property(overlay,"color:a",1.0,.12)
+	await t.finished
 	overlay.color.a = 1
 	subtitle.text = ""
 	engine.stop()
