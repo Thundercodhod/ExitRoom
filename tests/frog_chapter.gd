@@ -48,6 +48,10 @@ func run() -> void:
 	check(chapter.get_node("World/BinbunGrass").get_child_count()==72,"chunked Binbun grass loaded")
 	var grass: MultiMesh = chapter.get_node("World/BinbunGrass").get_child(0).multimesh
 	if capture: check(grass.get_instance_transform(0).origin.length()>1,"grass transforms survived scene serialization")
+	var grass_node: MultiMeshInstance3D = chapter.get_node("World/BinbunGrass").get_child(0)
+	check(grass.visible_instance_count == int(grass.instance_count * chapter.GRASS_KEEP) and grass_node.visibility_range_end == chapter.GRASS_RANGE,"EP4 grass trimmed to 70% within 40 m")
+	var expected_scale := clampf(chapter.GRASS_RENDER_HEIGHT / maxf(float(DisplayServer.window_get_size().y),1.0),.25,1.0)
+	check(root.scaling_3d_mode == Viewport.SCALING_3D_MODE_BILINEAR and is_equal_approx(root.scaling_3d_scale,expected_scale),"EP4 renders 3D at ~720p (scale %.2f)" % root.scaling_3d_scale)
 	await shot("title")
 	await chapter.panel_continue()
 	await aim(Vector3(.3,.1,1.8),Vector3(2.4,.95,2.5))
@@ -144,6 +148,9 @@ func run() -> void:
 		while anthology.changing: await process_frame
 	check(chapter.stage==chapter.Stage.END and chapter.ending_presented,"repaired car ends standalone episode through anthology or local fallback")
 	await shot("ending")
+	if is_instance_valid(chapter): chapter.queue_free()
+	await frames()
+	check(root.scaling_3d_scale == 1.0,"leaving EP4 restores full 3D resolution")
 	if had_preferences:
 		var preferences := FileAccess.open("user://anthology.cfg",FileAccess.WRITE)
 		if preferences: preferences.store_string(original_preferences)

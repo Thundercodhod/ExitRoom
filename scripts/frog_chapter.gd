@@ -118,6 +118,35 @@ func _ready() -> void:
 	setup_ui()
 	show_panel("THE PASSENGER  /  ผู้โดยสาร","ภาคิน / กลับจากเก็บของที่ห้องเช่าของพ่อ / 23:46\n\nพ่อเสียไปเกือบปี ผมจ่ายค่าเช่าทิ้งไว้จนไม่ไหว\nวันนั้นเลยต้องไปขนของออก แล้วคืนกุญแจเสียที\n\nขากลับถนนใหญ่ปิดซ่อม ผมเลยใช้ทางเลียบทุ่ง\nขับมาได้พักหนึ่ง ไฟหน้าก็หรี่ลง แล้วเครื่องก็ดับ\nมองไปรอบ ๆ มีบ้านเปิดไฟอยู่แค่หลังเดียว\n\nWASD เดิน · เมาส์มอง · Shift วิ่ง\nE สำรวจ · F ไฟฉาย · Esc พัก · F1 เมนู","เริ่มเรื่อง")
 	play_cue("tape",-23.0)
+	lighten_field()
+
+# The see-through grass is drawn many times over per pixel, which at Retina
+# resolution drops this episode to ~12 FPS. EP4 only: draw 3D at ~720p and
+# keep 70% of the blades within 40 m. Web already has its own cut in Anthology.
+const GRASS_RENDER_HEIGHT := 720.0
+const GRASS_KEEP := .7
+const GRASS_RANGE := 40.0
+
+func lighten_field() -> void:
+	if OS.has_feature("web"): return
+	_fit_render_scale()
+	get_viewport().size_changed.connect(_fit_render_scale)
+	for grass in find_children("Grass_*","MultiMeshInstance3D",true,false):
+		if grass.multimesh == null: continue
+		grass.multimesh = grass.multimesh.duplicate()
+		grass.multimesh.visible_instance_count = int(grass.multimesh.instance_count * GRASS_KEEP)
+		grass.visibility_range_end = GRASS_RANGE
+
+func _fit_render_scale() -> void:
+	var vp := get_viewport()
+	vp.scaling_3d_mode = Viewport.SCALING_3D_MODE_BILINEAR
+	vp.scaling_3d_scale = clampf(GRASS_RENDER_HEIGHT / maxf(float(DisplayServer.window_get_size().y), 1.0), .25, 1.0)
+
+func _exit_tree() -> void:
+	var vp := get_viewport()
+	if vp == null: return
+	if vp.size_changed.is_connected(_fit_render_scale): vp.size_changed.disconnect(_fit_render_scale)
+	vp.scaling_3d_scale = 1.0
 
 func episode_font(bold := false) -> Font:
 	var path := "res://ui/fonts/ChakraPetch-Bold.ttf" if bold else "res://ui/fonts/ChakraPetch-Regular.ttf"
