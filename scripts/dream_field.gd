@@ -109,7 +109,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if waking: return
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-		was_captured = true
+		# Web confirms pointer lock asynchronously; _process records the result.
 		return
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.physical_keycode == KEY_ESCAPE:
