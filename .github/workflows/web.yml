@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  GODOT_VERSION: "4.7"
+  GODOT_VERSION: "4.7.2"
 
 jobs:
   deploy:
@@ -39,10 +39,16 @@ jobs:
 
       - name: Export
         run: |
+          set -euo pipefail
           mkdir -p build/web
-          ./godot --headless --import
+          ./godot --headless --editor --import
+          ./godot --headless --script res://tools/verify_release.gd 2>&1 | tee /tmp/source-resources.log
+          ! grep -E '^(SCRIPT ERROR|SHADER ERROR|ERROR):' /tmp/source-resources.log
           ./godot --headless --export-release "Web" build/web/index.html
           test -f build/web/index.pck
+          # Test the imported resources inside the pack, not the source tree.
+          ./godot --headless --main-pack build/web/index.pck --script "$PWD/tools/verify_release.gd" 2>&1 | tee /tmp/packed-resources.log
+          ! grep -E '^(SCRIPT ERROR|SHADER ERROR|ERROR):' /tmp/packed-resources.log
 
       - uses: actions/upload-pages-artifact@v3
         with:

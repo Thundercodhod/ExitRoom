@@ -4,9 +4,11 @@ const INK := Color("e5e1d6")
 const MUTED := Color("949d99")
 const ACCENT := Color("d75055")
 const GOLD := Color("cbbd83")
+const BODY_FONT: Font = preload("res://ui/fonts/ChakraPetch-Regular.ttf")
+const TITLE_FONT: Font = preload("res://ui/fonts/ChakraPetch-Bold.ttf")
 
 static func font(bold := false) -> Font:
-	return load("res://ui/fonts/ChakraPetch-Bold.ttf" if bold else "res://ui/fonts/ChakraPetch-Regular.ttf")
+	return TITLE_FONT if bold else BODY_FONT
 
 static func label(words: String, size: int, color := INK, bold := false) -> Label:
 	var n := Label.new()

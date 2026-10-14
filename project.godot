@@ -17,7 +17,6 @@ config/features=PackedStringArray("4.7")
 
 [autoload]
 
-_mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 Anthology="*res://scripts/anthology.gd"
 
 [display]
@@ -29,7 +28,7 @@ window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/godot_ai/plugin.cfg")
+enabled=PackedStringArray()
 
 [rendering]
 

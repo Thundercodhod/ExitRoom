@@ -33,6 +33,8 @@
 
 ## ไฟล์สำคัญ
 
+ผังโฟลเดอร์และวิธี deploy ล่าสุด: [PROJECT_LAYOUT.md](PROJECT_LAYOUT.md). คลัง source asset และฉากทดลองที่ไม่ได้ใช้ย้ายออกไปไว้ใน `../ExitRoom_SourceLibrary/2026-10-09/` แล้ว; GitHub เก็บเฉพาะไฟล์สำหรับเกมกับเครื่องมือตรวจงานที่จำเป็น
+
 - `main_menu.tscn`, `scripts/main_menu.gd`: เมนู 3D และหน้าเลือกตอน
 - `scripts/anthology.gd`: รายชื่อตอน การตั้งค่า เสียง และหน้าจบ
 - `scripts/anthology_style.gd`, `ui/fonts/`, `ui/menu_film.gdshader`: รูปแบบเมนู ฟอนต์ และเอฟเฟกต์ภาพ

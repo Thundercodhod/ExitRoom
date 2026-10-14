@@ -1,5 +1,11 @@
 # 3D_game_project
 
+**Current project (2026-10-09):** use `PROJECT_LAYOUT.md` and `README.md` for the
+current file structure and Web deployment. There are four independent episodes,
+launched from `main_menu.tscn`, built with Godot 4.7.2. The notes below describe
+older prototypes. Their scene sequence and model paths are historical; do not
+apply them to the current anthology or regenerate the authored frog world.
+
 A 3D horror-comedy escape game built in Godot 4.7, played in THIRD-PERSON
 (camera behind the player, Fall Guys style).
 The player must escape a floor while avoiding monsters. Monsters are original,

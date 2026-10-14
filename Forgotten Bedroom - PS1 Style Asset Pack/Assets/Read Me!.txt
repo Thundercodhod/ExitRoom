@@ -1,5 +1,0 @@
-Just a note that most models in this pack will not have any textures — you need to add them yourself!
-
-All textures from the UE5 assets are from Polyhaven, so credit goes toward them <3
-
-But for the case of Mr. TiddyWinkles; his textures were made by Vicious Potato Studios.
