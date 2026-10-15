@@ -89,6 +89,10 @@ func run() -> void:
 	await idle()
 	check(chapter.stage==chapter.Stage.FIELD,"failed starter leads to field")
 	check(not chapter.frog.approach_enabled,"existing frog stays still during field encounter")
+	var watchers: Array = chapter.field_watchers
+	check(watchers.size()==3 and watchers.all(func(w): return w.mode==w.Mode.WATCH and w.visible and not w.approach_enabled),"three more frogs stand watching in the field (4 total)")
+	await aim(chapter.player.position,Vector3(0,1.3,-20))
+	await shot("field-watchers")
 	var pause := InputEventAction.new()
 	pause.action = "pause_game"
 	pause.pressed = true
@@ -117,6 +121,17 @@ func run() -> void:
 	await create_timer(1.5).timeout
 	check(wave.fraction() > spent and wave.visible,"resting brings the white back")
 	chapter.player.stamina = 100
+	# The sprint above may already have run past the nearest one; stand it back up.
+	watchers[0].appear_at(chapter.FIELD_WATCHERS[0][0])
+	watchers[0].vanish_when_seen_within(chapter.FIELD_WATCHERS[0][1],chapter.FIELD_WATCHERS[0][2])
+	# Walk up and look at the nearest one: it goes, the others stay.
+	await aim(Vector3(1,.05,-3),watchers[0].global_position+Vector3(0,1.4,0))
+	await create_timer(1.2).timeout
+	check(watchers[0].mode==watchers[0].Mode.GONE,"nearest field frog vanishes once looked at up close")
+	check(watchers[1].mode==watchers[1].Mode.WATCH and watchers[2].mode==watchers[2].Mode.WATCH and chapter.frog.mode==chapter.frog.Mode.WATCH,"the other frogs are still standing")
+	await aim(Vector3(-3,.05,-15),watchers[1].global_position+Vector3(0,1.4,0))
+	await create_timer(1.5).timeout
+	check(watchers[1].mode==watchers[1].Mode.GONE and watchers[2].mode==watchers[2].Mode.WATCH,"field frogs go one at a time")
 	await aim(Vector3(0,.05,-7),Vector3(0,1.7,-31))
 	await shot("approach")
 	# Real collision sweep through front door and hallway, not just teleport assertions.
@@ -126,6 +141,7 @@ func run() -> void:
 	await aim(Vector3(0,.05,-32),Vector3(3.8,.84,-33.9))
 	check(chapter.stage==chapter.Stage.NOTE,"house entry advances objective")
 	check(chapter.frog.mode==chapter.frog.Mode.GONE,"field frog vanishes at fence")
+	check(watchers.all(func(w): return w.mode==w.Mode.GONE),"any field frog still standing is gone at the fence")
 	await aim(Vector3(2.3,.05,-32.9),Vector3(3.8,.84,-33.9))
 	check(chapter.target()!=null and chapter.target().get_meta("action")=="note","warning note reachable")
 	chapter.interact("note")
