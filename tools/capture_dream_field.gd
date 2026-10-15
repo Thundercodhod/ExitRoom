@@ -1,5 +1,5 @@
 extends SceneTree
-const Terrain=preload("res://scripts/dream_field_terrain.gd")
+const Terrain=preload("res://levels/06_dream_field/scripts/dream_field_terrain.gd")
 ## Real-renderer captures of the new field only; existing thumbnails are untouched.
 func _initialize() -> void:
 	call_deferred("run")
@@ -20,7 +20,7 @@ func run() -> void:
 	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 	DisplayServer.window_set_size(Vector2i(1280,720))
 	root.size = Vector2i(1280,720)
-	change_scene_to_file("res://dream_field.tscn")
+	change_scene_to_file("res://levels/06_dream_field/dream_field.tscn")
 	await scene_changed
 	await create_timer(1.0).timeout
 	var field := current_scene

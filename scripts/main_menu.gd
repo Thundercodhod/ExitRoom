@@ -72,7 +72,7 @@ func build_backdrop() -> void:
 	post.add_child(image)
 
 func build_field_backdrop() -> void:
-	var world := (load("res://frog_field_world.tscn") as PackedScene).instantiate()
+	var world := (load("res://levels/04_passenger/frog_field_world.tscn") as PackedScene).instantiate()
 	world.name = "MenuBackdrop"
 	add_child(world)
 	world.process_mode = Node.PROCESS_MODE_DISABLED

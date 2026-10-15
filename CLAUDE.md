@@ -1,6 +1,6 @@
 # 3D_game_project
 
-**Current project (2026-10-09):** use `PROJECT_LAYOUT.md` and `README.md` for the
+**Current project (2026-10-09):** use `docs/PROJECT_LAYOUT.md` and `README.md` for the
 current file structure and Web deployment. There are five episodes (05 continues 04; the others stand alone),
 launched from `main_menu.tscn`, built with Godot 4.7.2. The notes below describe
 older prototypes. Their scene sequence and model paths are historical; do not
@@ -17,7 +17,7 @@ Always present a written plan for review before writing or editing any code.
 
 ## Current state (team repo Thundercodhod/ExitRoom, branch main)
 
-- The project is the team's ExitRoom repo (Godot 4.7, GL Compatibility): village prologue -> garden lobby -> Backrooms -> abandoned school. Main scene `res://prologue_village.tscn`.
+- The project is the team's ExitRoom repo (Godot 4.7, GL Compatibility): village prologue -> garden lobby -> Backrooms -> abandoned school. Main scene `res://levels/01_last_visit/prologue_village.tscn`.
 - All levels create the player with `CharacterBody3D.new()` + `res://scripts/player.gd`. Keep its public API: `pivot` (yaw), `camera`, `torch`, `body_visual`, `game.playing`, `set_hiding()`.
   Input actions (`forward/back/left/right/sprint/interact/flashlight`) are registered in each level script, not in project.godot.
 - **Player is now third-person** (SpringArm3D camera 2.4 m behind, shoulder offset, shortens at walls) using `res://assets/models/player/main_character.glb` at real scale (1.64 m, replaces the Hazmat demo).
@@ -40,7 +40,7 @@ Always present a written plan for review before writing or editing any code.
 ### The Frog (watcher, not a chaser)
 - Model: `res://assets/models/enemy/frog.glb` (Meshy AI, rigged by Meshy, 50 bones renamed to Hips/Spine/Chest/Neck/Head/L_/R_ arms, legs, 3 fingers per hand), 1.9 m tall, faces +Z in the file (the actor rotates it so the frog faces -Z). 51k triangles, PBR textures. Clips baked by `assets_src/frog/build_frog.py` (`Blender -b --python assets_src/frog/build_frog.py`, env FROG_HEIGHT / FROG_PREVIEW): `idle` 4 s, `walk` 1.2 s (planted foot 1.5 m/s), `sit` 4 s (seat height about 0.6 m, origin stays on the floor). Source blend: `assets_src/frog/frog_rigged.blend`.
 - Behaviour: `res://scripts/frog_watcher.gd` (CharacterBody3D built in code). Never attacks. Turns its head to follow the player's head (`scripts/frog_head_tracker.gd`, a SkeletonModifier3D, limit 85 deg), walks closer to look and stops at `keep_distance` (3.5 m, tolerance 0.5), backs away (walk clip played in reverse) when the player comes nearer, always faces the player. Optional path finding: set `bounds` (XZ rect) and it uses `scripts/nav_grid.gd` (same A* grid idea as the spider).
-- Story hooks (HANDOFF.md): `vanish_when_seen_within(distance, delay)`, `relocate_when_unseen(point, delay)` (queue: one jump each time the player is not looking), `appear_at(point, sitting)`, `sit()` / `stand()` for the passenger seat, `is_seen()`, `face_towards(point)`; signals `vanished`, `reappeared`, `relocated`, `settled`.
+- Story hooks (docs/HANDOFF.md): `vanish_when_seen_within(distance, delay)`, `relocate_when_unseen(point, delay)` (queue: one jump each time the player is not looking), `appear_at(point, sitting)`, `sit()` / `stand()` for the passenger seat, `is_seen()`, `face_towards(point)`; signals `vanished`, `reappeared`, `relocated`, `settled`.
 - Usage: `frog.set_script(preload(...)); frog.game = level; frog.target = player; frog.position = feet position; add_child(frog)`. Tunables: `keep_distance`, `distance_tolerance`, `approach_speed` 1.3, `retreat_speed` 1.0, `approach_range` 40, `approach_enabled`, `head_tracking`, `turn_body`.
 - Not placed in any level yet (HANDOFF asked to wait for the Frog chapter). Tests: `tests/frog_watcher.gd` (29 checks). Gotcha: skeleton modifiers do not keep their poses between frames, so read `frog.head_error()` (measured inside the modifier) instead of querying bone poses from outside.
 

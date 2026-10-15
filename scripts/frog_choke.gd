@@ -240,7 +240,7 @@ void fragment() {
 
 func _setup_audio() -> void:
 	breath = AudioStreamPlayer.new()
-	var b := (load("res://audio/frog_chapter/breath.wav") as AudioStreamWAV).duplicate() as AudioStreamWAV
+	var b := (load("res://levels/04_passenger/audio/breath.wav") as AudioStreamWAV).duplicate() as AudioStreamWAV
 	b.loop_mode = AudioStreamWAV.LOOP_FORWARD
 	b.loop_end = b.data.size() / 2
 	breath.stream = b
@@ -248,7 +248,7 @@ func _setup_audio() -> void:
 	add_child(breath)
 	breath.play()
 	heartbeat = AudioStreamPlayer.new()
-	var h := (load("res://audio/frog_chapter/heartbeat.wav") as AudioStreamWAV).duplicate() as AudioStreamWAV
+	var h := (load("res://levels/04_passenger/audio/heartbeat.wav") as AudioStreamWAV).duplicate() as AudioStreamWAV
 	h.loop_mode = AudioStreamWAV.LOOP_FORWARD
 	h.loop_end = h.data.size() / 2
 	heartbeat.stream = h

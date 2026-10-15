@@ -1,5 +1,5 @@
 extends SceneTree
-## Explicit authoring tool: only writes frog_field_world.tscn.
+## Explicit authoring tool: only writes levels/04_passenger/frog_field_world.tscn.
 func _initialize() -> void:
 	call_deferred("build")
 
@@ -21,6 +21,6 @@ func build() -> void:
 	own(world,world)
 	var packed := PackedScene.new()
 	var result := packed.pack(world)
-	if result == OK: result = ResourceSaver.save(packed,"res://frog_field_world.tscn")
+	if result == OK: result = ResourceSaver.save(packed,"res://levels/04_passenger/frog_field_world.tscn")
 	print("FROG_FIELD_BUILD=",result)
 	quit(result)

@@ -79,7 +79,7 @@ func run() -> void:
 	check(player.is_on_floor() and absf(player.position.y-start_y)<0.06,"Player lands after jumping")
 	fixture.queue_free()
 	await frames(2)
-	change_scene_to_file("res://prologue_village.tscn")
+	change_scene_to_file("res://levels/01_last_visit/prologue_village.tscn")
 	await scene_changed
 	current_scene.begin_game()
 	player=current_scene.player

@@ -204,6 +204,15 @@ func test_after_hours(scene: Node) -> void:
 	anthology.close_modal()
 	check(not paused and scene.playing,"global pause restores active gameplay")
 	scene._unhandled_input(use)
+	check(not scene.finished and anthology.modal==null,"After Hours door stays locked until the breaker is reset")
+	scene.player.global_position = scene.BREAKER_STAND
+	await scene.reset_breaker()
+	# Headless has no pointer capture, so the scene pauses itself meanwhile; resume.
+	scene._begin_game()
+	scene.was_captured = false
+	check(scene.power_on and scene.playing,"resetting the breaker powers the fire door")
+	scene.player.global_position = scene.EXIT
+	scene._unhandled_input(use)
 	await check_ending("after_hours",scene)
 
 func test_room407(scene: Node) -> void:

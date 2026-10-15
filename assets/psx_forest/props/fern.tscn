@@ -1,5 +1,0 @@
-[gd_scene load_steps=2 format=3]
-
-[ext_resource type="PackedScene" path="res://assets/psx_forest/models/fern_model.glb" id="1"]
-
-[node name="fern" instance=ExtResource("1")]

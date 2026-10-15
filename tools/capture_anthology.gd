@@ -28,11 +28,11 @@ func run() -> void:
 		return
 	if not menus_only:
 		var setups := [
-			["last_visit","res://prologue_village.tscn",Vector3(17.5,2,-137),Vector3(24,1.8,-150)],
-			["after_hours","res://backrooms_level.tscn",Vector3(9.5,1.6,-9.5),Vector3(-1,1.6,-3)],
-			["room407","res://Room407/main.tscn",Vector3(-3.6,1.62,-.65),Vector3(-5.3,1,-4.25)],
-			["passenger","res://frog_chapter.tscn",Vector3(-4,1.65,-22),Vector3(0,1.7,-33)],
-			["forest","res://forest_chapter.tscn",Vector3(1.4,1.6,2.6),Vector3(-1.2,1.3,-12)]
+			["last_visit","res://levels/01_last_visit/prologue_village.tscn",Vector3(17.5,2,-137),Vector3(24,1.8,-150)],
+			["after_hours","res://levels/02_after_hours/backrooms_level.tscn",Vector3(9.5,1.6,-9.5),Vector3(-1,1.6,-3)],
+			["room407","res://levels/03_room407/main.tscn",Vector3(-3.6,1.62,-.65),Vector3(-5.3,1,-4.25)],
+			["passenger","res://levels/04_passenger/frog_chapter.tscn",Vector3(-4,1.65,-22),Vector3(0,1.7,-33)],
+			["forest","res://levels/05_realization/forest_chapter.tscn",Vector3(1.4,1.6,2.6),Vector3(-1.2,1.3,-12)]
 		]
 		for config in setups:
 			if not only.is_empty() and config[0] != only: continue
@@ -68,7 +68,7 @@ func run() -> void:
 	root.size = Vector2i(1920,1080)
 	await save("res://.buildtmp/menu-home-1080.png")
 	root.size = Vector2i(1280,720)
-	for config in [["last_visit","res://prologue_village.tscn"],["after_hours","res://backrooms_level.tscn"],["room407","res://Room407/main.tscn"],["passenger","res://frog_chapter.tscn"],["forest","res://forest_chapter.tscn"]]:
+	for config in [["last_visit","res://levels/01_last_visit/prologue_village.tscn"],["after_hours","res://levels/02_after_hours/backrooms_level.tscn"],["room407","res://levels/03_room407/main.tscn"],["passenger","res://levels/04_passenger/frog_chapter.tscn"],["forest","res://levels/05_realization/forest_chapter.tscn"]]:
 		change_scene_to_file(config[1])
 		await scene_changed
 		await save("res://.buildtmp/intro-"+config[0]+".png")
@@ -78,7 +78,7 @@ func capture_endings() -> void:
 	var manager := root.get_node("Anthology")
 	var saved_progress: Array = manager.completed.duplicate()
 	var saved_id: String = manager.selected_id
-	for config in [["last_visit","res://scripts/prologue.gd","ENDING"],["after_hours","res://scripts/backrooms_level.gd","ENDING"],["room407","res://Room407/scripts/story.gd","ENDING"],["passenger","res://scripts/frog_chapter.gd","EPILOGUE"],["forest","res://scripts/forest_chapter.gd","EPILOGUE"]]:
+	for config in [["last_visit","res://levels/01_last_visit/scripts/prologue.gd","ENDING"],["after_hours","res://levels/02_after_hours/scripts/backrooms_level.gd","ENDING"],["room407","res://levels/03_room407/scripts/story.gd","ENDING"],["passenger","res://levels/04_passenger/scripts/frog_chapter.gd","EPILOGUE"],["forest","res://levels/05_realization/scripts/forest_chapter.gd","EPILOGUE"]]:
 		var script: GDScript = load(config[1])
 		await manager.complete_episode(config[0],script.get_script_constant_map()[config[2]])
 		await save("res://.buildtmp/ending-"+config[0]+".png")

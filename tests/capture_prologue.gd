@@ -12,7 +12,7 @@ func frames(count: int) -> void:
 
 
 func run() -> void:
-	change_scene_to_file("res://prologue_village.tscn")
+	change_scene_to_file("res://levels/01_last_visit/prologue_village.tscn")
 	await scene_changed
 	current_scene.begin_game()
 	await frames(24)

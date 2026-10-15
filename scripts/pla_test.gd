@@ -1,5 +1,5 @@
 extends Node3D
-# Sandbox for the Pladuk creature model: open pla_test.tscn and press F6.
+# Sandbox for the Pladuk creature model: open scenes/dev/pla_test.tscn and press F6.
 # Plays whatever animation the imported model carries (expected: Idle_Crawl).
 
 @onready var anim_player: AnimationPlayer = $Pladuk/AnimationPlayer

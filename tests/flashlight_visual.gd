@@ -4,10 +4,10 @@ var failures := 0
 var tag := "after"
 var manager: Node
 const VIEWS := [
-	["last_visit","res://prologue_village.tscn",Vector3(23.5,.12,-148),Vector3(19,1.5,-149)],
-	["after_hours","res://backrooms_level.tscn",Vector3(8,.1,-8),Vector3(4,1.55,-8)],
-	["room407","res://Room407/main.tscn",Vector3(-3.6,.05,-.65),Vector3(-5.3,1.3,-4.25)],
-	["passenger","res://frog_chapter.tscn",Vector3(-4,.05,-23),Vector3(0,1.5,-33)]
+	["last_visit","res://levels/01_last_visit/prologue_village.tscn",Vector3(23.5,.12,-148),Vector3(19,1.5,-149)],
+	["after_hours","res://levels/02_after_hours/backrooms_level.tscn",Vector3(8,.1,-8),Vector3(4,1.55,-8)],
+	["room407","res://levels/03_room407/main.tscn",Vector3(-3.6,.05,-.65),Vector3(-5.3,1.3,-4.25)],
+	["passenger","res://levels/04_passenger/frog_chapter.tscn",Vector3(-4,.05,-23),Vector3(0,1.5,-33)]
 ]
 
 func _initialize() -> void:

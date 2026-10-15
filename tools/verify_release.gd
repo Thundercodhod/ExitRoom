@@ -31,12 +31,16 @@ func verify() -> void:
 	if music==null or music.get_length()<=0:
 		push_error("Missing audio: menu_music")
 		failures += 1
-	var field_music := load("res://audio/dream_field/field_music.mp3") as AudioStream
+	var pladuk_voice := load("res://levels/05_realization/audio/pladuk_voice.wav") as AudioStream
+	if pladuk_voice==null or pladuk_voice.get_length()<4.5:
+		push_error("Missing audio: pladuk_voice")
+		failures += 1
+	var field_music := load("res://levels/06_dream_field/audio/field_music.mp3") as AudioStream
 	if field_music==null or field_music.get_length()<=0:
 		push_error("Missing audio: field_music")
 		failures += 1
 	# A failed shader include during export can silently strip material uniforms.
-	var world := (load("res://frog_field_world.tscn") as PackedScene).instantiate()
+	var world := (load("res://levels/04_passenger/frog_field_world.tscn") as PackedScene).instantiate()
 	var grass := world.get_node("BinbunGrass/Grass_0_0") as MultiMeshInstance3D
 	var material := grass.material_override as ShaderMaterial
 	for key in ["shape_texture","shape_atlas","color_gradient"]:
@@ -48,7 +52,7 @@ func verify() -> void:
 		failures += 1
 	world.free()
 	# Level 06 is independently selectable, including the baked cat and sunset.
-	var dream := (load("res://scenes/dream_field/world.tscn") as PackedScene).instantiate()
+	var dream := (load("res://levels/06_dream_field/scenes/world.tscn") as PackedScene).instantiate()
 	if dream.get_node_or_null("WakeMonument/StatueSocket/CatStatue")==null:
 		push_error("Missing dream-field cat statue")
 		failures += 1
@@ -58,12 +62,12 @@ func verify() -> void:
 		failures += 1
 	dream.free()
 	for path in ["cat_albedo.png","psx_grass.png","psx_dirt.png","psx_stone.png","psx_forest_floor.png"]:
-		var texture := load("res://assets/dream_field/"+path) as Texture2D
+		var texture := load("res://levels/06_dream_field/assets/"+path) as Texture2D
 		if texture==null or not texture.get_image().has_mipmaps():
 			push_error("Missing dream-field texture/mipmaps: "+path)
 			failures += 1
 	for path in ["wind_loop","dry_grass_loop","grass_step_1","grass_step_2","grass_step_3","grass_step_4"]:
-		var clip := load("res://audio/dream_field/"+path+".wav") as AudioStream
+		var clip := load("res://levels/06_dream_field/audio/"+path+".wav") as AudioStream
 		if clip==null or clip.get_length()<=0:
 			push_error("Missing dream-field audio: "+path)
 			failures += 1

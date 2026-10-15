@@ -5,7 +5,7 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "source_assets/dream_field"
-AUDIO = ROOT / "audio/dream_field"
+AUDIO = ROOT / "levels/06_dream_field/audio"
 AUDIO.mkdir(parents=True, exist_ok=True)
 
 with wave.open(str(SRC / "525268__thesuprememuffinpooter__dry-grass-rustle.wav")) as w:
