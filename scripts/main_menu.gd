@@ -1,5 +1,6 @@
 extends Node3D
 const Style = preload("res://scripts/anthology_style.gd")
+const Credits = preload("res://scripts/credits_data.gd")
 var page := "home"
 var selected := 0
 var stage: Control
@@ -126,7 +127,7 @@ func build_home() -> void:
 	shadow.add_theme_constant_override("outline_size",1)
 	text(root,"EXITROOM",Vector2(61,250),100,Style.INK,true)
 	text(root,"ประตูปิดแล้ว\nแต่บางอย่างยังตามออกมา",Vector2(72,377),25,Style.INK)
-	text(root,"4 เรื่องเล่า  ·  และทุ่งที่ยังอยู่ในความฝัน",Vector2(72,469),17,Style.MUTED)
+	text(root,"5 เรื่องเล่า  ·  และทุ่งที่ยังอยู่ในความฝัน",Vector2(72,469),17,Style.MUTED)
 	var first := button(root,"01   เลือกเรื่อง",Vector2(884,272),Vector2(326,61),func(): show_page("episodes"),27)
 	first.name = "EpisodesButton"
 	button(root,"02   ตั้งค่า",Vector2(884,344),Vector2(326,61),func(): show_page("options"),27)
@@ -267,19 +268,22 @@ func build_options() -> void:
 
 func build_credits() -> void:
 	var root: Control = pages.credits
-	header(root,"CREDITS","EXITROOM · เรื่องสั้นสยองขวัญ 4 ตอน และทุ่งในฝัน")
+	header(root,"CREDITS","EXITROOM · เรื่องสั้นสยองขวัญ 5 ตอน และทุ่งในฝัน")
 	var scroll := ScrollContainer.new()
 	place(root,scroll,Vector2(190,163),Vector2(900,495))
 	var stack := VBoxContainer.new()
 	stack.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	stack.add_theme_constant_override("separation",19)
 	scroll.add_child(stack)
-	for data in [
-		["THE STORIES","THE LAST VISIT · AFTER HOURS · ROOM 407 · THE PASSENGER\nเรื่องแต่งแนวจิตวิทยาสยองขวัญ แต่ละตอนเล่นได้อย่างอิสระ"],
-		["ART & CHARACTERS","โมเดลกบและระบบตัวละครจากทีมผู้สร้างโปรเจกต์\nห้องและเฟอร์นิเจอร์: Vicious Potato Studios · กล่อง: PomidorkaStudios\nLow-poly Furnished Abandoned House: NeoKG (CC BY 4.0)\nพื้นผิว: Poly Haven · Godot Grass Shader: Binbun (CC0)"],
-		["DREAM FIELD","รูปปั้นแมว: Stylized Station (CC BY 4.0)\nPSX Skyboxes Free: heyheythere (CC BY 4.0)\nPSX Natural Ground Textures: CipriEnt\nต้นไม้ ใบไม้ หิน ดอกไม้ และระบบทุ่ง: ExitRoom"],
-		["TYPE & SOUND","Chakra Petch: Cadson Demak · VT323: Peter Hull (SIL OFL)\nเสียงหญ้าแห้ง: TheSupremeMuffinPooter (CC0) · เสียงลมในทุ่ง: ExitRoom\nเสียงและสินทรัพย์เพิ่มเติม: ดู ASSET_CREDITS.md และ Room407/ASSET_CREDITS.md"],
-		["THANK YOU FOR PLAYING","ขอบคุณที่เล่น ExitRoom\nกลับมาเลือกเรื่องอื่นได้จากเมนูหลัก"]]:
+	# Same list as the end roll after Level 06 (scripts/credits_data.gd).
+	var rows := [
+		["สร้างโดย",Credits.team_text()],
+		["รายวิชา",Credits.COURSE+"\nอาจารย์ประจำวิชา "+Credits.ADVISOR+"\n"+Credits.SCHOOL],
+		["เรื่องเล่าทั้งหมด","\n".join(Credits.episode_lines())]]
+	for data in Credits.SECTIONS: rows.append([data[0],"\n".join(data[1])])
+	rows.append(["เครื่องมือ","Made with Godot Engine (MIT License)"])
+	rows.append(["THANK YOU FOR PLAYING","ขอบคุณที่เล่น ExitRoom\nกลับมาเลือกเรื่องอื่นได้จากเมนูหลัก"])
+	for data in rows:
 		stack.add_child(Style.label(data[0],23,Style.GOLD,true))
 		var copy := Style.label(data[1],20)
 		copy.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

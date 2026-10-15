@@ -17,6 +17,9 @@ const MUSIC := "res://audio/dream_field/field_music.mp3"
 const MUSIC_DB := -14.0
 var music: AudioStreamPlayer
 var music_fade: Tween
+const EndCredits = preload("res://scripts/end_credits.gd")
+const CREDITS_DIM := .6
+var credits: CanvasLayer
 var time_in_field := 0.0
 var was_captured := false
 
@@ -164,11 +167,25 @@ func wake_up() -> void:
 	hint.hide()
 	player.footstep.stop()
 	if music_fade and music_fade.is_valid(): music_fade.kill()
+	# Dim the field (not to black) and let the wind settle; the music carries the credits.
 	var fade := create_tween().set_parallel(true)
 	fade.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	fade.tween_property(curtain, "color:a", 1.0, 1.8)
+	fade.tween_property(curtain, "color:a", CREDITS_DIM, 2.4)
 	fade.tween_property(heading, "modulate:a", 0.0, .5)
-	for sound in ambient: fade.tween_property(sound, "volume_db", -70.0, 1.8)
+	for sound in ambient:
+		if sound != music: fade.tween_property(sound, "volume_db", -40.0, 2.4)
+	if music.volume_db < MUSIC_DB: fade.tween_property(music, "volume_db", MUSIC_DB, 2.4)
 	await fade.finished
+	credits = EndCredits.new()
+	credits.name = "EndCredits"
+	add_child(credits)
+	await credits.finished
+	await get_tree().create_timer(1.2, false).timeout
+	var out := create_tween().set_parallel(true)
+	out.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	out.tween_property(curtain, "color:a", 1.0, 2.5)
+	out.tween_property(credits.roll, "modulate:a", 0.0, 1.5)
+	for sound in ambient: out.tween_property(sound, "volume_db", -70.0, 2.5)
+	await out.finished
 	await get_tree().create_timer(.35, false).timeout
 	await Anthology.return_to_menu()

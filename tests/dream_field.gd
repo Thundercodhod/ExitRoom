@@ -138,9 +138,39 @@ func run()->void:
 	key(KEY_E,false)
 	await settle(.8)
 	check(field.waking and player.locked and field.curtain.color.a>.1 and field.curtain.color.a<1.0,"E starts a visible fade and locks movement")
-	check(field.ambient[0].volume_db < -25.0,"wind fades with the picture")
-	check(field.music.volume_db < -25.0,"music fades with the picture")
 	await shot("wake-fade")
+	while field.credits==null: await process_frame
+	await settle(.6)
+	var credits=field.credits
+	check(field.curtain.color.a < .9,"field stays dimly visible behind the credits")
+	check(field.ambient[0].volume_db < -35.0,"wind settles under the credits")
+	check(field.music.playing and field.music.volume_db > -20.0,"music keeps playing through the credits")
+	var roll_text:=""
+	for item in credits.roll.get_children():
+		if item is Label: roll_text+=item.text+"\n"
+	check(roll_text.contains("ที่บางที่ยังคงเก็บบางส่วนของเราไว้เสมอ"),"credits open with the closing line")
+	check(roll_text.contains("นายศรัณยู เจริญผล   673380532-1") and roll_text.contains("นายธันว์ สว่างศรี") and roll_text.contains("นายทีฆานนท์ อัศวะภูมิ"),"credits list the team with student IDs")
+	check(roll_text.contains("CP 410844") and roll_text.contains("ผศ.ดร.วชิราวุธ ธรรมวิเศษ"),"credits name the course and advisor")
+	check(roll_text.contains("heyheythere") and roll_text.contains("Stylized Station") and roll_text.contains("Epidemic Sound"),"credits carry the required attributions")
+	check(roll_text.contains("Godot") and credits.roll.get_node("GodotLicense").text.contains("MIT"),"credits include the Godot license")
+	await shot("credits-start")
+	var y0:float=credits.roll.position.y
+	await settle(1.0)
+	var normal:float=y0-credits.roll.position.y
+	check(normal>5.0,"credits scroll up on their own")
+	key(KEY_E,true)
+	y0=credits.roll.position.y
+	await settle(1.0)
+	var fast:float=y0-credits.roll.position.y
+	key(KEY_E,false)
+	check(fast>normal*2.5,"holding E speeds the roll up")
+	await shot("credits-scroll")
+	key(KEY_ESCAPE,true)
+	key(KEY_ESCAPE,false)
+	await settle(.2)
+	check(credits.done and manager.modal==null,"Esc skips the credits without opening pause")
+	await settle(2.0)
+	check(field.music.volume_db < -25.0,"music fades out with the picture after the credits")
 	while current_scene==field or manager.changing: await process_frame
 	check(current_scene.scene_file_path==manager.MENU and current_scene.page=="episodes","waking returns directly to selection")
 	check(not paused and Input.mouse_mode==Input.MOUSE_MODE_VISIBLE,"return restores menu input")
