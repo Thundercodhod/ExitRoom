@@ -7,6 +7,13 @@ const RETURN_START := Vector3(0,.05,-39)       # just outside the bedroom door
 const RETURN_FROG := Vector3(-4,.05,-23)
 const RETURN_OBJECTIVE := "กลับไปที่รถ · ไม่ต้องรับสาย"
 const EPISODE_ID := "passenger"
+# Extra frogs standing in the field at the start: [position, seen-within distance, delay].
+# Each one goes the moment the player gets close enough and looks at it.
+const FIELD_WATCHERS := [
+	[Vector3(2.7,.05,-10), 9.0, .6],
+	[Vector3(-13,.05,-19), 14.0, .9],
+	[Vector3(9,.05,-22), 11.0, .5],
+]
 # Episode 05 picks up from this blackout: he never reaches the station.
 const EPILOGUE := "ผมขับต่อไป ไม่กล้าหันไปมองเบาะข้าง ๆ อีก\nไฟปั๊มอยู่ข้างหน้าแล้ว อีกไม่ไกล\n\nแต่ตามันหนักขึ้นเรื่อย ๆ\nกะพริบครั้งหนึ่ง ถนนยังอยู่\nกะพริบอีกครั้ง ไฟปั๊มหายไป\n\nครั้งสุดท้าย ผมไม่แน่ใจว่าลืมตาขึ้นมาอีกหรือเปล่า"
 enum Stage { CAR, FIELD, HOUSE, NOTE, BATTERY, RECOGNITION, RETURN, REPAIRED, END }
@@ -18,6 +25,7 @@ var paused := false
 var reading := false
 var player: CharacterBody3D
 var frog: CharacterBody3D
+var field_watchers: Array[CharacterBody3D] = []
 var objective: Label
 var prompt: Label
 var subtitle: Label
@@ -79,6 +87,18 @@ func _ready() -> void:
 	frog.relocated.connect(func(_p): destination_pending = false; frog.face_towards(player.position))
 	frog.caught_player.connect(_on_frog_caught)
 	frog.threat_stage_changed.connect(_on_threat_stage)
+	for i in FIELD_WATCHERS.size():
+		var w := CharacterBody3D.new()
+		w.name = "FieldWatcher%d" % (i+1)
+		w.process_mode = Node.PROCESS_MODE_PAUSABLE
+		w.set_script(FrogScript)
+		w.game = self
+		w.target = player
+		w.approach_enabled = false
+		w.position = FIELD_WATCHERS[i][0]
+		add_child(w)
+		w.vanish()
+		field_watchers.append(w)
 	# The frog's own breathing: positional, so it comes from where it stands.
 	warn_breath = AudioStreamPlayer3D.new()
 	warn_breath.process_mode = Node.PROCESS_MODE_PAUSABLE
@@ -383,6 +403,7 @@ func _process(delta: float) -> void:
 	if stage == Stage.FIELD and player.position.z< -27:
 		frog.clear_scene_rules()
 		frog.vanish()
+		hide_field_watchers()
 		stage = Stage.HOUSE
 		objective.text = "เข้าไปขอความช่วยเหลือในบ้านที่เปิดไฟ"
 		say("ขอโทษครับ มีใครอยู่ไหมครับ? รถผมเสียอยู่ข้างนอก",5)
@@ -459,8 +480,18 @@ func failed_start() -> void:
 	objective.text = "เดินตามทางหญ้าไปขอความช่วยเหลือที่บ้าน"
 	frog.appear_at(Vector3(-8,.05,-13))
 	frog.face_towards(player.position)
+	for i in field_watchers.size():
+		var w := field_watchers[i]
+		w.appear_at(FIELD_WATCHERS[i][0])
+		w.face_towards(player.position)
+		w.vanish_when_seen_within(FIELD_WATCHERS[i][1],FIELD_WATCHERS[i][2])
 	await look_at_point(Vector3(0,2,-30),1.2)
 	unlock_scene()
+
+func hide_field_watchers() -> void:
+	for w in field_watchers:
+		w.clear_scene_rules()
+		w.vanish()
 
 func window_event() -> void:
 	lock_scene()
