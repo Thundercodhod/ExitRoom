@@ -19,10 +19,14 @@ Open `project.godot` with **Godot 4.7.2**. F5 opens `main_menu.tscn`.
 | `ui/fonts/`, `ui/previews/`, `ui/menu_film.gdshader` | Bundled Thai fonts, episode thumbnails and menu effect |
 | `audio/` | Shared and episode sound effects |
 | `tests/`, `tools/` | Development checks and scene generators; excluded from the web game |
-| `STORY.md`, `HANDOFF.md`, `FROG_CHAPTER.md`, `ASSET_CREDITS.md` | Story, handoff and credits |
+| `docs/` | Story (`STORY.md`), handoff notes, per-episode notes (`FROG_CHAPTER.md`, `FOREST_CHAPTER.md`) and this layout |
+| `README.md`, `ASSET_CREDITS.md`, `CLAUDE.md` | Overview, asset credits and agent notes (kept at the root) |
+| `scripts/credits_data.gd`, `scripts/end_credits.gd` | Credits list shared by the menu page and the end roll after Level 06 |
+| `scenes/dev/` | Sandbox scenes for trying models (not part of the game) |
+| `NotoSansThai.ttf` | Fallback Thai font; stays at the root because the protected frog test scene loads it by path |
 | `.github/workflows/web.yml`, `export_presets.cfg` | Web export and GitHub Pages deployment |
-| `.godot/`, `.buildtmp/`, `build/` | Local generated files; never commit |
-| `source_assets/`, downloaded PSX packs | Local source/reference packs, ignored by Godot and Git |
+| `.godot/`, `.buildtmp/`, `build/` | Local generated files; never commit (`.buildtmp/` has a `.gdignore`) |
+| `source_assets/`, `assets_src/`, downloaded PSX packs | Local source/reference packs, ignored by Godot (`.gdignore`) and Git |
 
 Scene paths stay at their current locations so existing references and the frog
 system remain valid. The web menu uses the existing Passenger photo; the native
