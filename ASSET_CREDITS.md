@@ -2,10 +2,10 @@
 
 ## Level 06 — Dream Field / sunset valley
 
-- **Handpainted Fat Cat Statue – Ghibli Style** by **Stylized Station**, supplied by the user: https://sketchfab.com/3d-models/handpainted-fat-cat-statue-ghibli-style-b86833c9e84041d38e169eaad86afc27 — CC BY 4.0 (identified in the GLB metadata). The original model's upright transform and UVs are preserved; runtime geometry is baked to `assets/dream_field/cat_mesh.res`, scaled to 5.6 metres, with a separate stone shader that brightens and desaturates the supplied handpainted albedo. No endorsement is implied.
-- **PSX Skyboxes Free** by **heyheythere** — https://heyheythere.itch.io/psx-skyboxes-free — CC BY 4.0. Bundled license: `assets/dream_field/LICENSE-PSX-Skyboxes.txt`. Uses the supplied Sunset Clouds panorama with a level-specific sky shader, colour treatment and aligned larger sun disc.
+- **Handpainted Fat Cat Statue – Ghibli Style** by **Stylized Station**, supplied by the user: https://sketchfab.com/3d-models/handpainted-fat-cat-statue-ghibli-style-b86833c9e84041d38e169eaad86afc27 — CC BY 4.0 (identified in the GLB metadata). The original model's upright transform and UVs are preserved; runtime geometry is baked to `levels/06_dream_field/assets/cat_mesh.res`, scaled to 5.6 metres, with a separate stone shader that brightens and desaturates the supplied handpainted albedo. No endorsement is implied.
+- **PSX Skyboxes Free** by **heyheythere** — https://heyheythere.itch.io/psx-skyboxes-free — CC BY 4.0. Bundled license: `levels/06_dream_field/assets/LICENSE-PSX-Skyboxes.txt`. Uses the supplied Sunset Clouds panorama with a level-specific sky shader, colour treatment and aligned larger sun disc.
 - **PSX Natural Ground Textures SAMPLE** by **CipriEnt** — https://ciprient.itch.io/psx-natural-ground-textures. Uses the user-supplied Grass 01, Dirt 01, Stone 01 and Forest Floor 01 textures. The author's terms allow use in finished personal/commercial games and modification; raw texture redistribution is restricted. Original downloads stay local and are not an asset pack for redistribution.
-- **Music** `audio/dream_field/field_music.mp3` (Ending_music): from Epidemic Sound (epidemicsound.com), used under the project owner's Epidemic Sound subscription. Converted to 44.1 kHz mono MP3 (V3) and looped in game.
+- **Music** `levels/06_dream_field/audio/field_music.mp3` (Ending_music): from Epidemic Sound (epidemicsound.com), used under the project owner's Epidemic Sound subscription. Converted to 44.1 kHz mono MP3 (V3) and looped in game.
 - **Dry Grass Rustle.wav** by **TheSupremeMuffinPooter** — https://freesound.org/people/TheSupremeMuffinPooter/sounds/525268/ — CC0. The supplied recording is crossfaded into a loop and excerpted into four footstep sounds. Original recording preserved locally under `source_assets/dream_field/`.
 - The terrain, meadow grass geometry/material, autumn trees, leaves, rocks, flowers, lake shader, wind bed and interaction code are authored for ExitRoom. Wind synthesis and grass-audio preparation: `tools/prepare_dream_field_audio.py`.
 - The supplied screaming-face scan, overcast EXR, dry-mud Blender source and chapel sample are retained locally as alternatives; they are not used in the final sunset/cat scene.
@@ -15,14 +15,14 @@
 - **Chakra Petch**, Regular and Bold, by **Cadson Demak**: https://github.com/google/fonts/tree/main/ofl/chakrapetch — SIL Open Font License 1.1. Bundled license: `ui/fonts/OFL-ChakraPetch.txt`. Used for Thai and Latin menu, subtitle and narrative text.
 - **VT323** by **Peter Hull**: https://github.com/google/fonts/tree/main/ofl/vt323 — SIL Open Font License 1.1. Bundled as an optional display font with `ui/fonts/OFL-VT323.txt`.
 - The ten sound effects and ambient loops under `audio/anthology/` are original procedural synthesis for this project. Reproducible source: `tools/build_anthology_audio.py`. No third-party recordings or voice performances are used in this sound set.
-- Episode thumbnails in `ui/previews/` are rendered from this project's existing scenes. The live menu backdrop reuses `frog_field_world.tscn` and the existing `tree/dead_tree.glb`; source models and authored scene layouts are unchanged by the menu.
+- Episode thumbnails in `ui/previews/` are rendered from this project's existing scenes. The live menu backdrop reuses `levels/04_passenger/frog_field_world.tscn` and the existing `tree/dead_tree.glb`; source models and authored scene layouts are unchanged by the menu.
 - Menu layout and film shader were authored for ExitRoom. Reference screenshots supplied by the user are visual direction; no Fears to Fathom artwork, logo, audio or fonts were extracted.
 
 ## Frog field chapter
 
 **Godot Grass Shader** by **Binbun** — https://binbun3d.itch.io/godot-grass — CC0 (license stated on the author's page). Uses the user-supplied shader and textures under `Grass/assets/BinbunGrass/src/` unchanged, with a chapter-specific material, palette and MultiMesh placement.
 
-The field house's bedroom reuses the existing Room407 furniture and textures; its original credits remain in `Room407/ASSET_CREDITS.md`. New car/house block geometry and the procedural audio in `audio/frog_chapter/` were authored for this chapter. Frog model and animations are unchanged.
+The field house's bedroom reuses the existing Room407 furniture and textures; its original credits remain in `levels/03_room407/ASSET_CREDITS.md`. New car/house block geometry and the procedural audio in `levels/04_passenger/audio/` were authored for this chapter. Frog model and animations are unchanged.
 
 **Low-poly Furnished Abandoned House** by **NeoKG**
 
@@ -51,9 +51,9 @@ Additional CC0 texture sources used for village buildings and generated props:
 
 ## Forest chapter (Episode 05)
 
-**PSX Forest Free** by heyheythere - https://heyheythere.itch.io/psx-forest-free - CC BY 4.0 (`assets/psx_forest/`, license in `assets/psx_forest/LICENSE.txt`). Changes: the Godot addon's runtime models, prop scenes, atlas and material were moved from `addons/psx_forest/` to `assets/psx_forest/` and their resource paths rewritten; the demo, icons, FBX/OBJ copies and the .blend were left out of the game.
+**PSX Forest Free** by heyheythere - https://heyheythere.itch.io/psx-forest-free - CC BY 4.0 (`levels/05_realization/assets/psx_forest/`, license in `levels/05_realization/assets/psx_forest/LICENSE.txt`). Changes: the Godot addon's runtime models, prop scenes, atlas and material were moved from `addons/psx_forest/` to `levels/05_realization/assets/psx_forest/` and their resource paths rewritten; the demo, icons, FBX/OBJ copies and the .blend were left out of the game.
 
-**Music and sound effects** `audio/anthology/menu_music.mp3` (main menu, encoded as MP3 V3), `audio/anthology/ui_accept.wav` (button press, trimmed to 0.9 s), `audio/forest/player_gasp.wav` (Phakin waking up), `audio/forest/campfire.wav` (cut into a seamless loop), `audio/forest/wind_gust.wav`, `audio/spider/aggro.wav` and `audio/spider/climb.wav` and `audio/forest/pladuk_hello.wav` (Pladuk leaning in): from Epidemic Sound (epidemicsound.com), used under the project owner's Epidemic Sound subscription. Converted to 44.1 kHz 16-bit mono. The other sounds in `audio/forest/` are generated by `tools/build_forest_audio.py`.
+**Music and sound effects** `audio/anthology/menu_music.mp3` (main menu, encoded as MP3 V3), `audio/anthology/ui_accept.wav` (button press, trimmed to 0.9 s), `levels/05_realization/audio/player_gasp.wav` (Phakin waking up), `levels/05_realization/audio/campfire.wav` (cut into a seamless loop), `levels/05_realization/audio/wind_gust.wav`, `audio/spider/aggro.wav` and `audio/spider/climb.wav` and `levels/05_realization/audio/pladuk_hello.wav` (Pladuk leaning in): from Epidemic Sound (epidemicsound.com), used under the project owner's Epidemic Sound subscription. Converted to 44.1 kHz 16-bit mono. The other sounds in `levels/05_realization/audio/` are generated by `tools/build_forest_audio.py`.
 
 ## Enemy models
 

@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://da1rt5mcyfjcg"]
 
 [ext_resource type="Script" uid="uid://bmoxjirapes17" path="res://scripts/pla_test.gd" id="1_ku100"]
-[ext_resource type="PackedScene" uid="uid://clbkfgo2exdt4" path="res://3Dmodel_import/pladuk.glb" id="2_l54oh"]
+[ext_resource type="PackedScene" uid="uid://clbkfgo2exdt4" path="res://levels/05_realization/assets/pladuk.glb" id="2_l54oh"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_f4vr1"]
 sky_top_color = Color(0.02, 0.02, 0.07, 1)

@@ -2,7 +2,7 @@ extends SceneTree
 func _initialize() -> void:
 	call_deferred("run")
 func run() -> void:
-	change_scene_to_file("res://prologue_village.tscn")
+	change_scene_to_file("res://levels/01_last_visit/prologue_village.tscn")
 	await scene_changed
 	for i in 3:
 		await physics_frame

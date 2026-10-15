@@ -15,7 +15,7 @@ Full Screen ใช้ `Anthology.set_fullscreen()` แยกจากเสี�
 - เมนูมีฉากหลัง 3D จากฉากที่มีอยู่ ภาพตัวอย่างจากการเรนเดอร์เกม ฟอนต์ Chakra Petch รองรับไทย เอฟเฟกต์ภาพ เสียงเมนูและเสียงเหตุการณ์ที่สังเคราะห์ขึ้นสำหรับโปรเจกต์นี้
 - `scripts/anthology.gd` เป็น autoload ดูแลการเลือกตอน การพักเกมด้วย F1 เสียง และบันทึกการตั้งค่า/ตอนที่เล่นจบใน `user://anthology.cfg` ไม่มีเซฟระหว่างตอน
 - `STORY.md` คือเรื่องฉบับ anthology ปัจจุบัน ส่วน `README.md` คือวิธีเปิดเล่นและตรวจงาน
-- คงโมเดลและระบบกบต้นฉบับของเพื่อนทั้งหมด รวมถึง `frog_field_world.tscn` ที่ผู้ใช้จัดวางไว้ ห้ามรันตัวสร้างฉากทับไฟล์นี้
+- คงโมเดลและระบบกบต้นฉบับของเพื่อนทั้งหมด รวมถึง `levels/04_passenger/frog_field_world.tscn` ที่ผู้ใช้จัดวางไว้ ห้ามรันตัวสร้างฉากทับไฟล์นี้
 - ตรวจการเริ่มตอนทั้ง 4 การจบ/กลับเมนู การตั้งค่า การบันทึก ฟอนต์ไทยและเสียงด้วย `tests/anthology_flow.gd` แล้วผ่าน ตรวจภาพเมนูและบทนำที่ 1280×720 และเมนูที่ 1920×1080 แล้ว
 - เสียงชุดใหม่อยู่ใน `audio/anthology/` และสร้างซ้ำด้วย `tools/build_anthology_audio.py` เป็น SFX สังเคราะห์ ไม่ใช่เสียงพากย์
 - ไฟล์และ asset อื่นที่ผู้ใช้มีอยู่ไม่ได้ถูกย้ายหรือลบ
@@ -26,11 +26,11 @@ Full Screen ใช้ `Anthology.set_fullscreen()` แยกจากเสี�
 
 ผู้ใช้สั่งให้เริ่มสร้างฉากกบแล้ว โดยยืนยันให้ทำใน ExitRoom และห้ามแก้โมเดลหรือระบบกบของเพื่อน ข้อความ “ยังไม่สร้างฉากกบ” และ “ยังไม่มีระบบกบ” ในบันทึกเก่าด้านล่างเป็นสถานะก่อนคำขอครั้งนี้
 
-เพิ่ม `frog_chapter.tscn`, `frog_field_world.tscn`, ตัวควบคุมเรื่องแยก `scripts/frog_chapter.gd` และ `PlayFrog.cmd` เล่นรถเสีย → บ้านกลางทุ่ง → ห้องนอน 407 → กลับไปจั๊มพ์แบตเตอรี่ → เครื่องติด → กบบนเบาะ → ตัดดำจบเรื่อง ใช้หญ้าที่ผู้ใช้ให้ใน `Grass` และห้องนอนสำเนาจาก Room407 จริง ไม่มีฉากต่อจากตอนจบ
+เพิ่ม `levels/04_passenger/frog_chapter.tscn`, `levels/04_passenger/frog_field_world.tscn`, ตัวควบคุมเรื่องแยก `levels/04_passenger/scripts/frog_chapter.gd` และ `PlayFrog.cmd` เล่นรถเสีย → บ้านกลางทุ่ง → ห้องนอน 407 → กลับไปจั๊มพ์แบตเตอรี่ → เครื่องติด → กบบนเบาะ → ตัดดำจบเรื่อง ใช้หญ้าที่ผู้ใช้ให้ใน `Grass` และห้องนอนสำเนาจาก Room407 จริง ไม่มีฉากต่อจากตอนจบ
 
 ระบบกบเดิม `frog_watcher.gd`, `frog_head_tracker.gd`, `frog_test.gd`, `frog_test.tscn`, `frog.glb` และ import settings ถูกตรวจ hash ว่าไม่เปลี่ยน ตัวควบคุมบทใช้ API และตัวเลือกเดิมเท่านั้น
 
-เปิดบทใหม่ด้วย F6 ที่ `frog_chapter.tscn` หรือ `PlayFrog.cmd` ส่วน F5 และลำดับแคมเปญเก่ายังเหมือนเดิม ยังไม่ได้ปรับทั้งแคมเปญตามพล็อตใหม่ รายละเอียดการเล่น/ไฟล์/การทดสอบอยู่ใน `FROG_CHAPTER.md` อย่ารันตัวสร้าง `tools/build_frog_field.gd` ทับการจัดวางด้วยมือ โดยตัวสร้างต้องใช้ renderer จริง (ไม่ใช้ --headless) เพื่อเก็บตำแหน่ง MultiMesh ลงไฟล์ได้ครบ
+เปิดบทใหม่ด้วย F6 ที่ `levels/04_passenger/frog_chapter.tscn` หรือ `PlayFrog.cmd` ส่วน F5 และลำดับแคมเปญเก่ายังเหมือนเดิม ยังไม่ได้ปรับทั้งแคมเปญตามพล็อตใหม่ รายละเอียดการเล่น/ไฟล์/การทดสอบอยู่ใน `FROG_CHAPTER.md` อย่ารันตัวสร้าง `tools/build_frog_field.gd` ทับการจัดวางด้วยมือ โดยตัวสร้างต้องใช้ renderer จริง (ไม่ใช้ --headless) เพื่อเก็บตำแหน่ง MultiMesh ลงไฟล์ได้ครบ
 
 ---
 
@@ -107,13 +107,13 @@ Full Screen ใช้ `Anthology.set_fullscreen()` แยกจากเสี�
 
 โปรเจกต์ในเครื่องเดิมอยู่ที่ `C:/Users/computer/Desktop/ExitRoom` ใช้ Godot 4.7.2 และ renderer `gl_compatibility` ขนาดภาพอ้างอิง 1280 × 720
 
-โปรเจกต์หลักมีเพียง `project.godot` ที่โฟลเดอร์ ExitRoom ส่วน Room407 รวมเป็นบทหนึ่งในโปรเจกต์นี้แล้ว เส้นทางทรัพยากรของบทนั้นใช้ `res://Room407/...`
+โปรเจกต์หลักมีเพียง `project.godot` ที่โฟลเดอร์ ExitRoom ส่วน Room407 รวมเป็นบทหนึ่งในโปรเจกต์นี้แล้ว เส้นทางทรัพยากรของบทนั้นใช้ `res://levels/03_room407/...`
 
 **ลำดับที่ตัวเกมยังเล่นอยู่จริง:**
 
-`prologue_village.tscn` → `backrooms_level.tscn` → `Room407/main.tscn` → หน้าบันทึกปูเรื่องกบเวอร์ชันเก่า
+`levels/01_last_visit/prologue_village.tscn` → `levels/02_after_hours/backrooms_level.tscn` → `levels/03_room407/main.tscn` → หน้าบันทึกปูเรื่องกบเวอร์ชันเก่า
 
-- `run/main_scene` ยังเป็น `res://prologue_village.tscn`
+- `run/main_scene` ยังเป็น `res://levels/01_last_visit/prologue_village.tscn`
 - บทหมู่บ้านยังมีบ้านยาย เทป และลูกแก้วตามเรื่องเก่า
 - ทางออก Backrooms ยังแสดง EXIT / 406 และส่งเข้า Room407
 - Room407 ยังมีลำดับเข้าพัก คืนแรก เช้า คืนที่สอง ร่างแฝด และบันทึกจากพรุ่งนี้
@@ -131,7 +131,7 @@ Full Screen ใช้ `Anthology.set_fullscreen()` แยกจากเสี�
 - ทดสอบเส้นทางเก่าและตรวจภาพ UI แล้ว
 - หลังจากผู้ใช้เลือกพล็อตใหม่ เปลี่ยนเฉพาะ STORY.md และคำอธิบายลิงก์ใน README.md ยังไม่ได้ย้ายลำดับฉากตามพล็อตใหม่
 
-ไฟล์ที่หายไปโดยตั้งใจ เช่น `main.tscn` ที่รากโปรเจกต์ (สวนเดิม), `scripts/lobby.gd`, `assets/garden_fountain_toothless.glb`, `abandoned_school.tscn`, `scripts/abandoned_school.gd`, `tools/build_school.gd` และ `Room407/project.godot` ไม่ใช่ไฟล์เสียที่ต้องกู้คืน
+ไฟล์ที่หายไปโดยตั้งใจ เช่น `main.tscn` ที่รากโปรเจกต์ (สวนเดิม), `scripts/lobby.gd`, `assets/garden_fountain_toothless.glb`, `abandoned_school.tscn`, `scripts/abandoned_school.gd`, `tools/build_school.gd` และ `levels/03_room407/project.godot` ไม่ใช่ไฟล์เสียที่ต้องกู้คืน
 
 ## แผนที่ไฟล์ที่เกี่ยวข้อง
 
@@ -139,21 +139,21 @@ Full Screen ใช้ `Anthology.set_fullscreen()` แยกจากเสี�
 | --- | --- |
 | `STORY.md` | ตัวเนื้อเรื่องใหม่เท่านั้น |
 | `project.godot` | ตั้งค่าเริ่มเกม ปัจจุบันยังเริ่มที่หมู่บ้าน |
-| `prologue_village.tscn` | ฉากหมู่บ้านและบ้านเดิม อาจใช้เป็นฐานงานบ้านที่ผู้ใช้จะปรับ |
-| `scripts/prologue.gd` | เทป ลูกแก้ว ประตูหลังบ้าน และข้อความเรื่องเก่า |
+| `levels/01_last_visit/prologue_village.tscn` | ฉากหมู่บ้านและบ้านเดิม อาจใช้เป็นฐานงานบ้านที่ผู้ใช้จะปรับ |
+| `levels/01_last_visit/scripts/prologue.gd` | เทป ลูกแก้ว ประตูหลังบ้าน และข้อความเรื่องเก่า |
 | `scripts/story_caption.gd` | แสดงข้อความเบาะแสแยกจาก objective |
-| `backrooms_level.tscn` | ฉาก Backrooms |
-| `scripts/backrooms_level.gd` | สร้างผู้เล่น แมงมุม ทางออก เมนู การแพ้/ลองใหม่ และเปลี่ยนฉาก |
+| `levels/02_after_hours/backrooms_level.tscn` | ฉาก Backrooms |
+| `levels/02_after_hours/scripts/backrooms_level.gd` | สร้างผู้เล่น แมงมุม ทางออก เมนู การแพ้/ลองใหม่ และเปลี่ยนฉาก |
 | `scripts/spider_enemy.gd` | พฤติกรรมแมงมุมเดิม |
 | `scripts/player.gd` | ผู้เล่นหมู่บ้าน/Backrooms: กล้อง การเดิน วิ่ง กระโดด และการควบคุมอื่น ๆ |
-| `Room407/main.tscn` | ห้อง 406/407 เฟอร์นิเจอร์และตัวละครที่ประกอบไว้ |
-| `Room407/scripts/story.gd` | ลำดับเหตุการณ์ บทพูด ประตู ฉากดึงกล้อง และหน้าจบเดิม |
-| `Room407/scripts/player.gd` | ผู้เล่นอีกชุดของ Room407 มี `locked`, `focus_on()` และการตรวจเป้าหมาย |
+| `levels/03_room407/main.tscn` | ห้อง 406/407 เฟอร์นิเจอร์และตัวละครที่ประกอบไว้ |
+| `levels/03_room407/scripts/story.gd` | ลำดับเหตุการณ์ บทพูด ประตู ฉากดึงกล้อง และหน้าจบเดิม |
+| `levels/03_room407/scripts/player.gd` | ผู้เล่นอีกชุดของ Room407 มี `locked`, `focus_on()` และการตรวจเป้าหมาย |
 | `assets/abandoned_house_playable.glb` | โมเดลบ้านเดิมที่ปรับช่องเดินและประตูแล้ว |
 | `tools/build_prologue.gd` | ตัวสร้างฉากหมู่บ้าน รันแล้วทับการจัดวางด้วยมือ |
 | `tools/imported_house.gd` | เครื่องมือวางบ้านและ collision จากโมเดล |
-| `Room407/tools/build_scene.gd` | ตัวสร้างฉาก Room407 รันแล้วทับการจัดวางด้วยมือ |
-| `ASSET_CREDITS.md`, `Room407/ASSET_CREDITS.md` | เครดิตและข้อมูลสินทรัพย์ |
+| `levels/03_room407/tools/build_scene.gd` | ตัวสร้างฉาก Room407 รันแล้วทับการจัดวางด้วยมือ |
+| `ASSET_CREDITS.md`, `levels/03_room407/ASSET_CREDITS.md` | เครดิตและข้อมูลสินทรัพย์ |
 
 **กล้องสองส่วนยังต่างกัน:** `scripts/player.gd` ตั้ง `THIRD_PERSON_DEFAULT := true` และกด V สลับได้ ส่วน Room407 เป็นบุคคลที่หนึ่ง โทนเรื่องใหม่ต้องการความรู้สึกแบบ First-person จึงต้องตรวจและปรับเมื่อได้รับงานนั้น อย่าอ้างว่าเกมทั้งหมดเป็น First-person อยู่แล้ว และอย่าทับระบบผู้เล่นเดิมโดยไม่อ่านก่อน
 
@@ -164,7 +164,7 @@ Full Screen ใช้ `Anthology.set_fullscreen()` แยกจากเสี�
 เปิด `project.godot` ที่ราก ExitRoom ด้วย Godot และรอ import ก่อนเล่น
 
 - `Play.cmd` — เล่นตั้งแต่จุดเริ่มที่ตั้งอยู่ในโปรเจกต์
-- `Room407/Play.cmd` — เปิดบท Room407 โดยตรง แต่ยังใช้โปรเจกต์หลัก
+- `levels/03_room407/Play.cmd` — เปิดบท Room407 โดยตรง แต่ยังใช้โปรเจกต์หลัก
 - `PreviewHouse.cmd` — เปิดทดสอบบริเวณบ้านเดิม
 
 เครื่องเดิมมี executable ที่ `C:/Users/computer/Desktop/Godot_v4.7.2-stable_win64.exe` เครื่องใหม่ต้องตรวจตำแหน่งเอง ไม่ถือว่า path นี้ใช้ได้ทุกเครื่อง
@@ -174,7 +174,7 @@ Full Screen ใช้ `Anthology.set_fullscreen()` แยกจากเสี�
 ```text
 godot --headless --path . --import
 godot --headless --path . --script res://tests/campaign_flow.gd
-godot --headless --path . --script res://Room407/tools/playtest.gd
+godot --headless --path . --script res://levels/03_room407/tools/playtest.gd
 godot --headless --path . --script res://tests/player_traversal.gd
 ```
 
@@ -183,7 +183,7 @@ godot --headless --path . --script res://tests/player_traversal.gd
 | ชุดตรวจ | ผลเดิม | ครอบคลุม |
 | --- | --- | --- |
 | `tests/campaign_flow.gd` | `EXITROOM_CAMPAIGN_FAILURES=0` | บ้านยาย → Backrooms → Room407 → บันทึก → เริ่มเรื่องใหม่ |
-| `Room407/tools/playtest.gd` | `PLAYTEST_COMPLETE failures=0` | ประตู collision ลำดับสองคืน การคืนกล้องและแอนิเมชัน |
+| `levels/03_room407/tools/playtest.gd` | `PLAYTEST_COMPLETE failures=0` | ประตู collision ลำดับสองคืน การคืนกล้องและแอนิเมชัน |
 | `tests/player_traversal.gd` | `EXITROOM_TRAVERSAL_FAILURES=0` | กล้อง การก้าวขึ้นพื้น กระโดด ชนผนัง เดินเข้าบ้านและเก็บเทป |
 
 ผลเหล่านี้เป็นของโค้ดและเนื้อเรื่องเก่า ไม่ใช่การทดสอบพล็อตใหม่หรือฉากล็อกกล้องแมงมุม เมื่อเปลี่ยนลำดับตาม STORY.md ต้องปรับชุดทดสอบให้ตรง ไม่แก้เกมกลับไปพล็อตเก่าเพียงเพื่อให้ test ผ่าน

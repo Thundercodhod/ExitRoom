@@ -1,6 +1,6 @@
 # Episode 05 — REALIZATION / การตกตะกอน
 
-เปิด `forest_chapter.tscn` แล้วกด **F6** หรือเลือก Episode 05 จากเมนู (เปิดให้เล่นหลังเล่น Episode 04 จบ)
+เปิด `levels/05_realization/forest_chapter.tscn` แล้วกด **F6** หรือเลือก Episode 05 จากเมนู (เปิดให้เล่นหลังเล่น Episode 04 จบ)
 
 ต่อจากตอนจบของ Episode 04: ภาคินขับใกล้ถึงปั๊มแล้ว “วูบ” หลับใน แล้วสะดุ้งตื่นกลางป่า
 
@@ -18,12 +18,12 @@
 
 ## ปลาดุกบนไหล่ (Pladuk)
 
-`scripts/pladuk_shoulder.gd` เกาะอยู่กับกล้องมุมมองบุคคลที่หนึ่ง ทุก 15–40 วินาที หน้ามันค่อย ๆ โผล่ที่ขอบขวาของจอ พร้อมเสียง `pladuk_hello.wav` ข้างหู ค้าง 1–2 วินาทีแล้วหลบ (ถี่ขึ้นเมื่อออกนอกทาง) กด V เป็นมุมบุคคลที่สาม มันหายทันที ไม่มีเงา ตอนนี้ใช้โมเดล `3Dmodel_import/pladuk.glb` ท่า Idle_Crawl ไปก่อน รอทำท่า Cling_Idle / Lean_In / Lean_Out และลดโพลีใน Blender
+`levels/05_realization/scripts/pladuk_shoulder.gd` เกาะอยู่กับกล้องมุมมองบุคคลที่หนึ่ง ทุก 15–40 วินาที หน้ามันค่อย ๆ โผล่ที่ขอบขวาของจอ พร้อมเสียง `pladuk_hello.wav` ข้างหู ค้าง 1–2 วินาทีแล้วหลบ (ถี่ขึ้นเมื่อออกนอกทาง) กด V เป็นมุมบุคคลที่สาม มันหายทันที ไม่มีเงา ตอนนี้ใช้โมเดล `levels/05_realization/assets/pladuk.glb` ท่า Idle_Crawl ไปก่อน รอทำท่า Cling_Idle / Lean_In / Lean_Out และลดโพลีใน Blender
 
 ## ไฟล์
 
-- `forest_chapter.tscn` / `scripts/forest_chapter.gd`: ฉากเล่นและลำดับเหตุการณ์
-- `forest_world.tscn`: ป่า สร้างจาก `tools/build_forest_world.gd` (seed เดิม = ป่าเดิม; ต้องรัน **ไม่ใส่ --headless** ไม่งั้นตำแหน่ง MultiMesh หาย)
-- `assets/psx_forest/`: ชิ้นส่วน PSX Forest Free (CC BY 4.0)
-- `audio/forest/`: เสียงที่สร้างจาก `tools/build_forest_audio.py`
+- `levels/05_realization/forest_chapter.tscn` / `levels/05_realization/scripts/forest_chapter.gd`: ฉากเล่นและลำดับเหตุการณ์
+- `levels/05_realization/forest_world.tscn`: ป่า สร้างจาก `tools/build_forest_world.gd` (seed เดิม = ป่าเดิม; ต้องรัน **ไม่ใส่ --headless** ไม่งั้นตำแหน่ง MultiMesh หาย)
+- `levels/05_realization/assets/psx_forest/`: ชิ้นส่วน PSX Forest Free (CC BY 4.0)
+- `levels/05_realization/audio/`: เสียงที่สร้างจาก `tools/build_forest_audio.py`
 - `tests/forest_loop.gd`: ทดสอบทั้งวง (ตื่น, กบแอบมอง, ปลาดุก, เตือน, ล่า, ตื่นใหม่, กองไฟ) `-- --capture` เพื่อถ่ายภาพลง `.buildtmp/`

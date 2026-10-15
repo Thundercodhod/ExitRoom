@@ -1,0 +1,38 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://levels/06_dream_field/scripts/dream_field.gd" id="1"]
+[ext_resource type="PackedScene" path="res://levels/06_dream_field/scenes/world.tscn" id="2"]
+[ext_resource type="Script" path="res://levels/06_dream_field/scripts/dream_field_player.gd" id="3"]
+[ext_resource type="Script" path="res://levels/06_dream_field/scripts/dream_field_grass.gd" id="4"]
+
+[sub_resource type="CapsuleShape3D" id="Capsule"]
+radius = 0.26
+height = 1.74
+
+[node name="DreamField" type="Node3D"]
+script = ExtResource("1")
+
+[node name="World" parent="." instance=ExtResource("2")]
+
+[node name="Player" type="CharacterBody3D" parent="."]
+position = Vector3(-6, 0.5, 6)
+rotation = Vector3(0, -0.266, 0)
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("3")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
+position = Vector3(0, 0.88, 0)
+shape = SubResource("Capsule")
+
+[node name="Camera3D" type="Camera3D" parent="Player"]
+position = Vector3(0, 1.64, 0)
+rotation = Vector3(-0.025, 0, 0)
+current = true
+fov = 65.0
+near = 0.06
+far = 1400.0
+
+[node name="DryGrass" type="Node3D" parent="."]
+script = ExtResource("4")
+follow = NodePath("../Player")

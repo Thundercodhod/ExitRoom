@@ -22,14 +22,14 @@ func build() -> void:
 				minimum=minimum.min(point)
 				maximum=maximum.max(point)
 			mesh.surface_set_material(s,null)
-		ResourceSaver.save(mesh,"res://assets/dream_field/cat_mesh.res")
+		ResourceSaver.save(mesh,"res://levels/06_dream_field/assets/cat_mesh.res")
 		var body:=MeshInstance3D.new()
 		body.name="Cat"
-		body.mesh=load("res://assets/dream_field/cat_mesh.res")
+		body.mesh=load("res://levels/06_dream_field/assets/cat_mesh.res")
 		body.transform=upright
 		var stone:=ShaderMaterial.new()
-		stone.shader=load("res://assets/dream_field/cat_stone.gdshader")
-		stone.set_shader_parameter("handpaint",load("res://assets/dream_field/cat_albedo.png"))
+		stone.shader=load("res://levels/06_dream_field/assets/cat_stone.gdshader")
+		stone.set_shader_parameter("handpaint",load("res://levels/06_dream_field/assets/cat_albedo.png"))
 		body.material_override=stone
 		visual.add_child(body)
 		body.owner=statue
@@ -61,7 +61,7 @@ func build() -> void:
 	focus.owner=statue
 	var packed:=PackedScene.new()
 	var result:=packed.pack(statue)
-	if result==OK: result=ResourceSaver.save(packed,"res://scenes/dream_field/cat_statue.tscn")
+	if result==OK: result=ResourceSaver.save(packed,"res://levels/06_dream_field/scenes/cat_statue.tscn")
 	print("CAT_BUILD=",result)
 	statue.free()
 	quit(0 if result==OK else 1)

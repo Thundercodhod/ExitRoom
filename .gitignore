@@ -13,16 +13,16 @@ preview-*.png
 # Keep only models used by the playable project. Other source models and
 # textures extracted from GLBs stay local and can be imported again.
 3Dmodel_import/*
-!3Dmodel_import/original_backrooms.glb
+!levels/02_after_hours/assets/original_backrooms.glb
 !3Dmodel_import/backrooms_rigged_hazmat.glb
 !3Dmodel_import/low-poly_furnished_abandoned_house.glb
-!3Dmodel_import/pladuk.glb
+!levels/05_realization/assets/pladuk.glb
 assets/*
 !assets/abandoned_house_playable.glb
 !assets/textures/
 !assets/shaders/
 !assets/models/
-!assets/psx_forest/
+!levels/05_realization/assets/psx_forest/
 # Textures Godot extracts next to a GLB stay local (the GLB embeds them).
 assets/models/**/*.png
 assets/models/**/*.jpg
@@ -33,6 +33,8 @@ assets/models/**/*.jpg
 tools/house-inspection.json
 build/
 
+# Texture copies Godot extracts from GLBs during import (the GLB embeds them).
+levels/05_realization/assets/pladuk_*.png
 # Texture copies extracted from the tree GLBs during import.
 tree/dead_tree_*.png
 tree/tree_ps1psx_style_*.png
@@ -49,19 +51,19 @@ tree/tree_ps1psx_style_*.png
 !assets/textures/*.import
 !assets/abandoned_house_playable_Image_*.jpg.import
 !assets/abandoned_house_playable_Image_*.png.import
-!Room407/assets/textures/*.jpg.import
-!Room407/assets/models/*.jpg.import
-!Room407/assets/models/*.png.import
+!levels/03_room407/assets/textures/*.jpg.import
+!levels/03_room407/assets/models/*.jpg.import
+!levels/03_room407/assets/models/*.png.import
 !Grass/assets/BinbunGrass/src/texture/basic/grass_basic_*.png.import
-!3Dmodel_import/original_backrooms_*.png
-!3Dmodel_import/original_backrooms_*.png.import
+!levels/02_after_hours/assets/original_backrooms_*.png
+!levels/02_after_hours/assets/original_backrooms_*.png.import
 
 # Downloaded source packs stay local; only prepared dream-field resources ship.
 /source_assets/
-!assets/dream_field/
-!assets/dream_field/**/*.import
-!assets/dream_field/*.import
-!audio/dream_field/*.import
+!levels/06_dream_field/assets/
+!levels/06_dream_field/assets/**/*.import
+!levels/06_dream_field/assets/*.import
+!levels/06_dream_field/audio/*.import
 /psx-skyboxes-free/
 /psx-skyboxes-free-assets/
 /PSX Natural Ground Textures SAMPLE/

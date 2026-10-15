@@ -1,12 +1,12 @@
 extends SceneTree
-## Builds forest_world.tscn for Episode 05 from the PSX Forest Free pieces.
+## Builds levels/05_realization/forest_world.tscn for Episode 05 from the PSX Forest Free pieces.
 ## godot --script res://tools/build_forest_world.gd
 ## NOT --headless: the headless dummy renderer drops MultiMesh transforms, and the
 ## ground, trail, ferns and grass would all be saved at the origin.
 ## Seeded, so re-running gives the same forest. Edit the constants, not the scene.
 
-const OUT := "res://forest_world.tscn"
-const P := "res://assets/psx_forest/"
+const OUT := "res://levels/05_realization/forest_world.tscn"
+const P := "res://levels/05_realization/assets/psx_forest/"
 const SEED := 505
 const WORLD := Rect2(-44, -112, 88, 128)        # x, z, width, depth (ground area)
 # The walk, start to campfire. The chapter script reads this curve from World/Trail.
@@ -38,7 +38,7 @@ func _initialize() -> void:
 	var packed := PackedScene.new()
 	var err := packed.pack(forest)
 	if err == OK: err = ResourceSaver.save(packed, OUT)
-	print("forest_world.tscn: ", "saved" if err == OK else "FAILED %d" % err)
+	print("levels/05_realization/forest_world.tscn: ", "saved" if err == OK else "FAILED %d" % err)
 	forest.free()
 	quit(0 if err == OK else 1)
 

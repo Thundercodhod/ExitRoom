@@ -178,7 +178,7 @@ func build() -> void:
 	rng.seed = 43274
 	scene_root = Node3D.new()
 	scene_root.name = "VillagePrologue"
-	scene_root.set_script(load("res://scripts/prologue.gd"))
+	scene_root.set_script(load("res://levels/01_last_visit/scripts/prologue.gd"))
 	material("DuskRoad", Color(0.22, 0.215, 0.20))
 	material("DirtPath", Color(0.39, 0.31, 0.23))
 	material("FieldEarth", Color(0.24, 0.28, 0.18))
@@ -342,11 +342,11 @@ func build() -> void:
 		push_error("Could not pack prologue scene: %s" % pack_result)
 		quit(1)
 		return
-	var save_result := ResourceSaver.save(packed, "res://prologue_village.tscn")
+	var save_result := ResourceSaver.save(packed, "res://levels/01_last_visit/prologue_village.tscn")
 	if save_result != OK:
 		push_error("Could not save prologue scene: %s" % save_result)
 		quit(1)
 		return
-	print("Built editable village prologue at res://prologue_village.tscn")
+	print("Built editable village prologue at res://levels/01_last_visit/prologue_village.tscn")
 	scene_root.free()
 	quit(0)

@@ -10,18 +10,18 @@
 
 | ตอน | เรื่อง | ฉาก |
 | --- | --- | --- |
-| 01 | The Last Visit — บ้านที่ยังรอ | `prologue_village.tscn` |
-| 02 | After Hours — กะสุดท้าย | `backrooms_level.tscn` |
-| 03 | Room 407 — ห้องที่ไม่มีใครเช่า | `Room407/main.tscn` |
-| 04 | The Passenger — ผู้โดยสาร | `frog_chapter.tscn` |
-| 05 | Realization — การตกตะกอน (ต่อจาก 04, เปิดหลังเล่น 04 จบ) | `forest_chapter.tscn` |
-| 06 | Dream Field — ทุ่งในฝัน (เดินอิสระ ต่อจาก 05, เปิดหลังเล่น 05 จบ) | `dream_field.tscn` |
+| 01 | The Last Visit — บ้านที่ยังรอ | `levels/01_last_visit/prologue_village.tscn` |
+| 02 | After Hours — กะสุดท้าย | `levels/02_after_hours/backrooms_level.tscn` |
+| 03 | Room 407 — ห้องที่ไม่มีใครเช่า | `levels/03_room407/main.tscn` |
+| 04 | The Passenger — ผู้โดยสาร | `levels/04_passenger/frog_chapter.tscn` |
+| 05 | Realization — การตกตะกอน (ต่อจาก 04, เปิดหลังเล่น 04 จบ) | `levels/05_realization/forest_chapter.tscn` |
+| 06 | Dream Field — ทุ่งในฝัน (เดินอิสระ ต่อจาก 05, เปิดหลังเล่น 05 จบ) | `levels/06_dream_field/dream_field.tscn` |
 
-**ด่าน 06** เป็นฉากอิสระยามพระอาทิตย์ตกตามภาพอ้างอิง มีทุ่ง เนิน รูปปั้นแมว ต้นไม้ หิน ดอกไม้ และทะเลสาบ เปิด `dream_field.tscn` แล้วกด **F6** ได้เลย หรือเลือก **06 / DREAM FIELD** จากเมนู (เปิดให้เล่นหลังจบ EPISODE 05 ซึ่งมีปุ่มไปตอนต่อไปให้ที่หน้าจบ) ใช้ WASD เดิน, Shift วิ่ง, Ctrl ย่อตัว, Space กระโดด และ Esc พัก เข้าใกล้รูปปั้นแมว มองไปที่ตัวแมว แล้วกด **E** เพื่อเฟดภาพและเสียงกลับเมนู ไม่มีลำดับเนื้อเรื่องหรือภารกิจ
+**ด่าน 06** เป็นฉากอิสระยามพระอาทิตย์ตกตามภาพอ้างอิง มีทุ่ง เนิน รูปปั้นแมว ต้นไม้ หิน ดอกไม้ และทะเลสาบ เปิด `levels/06_dream_field/dream_field.tscn` แล้วกด **F6** ได้เลย หรือเลือก **06 / DREAM FIELD** จากเมนู (เปิดให้เล่นหลังจบ EPISODE 05 ซึ่งมีปุ่มไปตอนต่อไปให้ที่หน้าจบ) ใช้ WASD เดิน, Shift วิ่ง, Ctrl ย่อตัว, Space กระโดด และ Esc พัก เข้าใกล้รูปปั้นแมว มองไปที่ตัวแมว แล้วกด **E** เพื่อเฟดภาพและเสียงกลับเมนู ไม่มีลำดับเนื้อเรื่องหรือภารกิจ
 
-ฉากโลกและรูปปั้นแยกอยู่ที่ `scenes/dream_field/world.tscn` และ `cat_statue.tscn` ปรับตำแหน่ง/แสงใน Godot ได้ตามปกติ `tools/build_dream_valley.gd` เป็นตัวสร้างเฉพาะฉากใหม่นี้; อย่ารันหากต้องการเก็บการจัดฉากที่แก้ด้วยมือไว้
+ฉากโลกและรูปปั้นแยกอยู่ที่ `levels/06_dream_field/scenes/world.tscn` และ `cat_statue.tscn` ปรับตำแหน่ง/แสงใน Godot ได้ตามปกติ `tools/build_dream_valley.gd` เป็นตัวสร้างเฉพาะฉากใหม่นี้; อย่ารันหากต้องการเก็บการจัดฉากที่แก้ด้วยมือไว้
 
-เนื้อเรื่องฉบับปัจจุบันอยู่ใน [STORY.md](docs/STORY.md) ไม่มีการส่งจากตอนหนึ่งไปอีกตอนโดยอัตโนมัติ เมื่อจบจะเลือกกลับเมนูหรือเล่นตอนเดิมอีกครั้งได้ `PlayFrog.cmd` และ `Room407/Play.cmd` ยังใช้เปิดตอนนั้นโดยตรงได้
+เนื้อเรื่องฉบับปัจจุบันอยู่ใน [STORY.md](docs/STORY.md) ไม่มีการส่งจากตอนหนึ่งไปอีกตอนโดยอัตโนมัติ เมื่อจบจะเลือกกลับเมนูหรือเล่นตอนเดิมอีกครั้งได้ `PlayFrog.cmd` และ `levels/03_room407/Play.cmd` ยังใช้เปิดตอนนั้นโดยตรงได้
 
 ## ควบคุมและการตั้งค่า
 
@@ -46,9 +46,9 @@
 - `scripts/anthology_style.gd`, `ui/fonts/`, `ui/menu_film.gdshader`: รูปแบบเมนู ฟอนต์ และเอฟเฟกต์ภาพ
 - `ui/previews/`: ภาพฉากจริงของแต่ละตอนสำหรับหน้าเลือกเรื่อง
 - `audio/anthology/`: เสียงประกอบเพิ่มเติมที่สังเคราะห์สำหรับโปรเจกต์นี้
-- สคริปต์เรื่อง: `scripts/prologue.gd`, `scripts/backrooms_level.gd`, `Room407/scripts/story.gd`, `scripts/frog_chapter.gd`
+- สคริปต์เรื่อง: `levels/01_last_visit/scripts/prologue.gd`, `levels/02_after_hours/scripts/backrooms_level.gd`, `levels/03_room407/scripts/story.gd`, `levels/04_passenger/scripts/frog_chapter.gd`
 
-โมเดลและระบบกบเดิมไม่เปลี่ยน และไม่รันตัวสร้างฉากทับการจัดวางเดิม รายละเอียดสินทรัพย์อยู่ใน `ASSET_CREDITS.md` และ `Room407/ASSET_CREDITS.md`
+โมเดลและระบบกบเดิมไม่เปลี่ยน และไม่รันตัวสร้างฉากทับการจัดวางเดิม รายละเอียดสินทรัพย์อยู่ใน `ASSET_CREDITS.md` และ `levels/03_room407/ASSET_CREDITS.md`
 
 ## ตรวจงาน
 

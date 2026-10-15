@@ -39,7 +39,7 @@ func idle() -> void:
 func run() -> void:
 	had_preferences = FileAccess.file_exists("user://anthology.cfg")
 	if had_preferences: original_preferences = FileAccess.get_file_as_string("user://anthology.cfg")
-	change_scene_to_file("res://frog_chapter.tscn")
+	change_scene_to_file("res://levels/04_passenger/frog_chapter.tscn")
 	await scene_changed
 	chapter = current_scene
 	await frames()

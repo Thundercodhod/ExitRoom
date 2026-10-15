@@ -1,6 +1,6 @@
 # Episode 04 — THE PASSENGER / ผู้โดยสาร
 
-เปิด `frog_chapter.tscn` ในโปรเจกต์ **ExitRoom** แล้วกด **F6** หรือเปิด `PlayFrog.cmd` บน Windows
+เปิด `levels/04_passenger/frog_chapter.tscn` ในโปรเจกต์ **ExitRoom** แล้วกด **F6** หรือเปิด `PlayFrog.cmd` บน Windows
 
 ตั้งแต่ 8 ตุลาคม 2026 ฉากนี้เป็น Episode อิสระของ ExitRoom กด F5 เปิดเมนูหลักแล้วเลือก Episode 04 ได้ ตัวเอกชื่อภาคิน ขับรถกลับหลังเก็บของในห้องเช่าของพ่อที่เสียไปแล้ว ไม่มีการเดินทางต่อจาก Room407 หรือ Backrooms เลข 407 ในบทนี้เป็นเลขห้องเช่าของพ่อ
 
@@ -26,10 +26,10 @@ WASD เดิน, เมาส์มอง, Shift วิ่ง, E สำรว�
 
 ## ไฟล์และการตรวจ
 
-- `frog_chapter.tscn` / `scripts/frog_chapter.gd`: ฉากเล่นและลำดับเหตุการณ์
-- `frog_field_world.tscn`: สภาพแวดล้อมที่บันทึกไว้ เปิดจัดวางใน editor ได้
-- `scripts/frog_field_world.gd` / `tools/build_frog_field.gd`: ตัวสร้างสภาพแวดล้อม **รันแล้วทับ frog_field_world.tscn** ไม่ควรรันหลังจัดฉากด้วยมือโดยไม่มีสำรอง
-- `audio/frog_chapter/`: เสียงสังเคราะห์ต้นฉบับสำหรับบทนี้ สร้างซ้ำได้ด้วย `tools/build_frog_audio.py`
+- `levels/04_passenger/frog_chapter.tscn` / `levels/04_passenger/scripts/frog_chapter.gd`: ฉากเล่นและลำดับเหตุการณ์
+- `levels/04_passenger/frog_field_world.tscn`: สภาพแวดล้อมที่บันทึกไว้ เปิดจัดวางใน editor ได้
+- `scripts/frog_field_world.gd` / `tools/build_frog_field.gd`: ตัวสร้างสภาพแวดล้อม **รันแล้วทับ levels/04_passenger/frog_field_world.tscn** ไม่ควรรันหลังจัดฉากด้วยมือโดยไม่มีสำรอง
+- `levels/04_passenger/audio/`: เสียงสังเคราะห์ต้นฉบับสำหรับบทนี้ สร้างซ้ำได้ด้วย `tools/build_frog_audio.py`
 - `tests/frog_chapter.gd`: ลำดับเล่น, การตรวจเป้าหมาย, ช่องประตู, ไฟดับ, กบขณะมอง, การซ่อมรถและตอนจบ
 
 ```text

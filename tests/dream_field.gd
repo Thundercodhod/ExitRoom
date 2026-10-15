@@ -1,6 +1,6 @@
 extends SceneTree
 ## Exercise real controls, collision, pause, bounded grass, and the wake transition.
-const Terrain=preload("res://scripts/dream_field_terrain.gd")
+const Terrain=preload("res://levels/06_dream_field/scripts/dream_field_terrain.gd")
 var failures:=0
 var manager:Node
 var saved:=""
@@ -67,7 +67,7 @@ func run()->void:
 	while manager.changing: await process_frame
 	await settle(.6)
 	var field=current_scene
-	check(field.scene_file_path=="res://dream_field.tscn","menu launches the real field")
+	check(field.scene_file_path=="res://levels/06_dream_field/dream_field.tscn","menu launches the real field")
 	check(field.playing and not field.player.locked,"free exploration starts without a story panel")
 	Input.mouse_mode=Input.MOUSE_MODE_CAPTURED
 	var player:CharacterBody3D=field.player

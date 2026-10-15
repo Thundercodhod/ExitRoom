@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://levels/05_realization/assets/psx_forest/models/campfire_model.glb" id="1"]
+
+[sub_resource type="BoxShape3D" id="box0"]
+size = Vector3(1.1923, 0.4220, 1.1765)
+
+[sub_resource type="BoxShape3D" id="box1"]
+size = Vector3(0.5600, 0.7000, 0.4852)
+
+[node name="campfire" instance=ExtResource("1")]
+
+[node name="Collision" type="StaticBody3D" parent="campfire"]
+
+[node name="Box" type="CollisionShape3D" parent="campfire/Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0131, 0.1449, 0.0016)
+shape = SubResource("box0")
+
+[node name="Collision" type="StaticBody3D" parent="campfire/campfire_flames"]
+
+[node name="Box" type="CollisionShape3D" parent="campfire/campfire_flames/Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.4000, -0.0000)
+shape = SubResource("box1")

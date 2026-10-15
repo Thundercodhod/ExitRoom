@@ -36,7 +36,7 @@ func run_checks() -> void:
 		recorded.name = "Anthology"
 		root.add_child(recorded)
 
-	var village: Node = load("res://prologue_village.tscn").instantiate()
+	var village: Node = load("res://levels/01_last_visit/prologue_village.tscn").instantiate()
 	root.add_child(village)
 	await process_frame
 	check(not village.playing, "Village must open on its standalone introduction")
@@ -69,7 +69,7 @@ func run_checks() -> void:
 	village.queue_free()
 	await process_frame
 
-	var backrooms: Node = load("res://backrooms_level.tscn").instantiate()
+	var backrooms: Node = load("res://levels/02_after_hours/backrooms_level.tscn").instantiate()
 	root.add_child(backrooms)
 	await process_frame
 	check(not backrooms.playing and not backrooms.player.third_person, "Backrooms must open in first person on its own introduction")

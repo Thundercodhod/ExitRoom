@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://levels/05_realization/assets/psx_forest/models/stump_model.glb" id="1"]
+
+[sub_resource type="BoxShape3D" id="box0"]
+size = Vector3(1.6506, 0.4920, 1.5847)
+
+[node name="stump" instance=ExtResource("1")]
+
+[node name="Collision" type="StaticBody3D" parent="stump"]
+
+[node name="Box" type="CollisionShape3D" parent="stump/Collision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1164, 0.1540, -0.1353)
+shape = SubResource("box0")

@@ -1,6 +1,6 @@
 extends SceneTree
-## The current Level 06 art builder. Writes only scenes/dream_field/world.tscn.
-const Terrain=preload("res://scripts/dream_field_terrain.gd")
+## The current Level 06 art builder. Writes only levels/06_dream_field/scenes/world.tscn.
+const Terrain=preload("res://levels/06_dream_field/scripts/dream_field_terrain.gd")
 var world:Node3D
 var stone:StandardMaterial3D
 var bark:StandardMaterial3D
@@ -42,15 +42,15 @@ func build()->void:
 	await process_frame
 	var packed:=PackedScene.new()
 	var error:=packed.pack(world)
-	if error==OK: error=ResourceSaver.save(packed,"res://scenes/dream_field/world.tscn")
+	if error==OK: error=ResourceSaver.save(packed,"res://levels/06_dream_field/scenes/world.tscn")
 	print("SUNSET_VALLEY_BUILD=",error," nodes=",world.find_children("*","",true,false).size())
 	world.free()
 	quit(0 if error==OK else 1)
 
 func make_atmosphere()->void:
 	var sky_material:=ShaderMaterial.new()
-	sky_material.shader=load("res://assets/dream_field/sunset_sky.gdshader")
-	sky_material.set_shader_parameter("panorama",load("res://assets/dream_field/sunset_clouds.png"))
+	sky_material.shader=load("res://levels/06_dream_field/assets/sunset_sky.gdshader")
+	sky_material.set_shader_parameter("panorama",load("res://levels/06_dream_field/assets/sunset_clouds.png"))
 	var sky:=Sky.new()
 	sky.sky_material=sky_material
 	sky.radiance_size=Sky.RADIANCE_SIZE_128
@@ -110,14 +110,14 @@ func make_terrain()->void:
 		offset+=(cells+1)*(cells+1)
 	surface.generate_normals()
 	var mesh:=surface.commit()
-	ResourceSaver.save(mesh,"res://assets/dream_field/terrain.res")
+	ResourceSaver.save(mesh,"res://levels/06_dream_field/assets/terrain.res")
 	var material:=ShaderMaterial.new()
-	material.shader=load("res://assets/dream_field/sunset_ground.gdshader")
-	material.set_shader_parameter("grass_map",load("res://assets/dream_field/psx_grass.png"))
-	material.set_shader_parameter("dirt_map",load("res://assets/dream_field/psx_dirt.png"))
+	material.shader=load("res://levels/06_dream_field/assets/sunset_ground.gdshader")
+	material.set_shader_parameter("grass_map",load("res://levels/06_dream_field/assets/psx_grass.png"))
+	material.set_shader_parameter("dirt_map",load("res://levels/06_dream_field/assets/psx_dirt.png"))
 	var ground:=MeshInstance3D.new()
 	ground.name="MeadowAndHills"
-	ground.mesh=load("res://assets/dream_field/terrain.res")
+	ground.mesh=load("res://levels/06_dream_field/assets/terrain.res")
 	ground.material_override=material
 	ground.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	put(ground)
@@ -135,21 +135,21 @@ func make_terrain()->void:
 	lake.mesh=plane
 	lake.position=Vector3(48,Terrain.WATER_LEVEL,-60)
 	var water:=ShaderMaterial.new()
-	water.shader=load("res://assets/dream_field/sunset_water.gdshader")
+	water.shader=load("res://levels/06_dream_field/assets/sunset_water.gdshader")
 	lake.material_override=water
 	lake.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	put(lake)
 
 func make_materials()->void:
 	stone=StandardMaterial3D.new()
-	stone.albedo_texture=load("res://assets/dream_field/psx_stone.png")
+	stone.albedo_texture=load("res://levels/06_dream_field/assets/psx_stone.png")
 	stone.albedo_color=Color(.49,.43,.45)
 	stone.roughness=1.0
 	stone.uv1_triplanar=true
 	stone.uv1_scale=Vector3.ONE*.4
 	stone.texture_filter=BaseMaterial3D.TEXTURE_FILTER_NEAREST_WITH_MIPMAPS
 	bark=StandardMaterial3D.new()
-	bark.albedo_texture=load("res://assets/dream_field/psx_forest_floor.png")
+	bark.albedo_texture=load("res://levels/06_dream_field/assets/psx_forest_floor.png")
 	bark.albedo_color=Color(.60,.43,.28)
 	bark.roughness=1.0
 	bark.uv1_triplanar=true
@@ -168,7 +168,7 @@ func make_cat()->void:
 	var socket:=Marker3D.new()
 	socket.name="StatueSocket"
 	put(socket,monument)
-	var cat=(load("res://scenes/dream_field/cat_statue.tscn") as PackedScene).instantiate()
+	var cat=(load("res://levels/06_dream_field/scenes/cat_statue.tscn") as PackedScene).instantiate()
 	put(cat,socket)
 	for i in 9:
 		var angle:float=i*TAU/10.0+.5
