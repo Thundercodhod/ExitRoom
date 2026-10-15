@@ -17,6 +17,19 @@ const OFF_TRAIL_FAR := 11.0       # this far out it hunts at once
 const WARN_TIME := 3.0            # seconds off the trail after the warning before it hunts
 const BACK_ON_TRAIL := 3.0        # within this, a warning or hunt is called off
 const CAMP_REACH := 3.2
+# Things from his childhood beside the walk. The fire only catches once he has
+# passed all three; before that it is embers and he does not want to sleep.
+const MEMORY_REACH := 3.0
+const MEMORY_LINES := {
+	"Bicycle": "จักรยานคันนี้... คันแรกที่พ่อซื้อให้ ล้อหลังยังพังอยู่เลย",
+	"FishingChair": "เก้าอี้ของพ่อ... วันอาทิตย์เราชอบไปนั่งตกปลากันริมคลอง ผมไม่เคยได้ปลาสักตัวเลย",
+	"CatfishToy": "ตุ๊กตาปลาดุก... ตัวที่ผมกอดนอนทุกคืนตอนเด็ก หายไปตั้งแต่ย้ายบ้าน",
+}
+const FORK_LINE := "มันดูไม่ได้จะทำร้ายเราเลยนี่... ทำไมมันชี้ไปทางโน้น?"
+const FIRE_EARLY_LINE := "รู้สึกแปลกๆแฮะ... เหมือนลืมอะไรไว้ข้างทาง"
+const FIRE_LIT_LINE := "ไฟติดแล้ว... ใครมาจุดไว้ให้กันนะ"
+const EMBER := .45            # fire_energy while it is only embers
+const FALSE_FORK_HINT := Vector3(4, 0, -72)   # where the false trail leaves the real one
 const START_MINUTES := 23 * 60 + 52
 const MINUTES_PER_CATCH := 37
 const REAL_SECONDS_PER_MINUTE := 6.0
@@ -85,6 +98,14 @@ var fire_light: OmniLight3D
 var fire_glow: MeshInstance3D
 var flames: Node3D
 var fire_energy := 2.4
+var fire_full := 2.4           # what the fire burns at once lit; lower after each catch
+var fire_lit := false
+var false_trail: Curve3D
+var false_end: Vector3
+var memories: Array[Node3D] = []
+var found := {}
+var fork_shown := false
+var early_fire_said := -100.0
 
 func _ready() -> void:
 	rng.randomize()
@@ -95,6 +116,9 @@ func _ready() -> void:
 		key.physical_keycode = {"forward":KEY_W,"back":KEY_S,"left":KEY_A,"right":KEY_D,"sprint":KEY_SHIFT,"interact":KEY_E,"flashlight":KEY_F,"pause_game":KEY_ESCAPE}[action_name]
 		InputMap.action_add_event(action_name,key)
 	trail = ($World/Trail as Path3D).curve
+	false_trail = ($World/FalseTrail as Path3D).curve
+	false_end = ($World/FalseTrailEnd as Node3D).global_position
+	for m in $World/Memories.get_children(): memories.append(m as Node3D)
 	campfire_spot = ($World/CampfireSpot as Node3D).global_position
 	frog_peek = ($World/FrogPeek as Node3D).global_position
 	fire_light = $World/Campsite/FireLight
@@ -104,6 +128,7 @@ func _ready() -> void:
 	setup_player()
 	setup_frog()
 	setup_audio()
+	apply_fire()
 	setup_ui()
 	update_clock()
 	show_panel("REALIZATION  /  การตกตะกอน","ภาคิน / ทางกลับจากห้องเช่าของพ่อ / 23:52\n\n“ใกล้ถึงปั๊มแล้วใช่ไหมนะ.....”\nผมจำได้แค่นั้น ไฟปั๊มอยู่ข้างหน้า\nแล้วตาก็กะพริบ ครั้งแล้วครั้งเล่า\n\nWASD เดิน · เมาส์มอง · Shift วิ่ง\nF ไฟฉาย · V มุมกล้อง · Esc พัก · F1 เมนู","ลืมตา")
@@ -489,7 +514,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_tree().paused = true
 		get_viewport().set_input_as_handled()
 		return
-	if event.is_action_pressed("interact") and playing and not busy and near_campfire():
+	if event.is_action_pressed("interact") and playing and not busy and fire_lit and near_campfire():
 		sleep_by_fire()
 
 func near_campfire() -> bool:
@@ -597,13 +622,95 @@ func _process(delta: float) -> void:
 	clock_minutes += delta / REAL_SECONDS_PER_MINUTE
 	update_clock()
 	ambient_calls(delta)
-	prompt.text = "[E] นั่งลงพักข้างกองไฟ" if near_campfire() and stage in [Stage.WALK,Stage.WARNED] else ""
+	prompt.text = "[E] นั่งลงพักข้างกองไฟ" if fire_lit and near_campfire() and stage in [Stage.WALK,Stage.WARNED] else ""
 	update_trail(delta)
+	if stage in [Stage.WALK,Stage.WARNED]:
+		update_memories()
+		update_fork()
+		if not fire_lit and near_campfire() and Time.get_ticks_msec() / 1000.0 - early_fire_said > 25.0:
+			early_fire_said = Time.get_ticks_msec() / 1000.0
+			say(FIRE_EARLY_LINE, 6)
 
+# Distance to the nearest walkable trail. The false fork counts: it is a trail,
+# just the wrong one, and the frog shows him that instead of hunting him.
 func trail_distance() -> float:
 	var p := player.global_position
-	var q := trail.get_closest_point(Vector3(p.x,0,p.z))
-	return Vector2(p.x-q.x, p.z-q.z).length()
+	var best := INF
+	for curve in [trail, false_trail]:
+		var q: Vector3 = curve.get_closest_point(Vector3(p.x,0,p.z))
+		best = minf(best, Vector2(p.x-q.x, p.z-q.z).length())
+	return best
+
+func flat_distance(a: Vector3, b: Vector3) -> float:
+	return Vector2(a.x-b.x, a.z-b.z).length()
+
+# ---------------------------------------------------------------- memories and the fork
+
+func update_memories() -> void:
+	for m in memories:
+		if found.has(m.name) or flat_distance(player.global_position, m.global_position) > MEMORY_REACH: continue
+		found[m.name] = true
+		say(MEMORY_LINES.get(String(m.name), ""), 7)
+		play_cue("tape", -30.0)
+		if m.name == "CatfishToy" and not player.third_person:
+			shoulder.lean_in()   # Pladuk leans in to look at itself
+		if found.size() == memories.size() and not fire_lit:
+			light_fire()
+
+func light_fire() -> void:
+	fire_lit = true
+	await wait_for(7.5)        # after his line about the last memory
+	if flames:
+		flames.visible = true
+		set_flame_size(.05)
+	var t := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP).set_parallel(true)
+	t.tween_property(self, "fire_energy", fire_full, 3.0).set_trans(Tween.TRANS_SINE)
+	t.tween_method(func(v: float): set_flame_size(v), .05, .45 + .55 * fire_full / 2.4, 3.0)
+	t.tween_property(fire_sound, "volume_db", fire_db_for(fire_full), 3.0)
+	await t.finished
+	if stage in [Stage.WALK, Stage.WARNED]:
+		say(FIRE_LIT_LINE, 5)
+
+func fire_db_for(energy: float) -> float:
+	return FIRE_DB + linear_to_db(clampf(energy / 2.4, .2, 1.0))
+
+# Embers until all three memories are found, then the fire at its current size.
+func apply_fire() -> void:
+	fire_energy = fire_full if fire_lit else EMBER
+	if flames: flames.visible = fire_lit
+	set_flame_size(.45 + .55 * fire_full / 2.4)
+	fire_sound.volume_db = fire_db_for(fire_full) if fire_lit else FIRE_DB - 14.0
+
+# Halfway down the false fork the frog is waiting at its dead end. It tilts its
+# head at him, then turns to look back towards the real trail.
+func update_fork() -> void:
+	if fork_shown: return
+	var p := player.global_position
+	var q: Vector3 = false_trail.get_closest_point(Vector3(p.x,0,p.z))
+	var along := false_trail.get_closest_offset(q)
+	var main_q: Vector3 = trail.get_closest_point(Vector3(p.x,0,p.z))
+	if flat_distance(p, q) < 3.0 and along > false_trail.get_baked_length() * .35 and flat_distance(p, main_q) > 4.0:
+		fork_event()
+
+func fork_event() -> void:
+	fork_shown = true
+	if peek_active: end_peek()
+	frog.stop_hunt()
+	frog.clear_scene_rules()
+	frog.threat_enabled = false
+	frog_leaving = false
+	frog.appear_at(false_end + Vector3(0,.05,0))
+	frog.face_towards(player.global_position)
+	if head_tilt: head_tilt.tilt = deg_to_rad(28)
+	play_cue("low_pulse",-26.0)
+	await wait_for(1.8)
+	# Look back to where the real trail carries on past the fork.
+	var fork_at := trail.get_closest_offset(Vector3(FALSE_FORK_HINT.x, 0, FALSE_FORK_HINT.z))
+	frog.face_towards(trail.sample_baked(minf(fork_at + 14.0, trail.get_baked_length())))
+	say(FORK_LINE, 6)
+	await wait_for(4.0)
+	frog_leaving = true
+	leave_unseen = 0.0
 
 # Birds and far-off frogs, from random directions, unless the forest has gone quiet.
 func ambient_calls(delta: float) -> void:
@@ -641,6 +748,7 @@ func update_trail(delta: float) -> void:
 		if leave_unseen > .6:
 			frog_leaving = false
 			frog.vanish()
+			if head_tilt and not peek_active: head_tilt.tilt = 0.0
 	var d := trail_distance()
 	match stage:
 		Stage.WALK:
@@ -718,10 +826,9 @@ func _on_choke_finished() -> void:
 	catches += 1
 	# The night has moved on while he was out, and the fire has burned down.
 	clock_minutes += MINUTES_PER_CATCH + rng.randf_range(-6.0, 8.0)
-	fire_energy = maxf(.8, fire_energy * .78)
-	set_flame_size(.45 + .55 * fire_energy / 2.4)
-	# A smaller fire crackles more quietly.
-	fire_sound.volume_db = FIRE_DB + linear_to_db(clampf(fire_energy / 2.4, .2, 1.0))
+	fire_full = maxf(.8, fire_full * .78)
+	# A smaller fire (or embers) crackles more quietly.
+	apply_fire()
 	frog.stop_hunt()
 	frog.clear_scene_rules()
 	frog.threat_enabled = false

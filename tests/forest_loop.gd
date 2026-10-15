@@ -159,7 +159,7 @@ func run() -> void:
 
 	# ---- straying far: hunt, catch, wake at the start later in the night
 	var minutes_before: float = chapter.clock_minutes
-	var energy_before: float = chapter.fire_energy
+	var energy_before: float = chapter.fire_full
 	await place(beside_trail(30, 12.5))
 	await frames(6)
 	check(chapter.stage == chapter.Stage.HUNTED and chapter.frog.is_hunting(), "12 m off the trail: the frog hunts")
@@ -168,11 +168,51 @@ func run() -> void:
 	if not await wait_until(func(): return chapter.stage == chapter.Stage.WALK and chapter.catches == 1, 40, "he wakes at the start again"): return finish()
 	check(chapter.player.global_position.distance_to(chapter.START) < .5, "back at the start of the trail")
 	check(chapter.clock_minutes - minutes_before > 25, "the clock moved on (%s)" % chapter.clock_label.text)
-	check(chapter.fire_energy < energy_before, "the campfire burned down")
-	check(chapter.fire_sound.volume_db < chapter.FIRE_DB, "the smaller fire crackles more quietly")
+	check(chapter.fire_full < energy_before, "the campfire burned down")
+	check(chapter.fire_sound.volume_db < chapter.FIRE_DB, "the fire (still embers) crackles quietly")
 	check(chapter.flames.scale.y < .99, "the flames themselves are smaller")
 	check(not chapter.player.held and chapter.player.camera.current, "control and view restored after the catch")
 	check(chapter.objective.visible and chapter.objective.text == chapter.OBJECTIVE, "objective back")
+
+	# ---- straight to the fire: only embers, he will not sleep yet
+	check(chapter.trail.get_baked_length() > 130, "the walk is longer (%.0f m)" % chapter.trail.get_baked_length())
+	check(not chapter.fire_lit and not chapter.flames.visible and chapter.fire_energy < 1.0, "the fire is only embers at first")
+	await place(chapter.campfire_spot + Vector3(0, .05, 2.4))
+	await frames(4)
+	check(chapter.prompt.text == "", "no sleep prompt while the fire is out")
+	check(chapter.subtitle.text == chapter.FIRE_EARLY_LINE, "he feels he left something on the way")
+	var early := InputEventAction.new()
+	early.action = "interact"
+	early.pressed = true
+	Input.parse_input_event(early)
+	await frames(4)
+	check(chapter.stage == chapter.Stage.WALK, "E does nothing at the embers")
+
+	# ---- the false fork: the frog at its dead end, looking back to the real trail
+	var fork_len: float = chapter.false_trail.get_baked_length()
+	await place(chapter.false_trail.sample_baked(fork_len * .6) + Vector3(0, .05, 0))
+	await frames(4)
+	check(chapter.fork_shown and chapter.stage == chapter.Stage.WALK, "the false fork is a trail: no warning, the frog is waiting")
+	check(chapter.frog.mode != chapter.frog.Mode.GONE and chapter.frog.global_position.distance_to(chapter.false_end) < 1.0, "the frog stands at the dead end")
+	check(is_equal_approx(chapter.head_tilt.tilt, deg_to_rad(28)), "its head is tilted")
+	await chapter.look_at_point(chapter.false_end + Vector3(0, 1.5, 0), .2)
+	await create_timer(2.2).timeout
+	check(chapter.subtitle.text == chapter.FORK_LINE, "why is it pointing over there?")
+	await shot("fork-frog")
+
+	# ---- the three memories
+	for name in ["Bicycle", "FishingChair", "CatfishToy"]:
+		var memory: Node3D = chapter.get_node("World/Memories/" + name)
+		await place(memory.global_position + Vector3(.8, .05, .8))
+		await frames(4)
+		check(chapter.found.has(name) and chapter.subtitle.text == chapter.MEMORY_LINES[name], "memory: " + name)
+		if name == "CatfishToy":
+			check(chapter.shoulder.leaning, "Pladuk leans in at the toy catfish")
+		await chapter.look_at_point(memory.global_position + Vector3(0, .4, 0), .2)
+		await shot("memory-" + name)
+	check(chapter.fire_lit, "all three found: the fire will catch")
+	await wait_until(func(): return chapter.flames.visible and chapter.fire_energy > chapter.fire_full - .05, 14, "the fire lights itself")
+	await wait_until(func(): return chapter.subtitle.text == chapter.FIRE_LIT_LINE, 3, "who lit it?")
 
 	# ---- the campfire
 	await place(chapter.campfire_spot + Vector3(0, .05, 5))
