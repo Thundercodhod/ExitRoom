@@ -116,7 +116,7 @@ func _ready() -> void:
 	add_child(field)
 	field.play()
 	setup_ui()
-	show_panel("THE PASSENGER  /  ผู้โดยสาร","ภาคิน / กลับจากเก็บของที่ห้องเช่าของพ่อ / 23:46\n\nพ่อเสียไปเกือบปี ผมจ่ายค่าเช่าทิ้งไว้จนไม่ไหว\nวันนั้นเลยต้องไปขนของออก แล้วคืนกุญแจเสียที\n\nขากลับถนนใหญ่ปิดซ่อม ผมเลยใช้ทางเลียบทุ่ง\nขับมาได้พักหนึ่ง ไฟหน้าก็หรี่ลง แล้วเครื่องก็ดับ\nมองไปรอบ ๆ มีบ้านเปิดไฟอยู่แค่หลังเดียว\n\nWASD เดิน · เมาส์มอง · Shift วิ่ง\nE สำรวจ · F ไฟฉาย · Esc พัก · F1 เมนู","เริ่มเรื่อง")
+	show_panel("THE PASSENGER  /  ผู้โดยสาร","ภาคิน / กลับจากเก็บของที่ห้องเช่าของพ่อ / 23:46\n\nพ่อเสียไปเกือบปี ผมยังไม่กล้าไปเก็บของเขาเลย\nแต่จ่ายค่าเช่าต่อไม่ไหวแล้ว วันนั้นเลยต้องไป\n\nขากลับถนนใหญ่ปิดซ่อม ผมเลยเลี้ยวเข้าทางเลียบทุ่ง\nขับมาได้สักพัก ไฟหน้าก็หรี่ แล้วรถก็ดับเอาดื้อ ๆ\nแถวนั้นมีบ้านเปิดไฟอยู่หลังเดียว\n\nWASD เดิน · เมาส์มอง · Shift วิ่ง\nE สำรวจ · F ไฟฉาย · Esc พัก · F1 เมนู","เริ่มเรื่อง")
 	play_cue("tape",-23.0)
 	lighten_field()
 
@@ -317,7 +317,7 @@ func _continue_panel() -> void:
 		started = true
 		playing = true
 		objective.text = "ลองสตาร์ตรถที่จอดอยู่ข้างถนน"
-		say("เมื่อเช้ายังขับได้อยู่เลย ลองสตาร์ตอีกทีแล้วกัน",6)
+		say("เอ้า เมื่อเช้ายังดี ๆ อยู่เลย ลองอีกทีแล้วกัน",6)
 
 func say(text: String, seconds := 5.0) -> void:
 	subtitle.text = text
@@ -385,7 +385,7 @@ func _process(delta: float) -> void:
 		frog.vanish()
 		stage = Stage.HOUSE
 		objective.text = "เข้าไปขอความช่วยเหลือในบ้านที่เปิดไฟ"
-		say("ขอโทษครับ มีใครอยู่ไหม รถผมเสียอยู่ตรงถนนครับ",5)
+		say("ขอโทษครับ มีใครอยู่ไหมครับ? รถผมเสียอยู่ข้างนอก",5)
 	if stage == Stage.HOUSE and player.position.z< -31:
 		stage = Stage.NOTE
 		objective.text = "สำรวจบ้าน · มีกระดาษอยู่บนโต๊ะข้างหน้าต่าง"
@@ -400,22 +400,22 @@ func interact(key: String) -> void:
 		"car":
 			if stage == Stage.CAR: failed_start()
 			elif stage == Stage.RETURN: repair_car()
-			else: say("ไฟหน้าหรี่ขนาดนี้ แบตน่าจะไม่ไหวแล้ว ลองไปขอให้เขาช่วยดูก่อน")
+			else: say("ไฟก็หรี่ สตาร์ตก็ไม่ติด... แบตหมดหรือเปล่า ไปขอให้เขาช่วยดีกว่า")
 		"note":
 			if stage in [Stage.HOUSE,Stage.NOTE]:
 				stage = Stage.NOTE
 				reading = true
 				play_cue("tape",-27.0)
-				show_panel("กระดาษข้างหน้าต่าง","เครื่องจั๊มพ์แบตอยู่ในห้องนอน\nเอาไปใช้ได้ ไม่ต้องเอามาคืน\n\nถ้าเห็นมันอยู่ข้างนอก อย่าเดินเข้าไปหา\nอย่าจ้องมัน และอย่าเรียกมัน\n\nตรงขอบกระดาษมีอีกบรรทัด ลายมือคนละคน\n“ไม่ว่าได้ยินเสียงใคร ก็ไม่ต้องตอบ”","[ วางกระดาษ ]")
-			else: say("ไม่ต้องเอามาคืนด้วยเหรอ ขอให้ยังใช้ได้ก็พอ")
+				show_panel("กระดาษข้างหน้าต่าง","เครื่องจั๊มพ์แบตอยู่ในห้องนอน\nเอาไปได้เลย ไม่ต้องเอามาคืน\n\nถ้าเห็นมันอยู่ข้างนอก อย่าเดินเข้าไปหา\nอย่าจ้องมัน อย่าเรียกมัน\n\nตรงขอบมีลายมืออีกคนเขียนแทรกไว้\n“ได้ยินเสียงใครก็ช่าง อย่าตอบ”","[ วางกระดาษ ]")
+			else: say("ไม่ต้องเอามาคืน... ให้กันง่าย ๆ แบบนี้เลยเหรอ")
 		"battery":
 			if stage == Stage.BATTERY:
 				$World/House/Bedroom407/JumpStarter.hide()
 				stage = Stage.RECOGNITION
-				objective.text = "นำเครื่องจั๊มพ์แบตเตอรี่กลับไปที่รถ"
+				objective.text = "เอาเครื่องจั๊มพ์แบตกลับไปที่รถ"
 				play_cue("ui_accept",-28.0)
-				say("ไฟยังขึ้นอยู่ น่าจะใช้ได้ ขอยืมก่อนนะครับ")
-			else: say("มีเครื่องจั๊มพ์แบตด้วย กระดาษข้างหน้าต่างเขียนไว้ว่าอะไรนะ")
+				say("ไฟยังขึ้นอยู่... ขอให้ใช้ได้เถอะ ขอยืมนะครับ")
+			else: say("เครื่องจั๊มพ์แบตนี่... แต่กระดาษข้างหน้าต่างว่าไงนะ")
 
 func lock_scene() -> void:
 	busy = true
@@ -449,9 +449,9 @@ func failed_start() -> void:
 	add_child(driver)
 	driver.current = true
 	play_sound("starter")
-	say("ไม่ติดแฮะ อย่าบอกนะว่าต้องนอนอยู่ตรงนี้",3)
+	say("เอาหน่อยน่า... อย่าเสียตรงนี้ดิ",3)
 	await wait_for(2.4)
-	say("โทรออกไม่ได้เลย บ้านตรงนั้นยังมีไฟ ลองเดินไปถามดูแล้วกัน",5)
+	say("ไม่มีสัญญาณอีก... เอาไงดี\nบ้านตรงนั้นยังเปิดไฟอยู่ ลองไปถามดูแล้วกัน",5)
 	await wait_for(1.5)
 	player.camera.current = true
 	driver.queue_free()
@@ -482,7 +482,7 @@ func window_event() -> void:
 	player.torch.visible = true
 	stage = Stage.BATTERY
 	objective.text = "หาอุปกรณ์ช่วยสตาร์ตรถ · สำรวจห้องนอนด้านใน"
-	say("เมื่อกี้มีเสียงหายใจอยู่ข้างหู ผมยืนกลั้นหายใจแทบตาย",7)
+	say("เฮ้ย... ไปไหนแล้ว\nเสียงหายใจเมื่อกี้อยู่ข้างหูเลยนะ",7)
 	unlock_scene()
 
 func recognize_room() -> void:
@@ -494,13 +494,13 @@ func recognize_room() -> void:
 	play_cue("door",-26.0)
 	await t.finished
 	await look_at_point(Vector3(0,1.85,-40.2),.8)
-	say("407... เลขเดียวกับห้องพ่อเลย",5)
+	say("407... เลขห้องพ่อนี่",5)
 	await wait_for(3.5)
 	await look_at_point(Vector3(-.9,1,-44.8),1.2)
-	say("สายชาร์จพันเทปแบบนี้ ของพ่อนี่ ผมเพิ่งเก็บใส่กล่องมาเอง",5)
+	say("สายชาร์จพ่อ... เพิ่งเก็บใส่กล่องเอง มันมาอยู่นี่ได้ไง",5)
 	await wait_for(4.0)
 	ringing.play()
-	say("เสียงโทรศัพท์พ่อดังมาจากใต้ผ้าห่ม\nแต่เครื่องของพ่ออยู่ในกระเป๋าผม ผมปิดมันไว้แล้วด้วย",5)
+	say("เสียงมือถือพ่อนี่...\nแต่เครื่องก็อยู่กับเรา ปิดไว้แล้วด้วย",5)
 	await wait_for(4.5)
 	# Leave a full opening for the return; the number stays attached to the door.
 	t = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP)
@@ -521,11 +521,11 @@ func update_return() -> void:
 		return
 	if return_caption_step == 0 and player.position.z> -28:
 		return_caption_step = 1
-		say("เมื่อกี้มันอยู่หน้าบ้าน ทำไมมาอยู่ตรงนี้แล้ว",6)
+		say("เฮ้ย... มาอยู่ตรงนี้ตั้งแต่เมื่อไหร่",6)
 	if return_caption_step == 1 and player.position.z> -12:
 		return_caption_step = 2
 		play_cue("low_pulse",-26.0)
-		say("อย่าไปมองมัน เดินไปให้ถึงรถก่อน",6)
+		say("ไม่มอง ไม่มอง... อีกนิดเดียวก็ถึงรถแล้ว",6)
 	# While it hunts it is not playing the relocation game.
 	if frog.is_hunting():
 		return
@@ -550,13 +550,13 @@ func repair_car() -> void:
 	frog.clear_scene_rules()
 	frog.vanish()
 	ringing.stop()
-	objective.text = "ต่อเครื่องจั๊มพ์แบตเตอรี่เข้ากับขั้วแบตเตอรี่"
+	objective.text = "ต่อเครื่องจั๊มพ์เข้ากับแบตเตอรี่รถ"
 	var hood := $World/Car/Hood
 	var t := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP)
 	t.tween_property(hood,"rotation:x",-.65,.6)
 	await t.finished
 	play_sound("clamp")
-	say("ขั้วบวก... ขั้วลบ...",3)
+	say("ขั้วบวก... ขั้วลบ... มืออย่าสั่นสิ",3)
 	await wait_for(2.5)
 	t = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP)
 	t.tween_property(hood,"rotation:x",0,.6)
@@ -581,7 +581,7 @@ func repair_car() -> void:
 	engine.play()
 	stage = Stage.REPAIRED
 	objective.text = ""
-	say("ติดแล้ว ไปได้สักที",4)
+	say("ติดแล้ว... ไป ๆ ออกจากที่นี่ก่อน",4)
 	await wait_for(4.5)
 	# The original sitting animation owns the pose; no skeleton/model edits.
 	player.position = Vector3(1.92,0,4.2)
@@ -667,7 +667,7 @@ func _on_choke_finished() -> void:
 	await wait_for(1.5)             # held on black
 	var t := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP)
 	t.tween_property(overlay,"color:a",0.0,1.0)
-	say("ผมสะดุ้ง... ยังยืนอยู่หน้าประตูห้องนอน คอยังเจ็บอยู่เลย",5)
+	say("แค่ก... คอเรา...\nยังอยู่หน้าห้องเหรอ เมื่อกี้มันบีบจริง ๆ นะ",5)
 	busy = false
 
 

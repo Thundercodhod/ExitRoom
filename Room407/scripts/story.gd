@@ -32,15 +32,15 @@ var episode_finished := false
 const BODY_FONT := "res://ui/fonts/ChakraPetch-Regular.ttf"
 const TITLE_FONT := "res://ui/fonts/ChakraPetch-Bold.ttf"
 const FALLBACK_FONT := "res://Room407/assets/NotoSansThai.ttf"
-const ENDING := "ผมไม่เก็บอะไรเลย วิ่งลงบันไดไปทั้งชุดนอน\nพอโทรหาเจ้าของหอ เขาบอกว่าผมคืนกุญแจไปตั้งแต่คืนก่อนแล้ว\n\nตอน 07:16 มีข้อความเสียงส่งมาจากเบอร์ของผมเอง\n“มีคนยืนอยู่หน้าห้อง มันใส่เสื้อเหมือนผมเลย” แล้วก็มีเสียงเคาะ\n\nกล่องเสื้อผ้ายังอยู่ที่นั่น ผมยอมซื้อใหม่ ยังไงก็ไม่กลับไป\nส่วนข้อความนั้น ผมลบไปแล้ว วันถัดมามันก็ส่งมาอีก"
+const ENDING := "ผมวิ่งลงบันไดทั้งชุดนอน ของสักชิ้นก็ไม่ได้หยิบ\nเจ้าของหอยังยืนยันว่าผมคืนกุญแจไปตั้งแต่เมื่อคืน\n\n07:16 มีข้อความเสียงส่งมาจากเบอร์ผมเอง\n“ใครอยู่หน้าห้องน่ะ... ทำไมใส่เสื้อเหมือนเราเลย” แล้วก็มีเสียงเคาะ\n\nเสื้อผ้าผมยังอยู่ในกล่องที่หอ ช่างมัน ซื้อใหม่ก็ได้\nส่วนข้อความเสียง ผมลบแล้วนะ แต่เช้าวันต่อมามันก็มาอีก"
 const OBJECTIVES := [
 	"ห้อง 406 · อ่านใบรับห้องบนตู้ข้างประตู",
 	"คืนแรก · เปิดกล่องย้ายบ้าน",
 	"เก็บของแล้ว · เข้านอน",
-	"03:07 · ตรวจเสียงที่ประตูห้องข้าง ๆ",
+	"03:07 · ไปดูเสียงที่ห้องข้าง ๆ",
 	"ประตูไม่เปิด · กลับไปพักในห้อง 406",
 	"07:16 · ตรวจประตู 407 อีกครั้ง",
-	"เก็บแรงไว้ · พักก่อนเฝ้าทางเดินคืนนี้",
+	"กลับไปพัก · คืนนี้ค่อยเฝ้าดูทางเดิน",
 	"คืนที่สอง · เข้าไปในห้อง 407",
 	"อ่านใบตรวจห้องบนตู้ในห้อง 407",
 	"พลิกใบตรวจห้อง · อ่านบรรทัดสุดท้าย"
@@ -186,7 +186,7 @@ func make_ui() -> void:
 	text(title_screen, "EXITROOM     /     EPISODE 03", Vector2(64, 108), 17, Color(.73, .65, .49), true)
 	text(title_screen, "ROOM 407", Vector2(58, 161), 76, Color(.91, .88, .79), true)
 	text(title_screen, "ห้องที่ไม่มีใครเช่า", Vector2(66, 260), 32, Color(.83, .77, .62), true)
-	text(title_screen, "“ช่างบอกว่าซ่อมท่อน้ำแค่สัปดาห์เดียว\nผมเลยเช่าห้องนี้ไว้ก่อน”", Vector2(66, 337), 27)
+	text(title_screen, "“ช่างบอกว่าอีกเจ็ดวันก็กลับห้องได้\nผมนึกว่าแค่มาหาที่นอนชั่วคราว”", Vector2(66, 337), 27)
 	var intro := text(title_screen, "ธีร์ / ผู้เช่าชั่วคราว\nอาคารพักอาศัยชานเมือง · คืนแรก · 22:48", Vector2(66, 450), 19, Color(.64, .66, .64))
 	intro.size.x = 590
 	menu_button(title_screen, "เข้าพัก   →", Vector2(66, 552), start).grab_focus()
@@ -222,7 +222,7 @@ func _start_gameplay() -> void:
 	title_screen.hide()
 	player.locked = false
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	say("ผมชื่อธีร์ ห้องเก่าท่อน้ำแตกจนต้องรื้อพื้น\nหอนี้อยู่ใกล้ที่ทำงาน ผมเลยขอเช่าแค่เจ็ดคืน ระหว่างรอช่างซ่อม", 9)
+	say("ห้องเก่าท่อน้ำแตก ช่างต้องรื้อพื้นกันใหม่\nผมเลยมาอยู่ที่นี่ก่อน กะว่าแค่เจ็ดคืน เดี๋ยวก็ได้กลับ", 9)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
@@ -275,7 +275,7 @@ func _process(delta: float) -> void:
 			hall_figure_vanished = true
 			$HallFigure.hide()
 			play_sound("low_pulse", -22)
-			say("เมื่อกี้ยังยืนอยู่ตรงนี้เลย ไปไหนแล้ว\nแล้วใครปิดไฟห้องผม ผมเปิดทิ้งไว้นี่", 8)
+			say("อ้าว... ไปไหนแล้ว เมื่อกี้ยังอยู่ตรงนี้\nแล้วไฟห้องเรา... ใครปิด?", 8)
 	objective.text = OBJECTIVES[clampi(stage, 0, OBJECTIVES.size() - 1)]
 	var node: Node = player.target()
 	prompt.text = "[ E ]  " + str(node.get_meta("hint")) if node and not busy and not player.locked else ""
@@ -286,28 +286,28 @@ func interact(action: String) -> void:
 	match action:
 		"note":
 			play_sound("tape", -24)
-			say("ใบรับห้องเขียนว่า “ธีร์ / 406 / เจ็ดคืน”\nแต่ตรงจำนวนคนพักเขียนไว้สองคน คงกรอกผิด เดี๋ยวพรุ่งนี้ค่อยบอก", 10)
+			say("ธีร์... ห้อง 406... เจ็ดคืน ถูกแล้วนี่\nเดี๋ยวนะ สองคน? มาคนเดียวสักหน่อย คงกรอกผิดมั้ง", 10)
 			if stage == 0:
 				stage = 1
 		"unpack":
 			if stage == 1:
 				stage = 2
 				play_sound("message", -23)
-				say("เบอร์ที่ไม่ได้บันทึก: “พรุ่งนี้ไม่ต้องตั้งปลุก 07:16 หรอก เดี๋ยวปลุกให้”\nผมตั้งเวลานี้จริง ๆ ตอนแรกก็นึกว่าเพื่อนแกล้ง", 10)
+				say("เบอร์ไม่รู้จัก: “ไม่ต้องตั้งปลุก 07:16 นะ เดี๋ยวปลุกให้”\nใครวะ... รู้เวลาปลุกได้ไง เพื่อนแกล้งหรือเปล่า", 10)
 			else:
-				say("เอามาแค่เสื้อผ้ากับนาฬิกาปลุก เดี๋ยวก็ได้กลับแล้ว")
+				say("เสื้อผ้า นาฬิกาปลุก... ครบแล้ว แค่นี้ก็พออยู่ได้")
 		"bed":
 			if stage in [2, 4, 6]:
 				sleep_transition()
 			else:
-				say("ขอทำธุระให้เสร็จก่อน ค่อยนอน")
+				say("ขอจัดการให้เรียบร้อยก่อน ค่อยนอน")
 		"wall":
 			if stage == 5:
 				stage = 6
 				play_sound("message", -24)
-				say("ผมส่งรูปให้เจ้าของหอ ถามว่าประตูข้างห้องหายไปไหน\nเขาโทรกลับมาถามว่า “เมื่อคืนคืนกุญแจแล้วไม่ใช่เหรอ ยังไม่กลับอีก?”", 10)
+				say("เจ้าของหอโทรกลับมา: “เมื่อคืนคืนกุญแจแล้วนี่ ยังไม่กลับอีกเหรอ?”\nคืนอะไรครับ... กุญแจก็ยังอยู่กับผม", 10)
 			else:
-				say("ผมจำไม่ผิดแน่ เมื่อคืนมีประตูตรงนี้")
+				say("ตรงนี้แหละ เมื่อคืนยังยืนเคาะอยู่เลย... จะจำผิดได้ไง")
 		"door406":
 			toggle_door($Door406)
 		"door407":
@@ -317,7 +317,7 @@ func interact(action: String) -> void:
 				scrape.stop()
 				$HallFigure.visible = not hall_figure_vanished
 				play_sound("knock", -20)
-				say("“ธีร์ กลับไปนอนเถอะ อย่าลืมคลุมเท้าด้วย”\nผมไม่ได้บอกชื่อเขา แล้วเรื่องนอนคลุมเท้า เขารู้ได้ยังไง", 10)
+				say("“ธีร์ กลับไปนอนได้แล้ว อย่าลืมคลุมเท้าล่ะ”\nเดี๋ยว... ใครน่ะ รู้ชื่อผมได้ไง", 10)
 				await player.focus_on(Vector3(4, 1.7, 0))
 				busy = false
 			elif stage >= 7:
@@ -330,18 +330,18 @@ func interact(action: String) -> void:
 				stage = 9
 				play_sound("tape", -22)
 				chapter.text = "EPISODE 03     /     ใบตรวจห้องลงวันที่พรุ่งนี้"
-				say("กระดาษลงวันที่พรุ่งนี้ เขียนชื่อผมกับเลขห้องไว้\n“ผู้เช่าจะยืนข้างตู้ อ่านหน้านี้ แล้วพลิกดูด้านหลัง”", 11)
+				say("วันที่พรุ่งนี้? แล้วนี่ชื่อเรา...\n“ผู้เช่าจะยืนข้างตู้ อ่านหน้านี้ แล้วพลิกดูด้านหลัง”", 11)
 			elif stage == 9:
 				if not busy: finish_note()
 			else:
-				say("วันที่บนกระดาษเป็นวันพรุ่งนี้ ใครเขียนไว้")
+				say("ลงวันที่พรุ่งนี้ไว้ด้วย... ใครเขียนเนี่ย")
 
 func toggle_door(door: Node3D) -> void:
 	if door_busy:
 		return
 	# Preserve the existing doorway safety check and collision geometry.
 	if absf(door.rotation.y) > .2 and player.position.distance_to(door.position) < 1.4:
-		say("ยืนขวางอยู่ ต้องถอยก่อน")
+		say("อ้อ ยืนขวางประตูเอง ต้องถอยอีกนิด")
 		return
 	door_busy = true
 	play_sound("door", -24)
@@ -400,7 +400,7 @@ func sleep_transition() -> void:
 		set_407(true)
 		scrape.play()
 		chapter.text = "EPISODE 03     /     คืนแรก     /     03:07"
-		say("ใครลากอะไรอยู่ตอนนี้ ตีสามแล้วนะ\nพอผมลุกจากเตียง เสียงก็เงียบไป", 9)
+		say("อื้อ... เสียงอะไรอีก ตีสามแล้วนะ\nลากกันอยู่ได้ ไม่เกรงใจกันบ้างเลย", 9)
 	elif stage == 4:
 		stage = 5
 		$HallFigure.hide()
@@ -408,7 +408,7 @@ func sleep_transition() -> void:
 		scrape.stop()
 		$WorldEnvironment.environment.ambient_light_energy = .65
 		chapter.text = "EPISODE 03     /     เช้าวันถัดมา     /     07:16"
-		say("ตื่นสายจนได้ นาฬิกาไม่ดังเลย\nเมื่อคืนผมตั้งปลุกไว้แล้วนะ จำได้ว่าลองกดฟังด้วย", 9)
+		say("เจ็ดโมงสิบหก... นาฬิกาไม่ดังเลย\nเมื่อคืนยังใช้ได้อยู่เลยนี่", 9)
 	elif stage == 6:
 		stage = 7
 		set_407(true)
@@ -417,7 +417,7 @@ func sleep_transition() -> void:
 		$WorldEnvironment.environment.ambient_light_energy = .22
 		chapter.text = "EPISODE 03     /     คืนที่สอง     /     03:07"
 		play_sound("fluorescent", -28)
-		say("ผมว่าจะไม่นอน แต่เผลอหลับไปจนได้\nเสียงปลุกดังมาจากห้องข้าง ๆ คราวนี้ประตูเปิดอยู่", 10)
+		say("เผลอหลับอีกแล้ว... นั่นเสียงนาฬิกาเรานี่\nทำไมไปดังในห้องนั้นได้ ประตูก็เปิดอยู่ด้วย", 10)
 	await get_tree().create_timer(.7).timeout
 	tween = create_tween()
 	tween.tween_property(shade, "color:a", 0.0, 1.2)
@@ -431,7 +431,7 @@ func reveal() -> void:
 	busy = true
 	stage = 8
 	play_sound("sting", -25)
-	say("เสื้อตัวนั้น... ผมใส่อยู่เหมือนกัน\nผมลองกลั้นหายใจ คนบนเตียงก็หยุดหายใจไปด้วย", 10)
+	say("เสื้อตัวนั้น... เหมือนที่เราใส่เลย\nเดี๋ยว มันหยุดหายใจตามเราได้ยังไง", 10)
 	await player.focus_on(Vector3(2.3, .72, -4.85))
 	var light: OmniLight3D = $Room407/BedLight
 	var tween := create_tween()
@@ -514,7 +514,7 @@ func finish_note() -> void:
 	busy = true
 	player.locked = true
 	player.velocity = Vector3.ZERO
-	say("ด้านหลังมีแค่บรรทัดเดียว\n‘อ่านจบแล้วใช่ไหม ทีนี้ลองฟังเสียงหน้าประตู’",8)
+	say("ด้านหลังเขียนไว้ว่า\n‘อ่านจบแล้วใช่ไหม ฟังเสียงตรงประตูสิ’",8)
 	await get_tree().create_timer(4.0,false).timeout
 	play_sound("knock",-20)
 	await get_tree().create_timer(3.0,false).timeout

@@ -43,3 +43,27 @@ tree/tree_ps1psx_style_*.png
 *.zip
 *.blend1
 /assets_src/
+
+# Runtime surface mipmaps are authored settings: keep them on clean web builds.
+!assets/textures/**/*.import
+!assets/textures/*.import
+!assets/abandoned_house_playable_Image_*.jpg.import
+!assets/abandoned_house_playable_Image_*.png.import
+!Room407/assets/textures/*.jpg.import
+!Room407/assets/models/*.jpg.import
+!Room407/assets/models/*.png.import
+!Grass/assets/BinbunGrass/src/texture/basic/grass_basic_*.png.import
+!3Dmodel_import/original_backrooms_*.png
+!3Dmodel_import/original_backrooms_*.png.import
+
+# Downloaded source packs stay local; only prepared dream-field resources ship.
+/source_assets/
+!assets/dream_field/
+!assets/dream_field/**/*.import
+!assets/dream_field/*.import
+!audio/dream_field/*.import
+/psx-skyboxes-free/
+/psx-skyboxes-free-assets/
+/PSX Natural Ground Textures SAMPLE/
+/psx-haunted-chapel_free-sample_v1.0.2/
+/handpainted_fat_cat_statue_-_ghibli_style*
