@@ -55,6 +55,20 @@
 
 โมเดลและระบบกบเดิมไม่เปลี่ยน และไม่รันตัวสร้างฉากทับการจัดวางเดิม รายละเอียดสินทรัพย์อยู่ใน `ASSET_CREDITS.md` และ `levels/03_room407/ASSET_CREDITS.md`
 
+## เครื่องมือที่ใช้
+
+| เครื่องมือ | ใช้ทำอะไร |
+| --- | --- |
+| **Godot Engine 4.7** (GDScript) | เอนจินเกม ฉาก ระบบผู้เล่น ศัตรู UI และ export เวอร์ชันเว็บ |
+| **Blender** | ปรับโมเดลและ rig ของปลาดุก (Pladuk) และตัวละคร ก่อน export เป็น `.glb` |
+| **Meshy AI** | สร้างโมเดลตั้งต้นของกบและปลาดุกจากภาพ concept ของทีม |
+| **Python** | สคริปต์สร้างและตัดต่อเสียงใน `tools/*.py` |
+| **Git / GitHub** | เก็บโค้ด แยก branch และรีวิวงานผ่าน Pull Request |
+| **GitHub Actions + GitHub Pages** | build เวอร์ชันเว็บอัตโนมัติเมื่อ merge เข้า main และเผยแพร่ให้เล่นบนเว็บ |
+| **itch.io + butler** | หน้าเกม https://icekungiir.itch.io/exitroom และอัปโหลดด้วย `tools/itch_upload.sh` |
+| **Epidemic Sound, Freesound** | เพลงและเสียงประกอบ (รายละเอียดใน `ASSET_CREDITS.md`) |
+| **Claude, Codex** | AI ช่วยเขียนโค้ดตามแผนของทีม (ดูหัวข้อถัดไป) |
+
 ## การใช้ AI ในการพัฒนา
 
 โปรเจกต์นี้ใช้ AI ช่วยเขียนโค้ด ได้แก่ **Claude** (Anthropic) และ **Codex** (OpenAI) โดยเขียนตามแผนของโปรเจกต์ที่ทีมกำหนด
