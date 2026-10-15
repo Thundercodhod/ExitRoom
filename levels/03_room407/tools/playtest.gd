@@ -54,6 +54,9 @@ func run() -> void:
 	await process_frame
 	await process_frame
 	check(figure.visible,"hall figure remains visible at a distance")
+	game.set_paused(true)
+	check(game.volume_controls.visible and game.volume_controls.sliders.size()==4,"pause screen shows the volume sliders")
+	game.set_paused(false)
 	game.paused=true
 	game.player.position=figure.position+Vector3(-1.5,0,0)
 	await process_frame

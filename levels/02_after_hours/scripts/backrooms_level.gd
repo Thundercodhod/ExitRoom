@@ -1,4 +1,5 @@
 extends Node3D
+const VolumeControls = preload("res://scripts/volume_controls.gd")
 
 const PlayerScript = preload("res://scripts/player.gd")
 const SpiderScript = preload("res://scripts/spider_enemy.gd")
@@ -34,6 +35,7 @@ var flicker_light: OmniLight3D
 var elapsed := 0.0
 var intro_title: Label
 var intro_copy: Label
+var volume_controls: GridContainer
 var begin_button: Button
 var clue: Label
 var started := false
@@ -377,6 +379,11 @@ func setup_ui() -> void:
 	intro_copy.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	intro_copy.custom_minimum_size.x = 704
 	content.add_child(intro_copy)
+	volume_controls = VolumeControls.new()
+	volume_controls.font = intro_copy.get_theme_font("font")
+	volume_controls.accent = Color(0.80, 0.72, 0.40)
+	volume_controls.visible = false
+	content.add_child(volume_controls)
 	begin_button = make_button("เริ่มกะสุดท้าย  /  BEGIN EPISODE", begin_game)
 	content.add_child(begin_button)
 	content.add_child(make_button("กลับหน้าเลือกตอน  /  EPISODES", return_to_menu))
@@ -444,6 +451,8 @@ func show_intro() -> void:
 		begin_button.text = "เดินต่อ  /  RESUME"
 	else:
 		intro_copy.text = "ฉันชื่อริน เป็นช่างซ่อมบำรุงอยู่ที่ตึกสำนักงานแห่งหนึ่ง\nคืนนั้นเพื่อนไม่สบาย เลยมารับกะแทน\n\nสี่ทุ่มกว่า เก็บเครื่องมือเสร็จ กำลังจะกลับอยู่แล้ว\nดันได้ยินคนเรียกจากห้องเก็บของ\nฉันนึกว่าพี่แม่บ้านโดนล็อกไว้ เลยหยิบไฟฉายเข้าไปดู\n\nเดินเข้าไปไม่กี่ก้าวเอง พอหันกลับมา... ประตูอยู่ไหนก็ไม่รู้"
+	volume_controls.visible = started   # only on the pause screen, not the intro
+	if started: volume_controls.refresh()
 	overlay.show()
 	begin_button.grab_focus.call_deferred()
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE

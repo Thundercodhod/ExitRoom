@@ -104,6 +104,18 @@ func run() -> void:
 	check(not paused and chapter.playing,"pause resumes gameplay")
 	await press_key(KEY_ESCAPE)
 	check(paused and chapter.panel.visible,"Esc opens the pause screen")
+	# Volume sliders on the pause screen take a real click while the tree is paused.
+	var volume = chapter.volume_controls
+	check(volume.visible and volume.sliders.size()==4,"pause screen shows the four volume sliders")
+	var music_slider: HSlider = volume.sliders["music"]
+	var music_before: float = volume.volume("music")
+	music_slider.value = 0
+	await click(music_slider)
+	var music_bus := AudioServer.get_bus_index("Music")
+	check(absf(volume.volume("music")-.5)<.06 and (music_bus<0 or absf(db_to_linear(AudioServer.get_bus_volume_db(music_bus))-volume.volume("music"))<.02),"clicking the music slider sets music to ~50%% and the Music bus follows (%.2f)" % volume.volume("music"))
+	await shot("pause-volume")
+	volume.set_volume("music",music_before)
+	volume.refresh()
 	await click(chapter.panel_button)
 	check(not paused and not chapter.panel.visible and chapter.playing,"clicking 'เล่นต่อ' resumes gameplay")
 	# Stamina wave: always shown while playing, black creeps in from the right as he runs.
@@ -146,6 +158,7 @@ func run() -> void:
 	check(chapter.target()!=null and chapter.target().get_meta("action")=="note","warning note reachable")
 	chapter.interact("note")
 	check(chapter.reading and not chapter.playing,"note can be read without a timer")
+	check(not chapter.volume_controls.visible,"volume sliders stay off the note panel")
 	await shot("note")
 	chapter.panel_continue()
 	await create_timer(1).timeout

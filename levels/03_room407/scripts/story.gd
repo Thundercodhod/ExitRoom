@@ -1,4 +1,5 @@
 extends Node3D
+const VolumeControls = preload("res://scripts/volume_controls.gd")
 
 @onready var player = $Player
 @export_range(0.5, 4.0, 0.1) var hall_figure_vanish_distance := 1.8
@@ -12,6 +13,7 @@ var overlay: ColorRect
 var ui: CanvasLayer
 var title_screen: Control
 var pause_screen: Control
+var volume_controls: GridContainer
 var objective: Label
 var subtitle: Label
 var subtitle_plate: ColorRect
@@ -203,6 +205,13 @@ func make_ui() -> void:
 	menu_button(pause_screen, "เล่นต่อ   [ Esc ]", Vector2(100, 231), resume_game)
 	menu_button(pause_screen, "เริ่มตอนนี้ใหม่", Vector2(100, 297), restart_story)
 	menu_button(pause_screen, "กลับหน้าเลือกตอน", Vector2(100, 363), return_to_menu)
+	text(pause_screen, "เสียง", Vector2(700, 195), 17, Color(.77, .64, .42), true)
+	volume_controls = VolumeControls.new()
+	volume_controls.font = game_font()
+	volume_controls.accent = Color(.77, .64, .42)
+	volume_controls.slider_width = 260
+	volume_controls.position = Vector2(700, 231)
+	pause_screen.add_child(volume_controls)
 	text(pause_screen, "M  เปิด / ปิดการลดการเคลื่อนไหวกล้อง", Vector2(100, 450), 19, Color(.68, .66, .61))
 	text(pause_screen, "Assets: Vicious Potato Studios / PomidorkaStudios\nTextures: NeoKG (CC BY 4.0) / Poly Haven\nรายละเอียดเครดิต: levels/03_room407/ASSET_CREDITS.md", Vector2(100, 556), 16, Color(.49, .51, .51))
 	pause_screen.hide()
@@ -255,6 +264,7 @@ func set_paused(value: bool) -> void:
 	drone.stream_paused = paused
 	scrape.stream_paused = paused
 	if paused:
+		volume_controls.refresh()
 		pause_screen.find_children("*", "Button", true, false)[0].grab_focus()
 
 func resume_game() -> void:

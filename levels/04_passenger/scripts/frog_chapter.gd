@@ -1,4 +1,5 @@
 extends Node3D
+const VolumeControls = preload("res://scripts/volume_controls.gd")
 ## Story direction uses only the existing frog's public scene helpers.
 const PlayerScript = preload("res://scripts/player.gd")
 const FrogScript = preload("res://scripts/frog_watcher.gd")
@@ -33,6 +34,7 @@ var overlay: ColorRect
 var panel: CenterContainer
 var panel_title: Label
 var panel_text: Label
+var volume_controls: GridContainer
 var panel_button: Button
 var menu_button: Button
 var subtitle_backdrop: PanelContainer
@@ -261,6 +263,10 @@ func setup_ui() -> void:
 	panel_text.custom_minimum_size.x = 620
 	panel_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	contents.add_child(panel_text)
+	volume_controls = VolumeControls.new()
+	volume_controls.font = episode_font()
+	volume_controls.visible = false
+	contents.add_child(volume_controls)
 	panel_button = Button.new()
 	panel_button.custom_minimum_size.y = 48
 	panel_button.add_theme_font_override("font",episode_font(true))
@@ -304,6 +310,8 @@ func show_panel(title: String, text: String, button: String) -> void:
 	panel_title.text = title
 	panel_text.text = text
 	panel_button.text = button
+	volume_controls.visible = paused   # pause screen only, not notes or endings
+	if paused: volume_controls.refresh()
 	menu_button.visible = not reading and get_node_or_null("/root/Anthology") != null
 	panel.show()
 	playing = false

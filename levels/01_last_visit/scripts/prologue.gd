@@ -1,4 +1,5 @@
 extends Node3D
+const VolumeControls = preload("res://scripts/volume_controls.gd")
 ## Standalone episode. The authored village and its props remain intact.
 
 const PlayerScript = preload("res://scripts/player.gd")
@@ -15,6 +16,7 @@ var objective: Label
 var overlay: Control
 var intro_title: Label
 var intro_copy: Label
+var volume_controls: GridContainer
 var continue_button: Button
 var font: Font
 var title_font: Font
@@ -164,6 +166,11 @@ func setup_ui() -> void:
 	intro_copy.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	intro_copy.custom_minimum_size.x = 704
 	content.add_child(intro_copy)
+	volume_controls = VolumeControls.new()
+	volume_controls.font = intro_copy.get_theme_font("font")
+	volume_controls.accent = Color(0.75, 0.72, 0.52)
+	volume_controls.visible = false
+	content.add_child(volume_controls)
 	continue_button = make_button("เข้าบ้าน  /  BEGIN EPISODE", begin_game)
 	content.add_child(continue_button)
 	content.add_child(make_button("กลับหน้าเลือกตอน  /  EPISODES", return_to_menu))
@@ -178,6 +185,8 @@ func show_intro() -> void:
 		continue_button.text = "เดินต่อ  /  RESUME"
 	else:
 		intro_copy.text = "ผมชื่อธาม รับซ่อมไฟกับเพื่อนแถวบ้าน\nเย็นนั้นเพื่อนฝากให้แวะดูบ้านหลังหนึ่ง เจ้าของกำลังจะขาย\n\n“เช็กไฟให้หน่อย เสร็จแล้วล็อกบ้าน เอากุญแจมาคืนด้วยนะ”\nเจ้าของย้ายออกไปสามเดือนแล้ว ยังขนของออกไม่หมด\n\nผมต้องปิดร้านก่อน กว่าจะมาถึงก็เกือบเที่ยงคืน\nกะว่าเช็กแป๊บเดียว ไม่เกินครึ่งชั่วโมงก็คงได้กลับ"
+	volume_controls.visible = started   # only on the pause screen, not the intro
+	if started: volume_controls.refresh()
 	overlay.show()
 	continue_button.grab_focus.call_deferred()
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
