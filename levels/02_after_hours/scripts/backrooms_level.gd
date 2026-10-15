@@ -7,6 +7,15 @@ const EXIT := Vector3(-10.5, 0.0, 10.5)
 const SPIDER_BOUNDS := Rect2(-12.7, -13.25, 25.4, 26.5)
 const DEFAULT_STATUS := "หาประตูหนีไฟสีเขียว"
 const SPIDER_ALERT := "มันได้ยินคุณแล้ว  /  หาที่กำบัง"
+# The fire door's magnetic lock has no power until the breaker is reset. The
+# breaker sits in the far bottom room, about 28 m of corridor from both the
+# spawn and the exit, so the walk takes the player past every incident.
+const BREAKER := Vector3(2.6, 0.0, 12.2)          # on the south wall, facing -Z
+const BREAKER_STAND := Vector3(2.6, 0.0, 11.3)
+const BREAKER_STATUS := "ประตูล็อกแม่เหล็ก  /  หาตู้เบรกเกอร์แล้วรีเซ็ตไฟ"
+const RETURN_STATUS := "ไฟมาแล้ว  /  กลับไปที่ประตูหนีไฟ"
+const ANNOUNCE_DISTANCE := 7.0                   # first announcement once she leaves the start
+const KNOCK_EVERY := 3.2                          # seconds of walking between knocks
 const ENDING := "พอผลักประตูออกมา ฉันก็เจอลานจอดรถ ฟ้าสว่างแล้ว\nฉันวิ่งไปหาพี่ รปภ. ขอให้ช่วยเรียกรถ มือสั่นจนกดมือถือไม่ถูก\n\nเขาดูหน้าจอแล้วถามว่าออกมาทางไหน ในระบบไม่มีใครเปิดประตูชั้นนั้นเลย\nฉันยังไม่ทันตอบ วิทยุบนโต๊ะเขาก็ดังขึ้น\n\n“พี่ อย่าเปิดประตูนะ คนข้างนอกไม่ใช่หนู”\nพี่ รปภ. ค่อย ๆ หันมามองฉัน\nฉันจำได้ เสียงในวิทยุนั่นมันเสียงฉัน"
 
 var playing := false
@@ -32,6 +41,20 @@ var finished := false
 var story_beat := 0
 var chase_seen := false
 var near_exit_seen := false
+var power_on := false
+var objective := DEFAULT_STATUS
+var lock_seen := false
+var resetting := false
+var knock_seen := false
+var walk_clock := 0.0
+var lamps: Array[OmniLight3D] = []
+var exit_glow: OmniLight3D
+var exit_sign: Label3D
+var lock_light: OmniLight3D
+var lock_lamp: StandardMaterial3D
+var breaker_led: OmniLight3D
+var breaker_lever: MeshInstance3D
+var knocker: AudioStreamPlayer3D
 var title_font: Font
 
 
@@ -48,6 +71,7 @@ func _ready() -> void:
 	setup_collisions()
 	setup_lights()
 	setup_exit()
+	setup_breaker()
 	player = CharacterBody3D.new()
 	player.name = "AfterHoursPlayer"
 	player.set_script(PlayerScript)
@@ -146,6 +170,7 @@ func setup_lights() -> void:
 			lamp.omni_range = 7.0
 			lamp.shadow_enabled = false
 			add_child(lamp)
+			lamps.append(lamp)
 			if x == 3.0 and z == 3.0:
 				flicker_light = lamp
 
@@ -186,16 +211,76 @@ func setup_exit() -> void:
 	sign.font = font
 	sign.font_size = 48
 	sign.pixel_size = 0.005
-	sign.modulate = Color(0.7, 1.0, 0.7)
+	sign.modulate = Color(0.35, 0.42, 0.36)   # unlit until the power comes back
+	exit_sign = sign
 	sign.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	sign.position = Vector3(0, 2.3, 0.45)
 	exit_root.add_child(sign)
 	var glow := OmniLight3D.new()
 	glow.light_color = Color(0.36, 1.0, 0.58)
-	glow.light_energy = 1.3
+	glow.light_energy = 0.0
 	glow.omni_range = 4.5
 	glow.position = Vector3(0, 1.5, 0.3)
 	exit_root.add_child(glow)
+	exit_glow = glow
+	# A small red lamp on the lock: the door is dead until the breaker is reset.
+	lock_lamp = emissive(Color(0.9, 0.08, 0.05), 2.4)
+	add_exit_box(exit_root, Vector3(0.52, 1.18, 0.86), Vector3(0.12, 0.12, 0.06), lock_lamp)
+	lock_light = OmniLight3D.new()
+	lock_light.light_color = Color(1.0, 0.18, 0.1)
+	lock_light.light_energy = 0.7
+	lock_light.omni_range = 2.2
+	lock_light.position = Vector3(0.52, 1.18, 0.6)
+	exit_root.add_child(lock_light)
+
+
+func setup_breaker() -> void:
+	var root := Node3D.new()
+	root.name = "BreakerPanel"
+	root.position = BREAKER
+	add_child(root)
+	var grey := StandardMaterial3D.new()
+	grey.albedo_color = Color(0.42, 0.43, 0.40)
+	grey.roughness = 0.55
+	grey.metallic = 0.35
+	var dark := StandardMaterial3D.new()
+	dark.albedo_color = Color(0.08, 0.08, 0.07)
+	add_exit_box(root, Vector3(0, 1.35, -0.06), Vector3(0.62, 0.84, 0.12), grey)       # cabinet
+	add_exit_box(root, Vector3(0, 1.35, -0.125), Vector3(0.5, 0.7, 0.01), dark)        # open door recess
+	for row in 3:
+		for col in 4:
+			add_exit_box(root, Vector3(-0.15 + col * 0.1, 1.55 - row * 0.16, -0.14), Vector3(0.05, 0.09, 0.03), grey)
+	var lever := MeshInstance3D.new()
+	var lever_mesh := BoxMesh.new()
+	lever_mesh.size = Vector3(0.09, 0.2, 0.05)
+	lever.mesh = lever_mesh
+	lever.material_override = emissive(Color(0.75, 0.12, 0.08), 0.6)
+	lever.position = Vector3(0.2, 1.08, -0.15)
+	lever.rotation.x = -0.6                       # tripped: pointing down
+	root.add_child(lever)
+	breaker_lever = lever
+	var tag := Label3D.new()
+	tag.text = "MAIN / ชั้น B"
+	tag.font = font
+	tag.font_size = 32
+	tag.pixel_size = 0.004
+	tag.modulate = Color(0.9, 0.86, 0.6)
+	tag.position = Vector3(0, 1.86, -0.13)
+	tag.rotation.y = PI
+	root.add_child(tag)
+	breaker_led = OmniLight3D.new()
+	breaker_led.light_color = Color(1.0, 0.25, 0.12)
+	breaker_led.light_energy = 0.8
+	breaker_led.omni_range = 2.6
+	breaker_led.position = Vector3(0, 1.4, -0.5)
+	root.add_child(breaker_led)
+	knocker = AudioStreamPlayer3D.new()
+	knocker.name = "WallKnock"
+	knocker.stream = load("res://audio/anthology/knock.wav")
+	knocker.volume_db = -4.0
+	knocker.unit_size = 3.0
+	knocker.bus = &"SFX"
+	add_child(knocker)
 
 
 func styled_label(text: String, size: int, color: Color) -> Label:
@@ -257,7 +342,7 @@ func setup_ui() -> void:
 	ui.add_child(clue)
 	var hint := styled_label("WASD เดิน   /   SHIFT วิ่ง   /   E สำรวจ   /   F ไฟฉาย   /   ESC พัก   /   F1 เมนู", 14, Color(0.70, 0.69, 0.56))
 	hint.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-	hint.position = Vector2(26, -40)
+	hint.position = Vector2(26, -76)
 	ui.add_child(hint)
 	overlay = Control.new()
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -423,8 +508,57 @@ func _unhandled_input(event: InputEvent) -> void:
 		else:
 			begin_game()
 		get_viewport().set_input_as_handled()
-	if event.is_action_pressed("interact") and playing and player.global_position.distance_to(EXIT) < 1.8:
-		finish_episode()
+	if event.is_action_pressed("interact") and playing:
+		if player.global_position.distance_to(EXIT) < 1.8:
+			if power_on: finish_episode()
+			else: door_locked()
+		elif not power_on and not resetting and player.global_position.distance_to(BREAKER_STAND) < 1.6:
+			reset_breaker()
+
+
+func door_locked() -> void:
+	sound("knock", -24)
+	objective = BREAKER_STATUS
+	status.text = objective
+	if not lock_seen:
+		lock_seen = true
+		clue.show_clue("ล็อกแม่เหล็ก ไฟไม่เข้าเลย...\nต้องไปรีเซ็ตเบรกเกอร์ ตู้หลักน่าจะอยู่ห้องฝั่งล่างสุด")
+
+
+# The lights die, the breaker clunks, then the building comes back on with her
+# own voice on the speakers. The noise draws the spider to this room.
+func reset_breaker() -> void:
+	resetting = true
+	sound("door", -14)
+	var t := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP)
+	t.tween_property(breaker_lever, "rotation:x", 0.6, 0.25)
+	for lamp in lamps: lamp.visible = false
+	breaker_led.visible = false
+	await get_tree().create_timer(1.6, false).timeout
+	for i in 3:
+		for lamp in lamps: lamp.visible = true
+		await get_tree().create_timer(0.08, false).timeout
+		for lamp in lamps: lamp.visible = false
+		await get_tree().create_timer(0.12 + i * 0.05, false).timeout
+	for lamp in lamps: lamp.visible = true
+	power_on = true
+	resetting = false
+	exit_glow.light_energy = 1.3
+	exit_sign.modulate = Color(0.7, 1.0, 0.7)
+	lock_light.visible = false
+	lock_lamp.albedo_color = Color(0.15, 0.85, 0.35)
+	lock_lamp.emission = Color(0.15, 0.85, 0.35)
+	sound("fluorescent", -16)
+	objective = RETURN_STATUS
+	status.text = objective
+	# The clunk carries: a patrolling spider heads for the breaker room.
+	if is_instance_valid(spider) and not caught and spider.state_name() == "PATROL":
+		spider.plan_path(BREAKER_STAND)
+	await get_tree().create_timer(1.1, false).timeout
+	if finished or caught: return
+	story_beat = maxi(story_beat, 2)
+	sound("message", -19)
+	clue.show_clue("“รออยู่ตรงนั้นนะ เดี๋ยวฉันไปหา”\nนั่นเสียงฉันนี่... ใครเอาเสียงฉันไปเปิด")
 
 
 func _process(delta: float) -> void:
@@ -437,30 +571,52 @@ func _process(delta: float) -> void:
 		prompt.text = ""
 		return
 	elapsed += delta
-	if is_instance_valid(flicker_light):
+	if is_instance_valid(flicker_light) and not resetting:
 		flicker_light.light_energy = 0.72 if sin(elapsed * 3.7) > -0.94 else 0.07
 	if is_instance_valid(spider) and not caught:
-		status.text = SPIDER_ALERT if spider.state_name() == "CHASE" else DEFAULT_STATUS
+		status.text = SPIDER_ALERT if spider.state_name() == "CHASE" else objective
 		if spider.state_name() == "CHASE" and not chase_seen:
 			chase_seen = true
 			sound("low_pulse", -18)
-	# Timed, one-shot incidents only advance while the player is in control.
-	if story_beat == 0 and elapsed > 18.0:
+	# Incidents are tied to places, not time, so a straight walk cannot skip them.
+	if story_beat == 0 and is_instance_valid(player) and player.global_position.distance_to(SPAWN) > ANNOUNCE_DISTANCE:
 		story_beat = 1
 		sound("message", -23)
 		clue.show_clue("“พนักงานที่ยังอยู่ในอาคาร กรุณากลับไปที่ห้องเก็บของ”\nให้กลับไปทำไม... ปกติต้องเรียกลงข้างล่างสิ")
-	elif story_beat == 1 and elapsed > 42.0:
-		story_beat = 2
-		sound("fluorescent", -19)
-		clue.show_clue("“รออยู่ตรงนั้นนะ เดี๋ยวฉันไปหา”\nนั่นเสียงฉันนี่... ใครเอาเสียงฉันไปเปิด")
-	elif story_beat == 2 and elapsed > 69.0:
-		story_beat = 3
-		sound("knock", -22)
-		clue.show_clue("เสียงอะไรอยู่หลังผนัง ตามมาตั้งแต่เมื่อกี้แล้ว\nพอฉันหยุด... มันก็หยุด")
+	# After the power is back something knocks behind the wall beside her, but
+	# only while she is walking. When she stops, it stops.
+	if power_on and is_instance_valid(player):
+		var moving := Vector2(player.velocity.x, player.velocity.z).length() > 0.6
+		if moving:
+			walk_clock += delta
+			if walk_clock >= KNOCK_EVERY:
+				walk_clock = 0.0
+				knock_behind_wall()
+		elif knocker.playing:
+			knocker.stop()
 	if is_instance_valid(player):
 		var exit_distance := player.global_position.distance_to(EXIT)
-		prompt.text = "[ E ]  ผลักประตูหนีไฟ" if exit_distance < 1.8 else ""
+		if exit_distance < 1.8:
+			prompt.text = "[ E ]  ผลักประตูหนีไฟ" if power_on else "[ E ]  ประตูหนีไฟ  (ไม่มีไฟเข้า)"
+		elif not power_on and not resetting and player.global_position.distance_to(BREAKER_STAND) < 1.6:
+			prompt.text = "[ E ]  รีเซ็ตเบรกเกอร์"
+		else:
+			prompt.text = ""
 		if exit_distance < 5.0 and not near_exit_seen:
 			near_exit_seen = true
 			sound("message", -21)
 			clue.show_clue("บัตรใคร... อ้าว นี่บัตรฉัน\nมุมบิ่นตรงเดียวกันเลย แต่ของฉันยังคล้องคออยู่นี่")
+
+
+func knock_behind_wall() -> void:
+	# From her left or right side, a little behind: the other side of the wall.
+	var side := 1.0 if randf() < 0.5 else -1.0
+	var right: Vector3 = player.pivot.global_basis.x
+	var back: Vector3 = player.pivot.global_basis.z
+	knocker.global_position = player.global_position + right * side * 2.4 + back * 0.8 + Vector3.UP * 1.2
+	knocker.pitch_scale = randf_range(0.85, 1.0)
+	knocker.play()
+	if not knock_seen:
+		knock_seen = true
+		story_beat = maxi(story_beat, 3)
+		clue.show_clue("เสียงอะไรอยู่หลังผนัง ตามมาตั้งแต่เมื่อกี้แล้ว\nพอฉันหยุด... มันก็หยุด")

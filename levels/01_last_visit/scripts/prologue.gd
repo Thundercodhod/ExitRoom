@@ -129,7 +129,7 @@ func setup_ui() -> void:
 	hud.add_child(prompt)
 	var hint := styled_label("WASD เดิน   /   SHIFT วิ่ง   /   E สำรวจ   /   F ไฟฉาย   /   ESC พัก   /   F1 เมนู", 14, Color(0.66, 0.71, 0.68))
 	hint.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-	hint.position = Vector2(32, -32)
+	hint.position = Vector2(32, -70)   # clear of the stamina wave along the bottom edge
 	hud.add_child(hint)
 	overlay = Control.new()
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)

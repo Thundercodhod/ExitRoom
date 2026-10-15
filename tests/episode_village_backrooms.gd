@@ -79,7 +79,10 @@ func run_checks() -> void:
 	# Headless has no pointer capture; emulate the in-game capture transition.
 	backrooms.was_captured = false
 	backrooms._process(19.0)
-	check(backrooms.story_beat == 1, "The first announcement must occur during play")
+	check(backrooms.story_beat == 0, "Standing at the start does not play the announcement (events follow places, not time)")
+	backrooms.player.global_position = backrooms.SPAWN + Vector3(-8, 0, 0)
+	backrooms._process(0.1)
+	check(backrooms.story_beat == 1, "The first announcement plays once she walks away from the start")
 	backrooms.show_intro()
 	var paused_elapsed: float = backrooms.elapsed
 	backrooms._process(30.0)
@@ -90,6 +93,26 @@ func run_checks() -> void:
 	use.pressed = true
 	backrooms._unhandled_input(use)
 	check(not backrooms.finished, "Backrooms exit cannot trigger from spawn")
+	# Walking straight to the door is not enough: the lock has no power yet.
+	backrooms.player.global_position = backrooms.EXIT
+	backrooms._unhandled_input(use)
+	check(not backrooms.finished and backrooms.lock_seen and backrooms.status.text == backrooms.BREAKER_STATUS, "The fire door is locked until the breaker is reset")
+	check(not backrooms.exit_glow.light_energy > 0.0 and backrooms.lock_light.visible, "The exit sign is dark and the lock lamp red before the reset")
+	backrooms.player.global_position = backrooms.BREAKER_STAND
+	backrooms.was_captured = false   # headless: no pointer capture to lose
+	backrooms._process(0.1)
+	check(backrooms.prompt.text.contains("เบรกเกอร์"), "The breaker offers a reset prompt")
+	backrooms._unhandled_input(use)
+	check(backrooms.resetting, "Resetting the breaker starts the blackout")
+	await create_timer(4.0).timeout
+	check(backrooms.power_on and not backrooms.resetting and backrooms.exit_glow.light_energy > 1.0 and not backrooms.lock_light.visible, "The power comes back and the exit lights up")
+	check(backrooms.story_beat >= 2 and backrooms.status.text == backrooms.RETURN_STATUS, "Her own voice plays after the reset and the objective points back to the door")
+	backrooms.player.velocity = Vector3(1.4, 0, 0)
+	backrooms._process(backrooms.KNOCK_EVERY + 0.1)
+	check(backrooms.knock_seen and backrooms.knocker.playing, "Walking after the reset brings the knocking behind the wall")
+	backrooms.player.velocity = Vector3.ZERO
+	backrooms._process(0.1)
+	check(not backrooms.knocker.playing, "The knocking stops when she stops")
 	backrooms.player.global_position = backrooms.EXIT
 	backrooms._unhandled_input(use)
 	check(backrooms.finished and not backrooms.playing, "Backrooms exit must stop player control")
