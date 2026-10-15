@@ -45,6 +45,7 @@ func run_checks() -> void:
 	check(village.get_node("04_StoryObjectsAndExit/DoorToBackrooms/FaintMessage").text == "อย่าออกประตูหน้า", "Back door retains an old campaign sign")
 	var marble: Node3D = village.get_node("04_StoryObjectsAndExit/BlueMarbleInteraction")
 	check(marble.visible and marble.global_position.distance_to(village.CASSETTE) < 1.0, "Marble must be seen inside before the tape moves it")
+	check(not village.volume_controls.visible, "Village intro does not show the volume sliders")
 	village.begin_game()
 	village.interact()
 	check(village.story_stage == 0, "Tape must not activate from spawn")
@@ -53,6 +54,7 @@ func run_checks() -> void:
 	check(village.story_stage == 1 and marble.global_position.is_equal_approx(village.MARBLE), "Tape must move the same marble outside")
 	check(recorded.sounds.has("tape"), "Tape interaction must cue audio")
 	village.show_intro()
+	check(village.volume_controls.visible and village.volume_controls.sliders.size() == 4, "Village pause screen shows the volume sliders")
 	var paused_clock: float = village.atmosphere_clock
 	village._process(30.0)
 	check(village.atmosphere_clock == paused_clock, "Village scares must stop while paused")
@@ -75,6 +77,10 @@ func run_checks() -> void:
 	check(not backrooms.playing and not backrooms.player.third_person, "Backrooms must open in first person on its own introduction")
 	var sign := backrooms.get_node("Level01Exit").find_children("*", "Label3D", true, false)[0] as Label3D
 	check(sign.text == "EXIT\nSTAFF ONLY", "Backrooms exit must not promise another campaign level")
+	check(not backrooms.volume_controls.visible, "Backrooms intro does not show the volume sliders")
+	backrooms.begin_game()
+	backrooms.show_intro()
+	check(backrooms.volume_controls.visible and backrooms.volume_controls.sliders.size() == 4, "Backrooms pause screen shows the volume sliders")
 	backrooms.begin_game()
 	# Headless has no pointer capture; emulate the in-game capture transition.
 	backrooms.was_captured = false

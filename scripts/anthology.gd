@@ -1,4 +1,5 @@
 extends Node
+const VolumeControls = preload("res://scripts/volume_controls.gd")
 signal display_mode_changed(enabled: bool, message: String)
 signal transition_finished
 ## Episode selection, saved preferences and completion; no mid-episode checkpoint.
@@ -416,6 +417,13 @@ func _present_ending(id: String, narrative: String) -> void:
 func show_pause() -> void:
 	var stack := make_modal("พักเกม","กลับไปหน้าเลือกเรื่องได้ทุกเมื่อ\nเมื่อเริ่มเล่นใหม่ เรื่องนั้นจะเริ่มจากต้นตอน")
 	modal_kind = "pause"
+	var volume := VolumeControls.new()
+	volume.font = Style.font()
+	volume.font_size = 20
+	volume.ink = Style.INK
+	volume.accent = Style.GOLD
+	volume.slider_width = 380
+	stack.add_child(volume)
 	var resume := Style.button("เล่นต่อ")
 	resume.pressed.connect(close_modal)
 	stack.add_child(resume)
