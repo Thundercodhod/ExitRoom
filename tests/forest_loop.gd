@@ -89,6 +89,14 @@ func run() -> void:
 	check(chapter.peek_active and chapter.frog.mode != chapter.frog.Mode.GONE, "frog is peeking from behind the giant tree")
 	check(chapter.frog.global_position.distance_to(chapter.frog_peek) < .3, "frog stands at the peek spot")
 	check(is_equal_approx(chapter.head_tilt.tilt, deg_to_rad(28)), "frog's head is tilted")
+	# ---- pause screen buttons take real clicks while the tree is paused
+	await press_key(KEY_ESCAPE)
+	check(paused and chapter.panel.visible and chapter.panel_title.text == "พักเกม", "Esc opens the pause screen")
+	await click(chapter.panel_button)
+	check(not paused and not chapter.panel.visible and chapter.playing, "clicking 'เล่นต่อ' resumes the walk")
+	await press_key(KEY_ESCAPE)
+	await press_key(KEY_ESCAPE)
+	check(not paused and chapter.playing, "Esc twice pauses and resumes")
 	check(chapter.frog.is_seen(), "the wake-up look lands on the frog")
 	check(chapter.head_tilt._applied > deg_to_rad(15), "the tilt is actually applied to the head bone")
 	check(chapter.forest_silent, "seeing the frog silences the forest")
@@ -190,7 +198,51 @@ func run() -> void:
 		check(anthology.completed.has("forest"), "completion recorded")
 	check(chapter.EPILOGUE.contains("EPISODE 06"), "ending points on to Episode 06")
 	await shot("ending")
+	# ---- 'กลับไปเลือกตอน' on the pause screen goes back to the menu
+	if anthology:
+		anthology.close_modal(false)
+		paused = false
+		change_scene_to_file("res://levels/05_realization/forest_chapter.tscn")
+		await scene_changed
+		chapter = current_scene
+		await frames()
+		await chapter.panel_continue()
+		await wait_until(func(): return chapter.stage == chapter.Stage.WALK, 20, "second run reaches the walk")
+		await press_key(KEY_ESCAPE)
+		check(paused and chapter.menu_button.is_visible_in_tree(), "pause screen offers the way back to the menu")
+		await click(chapter.menu_button)
+		await wait_until(func(): return current_scene != null and current_scene.scene_file_path == anthology.MENU and not anthology.changing, 6, "clicking 'กลับไปเลือกตอน' returns to the menu")
 	finish()
+
+# Real input, the way a player does it: Esc through the input map, a mouse click
+# on the button's centre. Calling the handler directly would miss a paused UI.
+func press_key(code: Key) -> void:
+	for down in [true, false]:
+		var e := InputEventKey.new()
+		e.keycode = code
+		e.physical_keycode = code
+		e.pressed = down
+		Input.parse_input_event(e)
+		await process_frame
+	await create_timer(.5).timeout
+
+func click(button: Control) -> void:
+	# Input events are in window pixels; the stretched 1280x720 view is scaled on HiDPI screens.
+	var p: Vector2 = root.get_final_transform() * button.get_global_rect().get_center()
+	var move := InputEventMouseMotion.new()
+	move.position = p
+	move.global_position = p
+	Input.parse_input_event(move)
+	await process_frame
+	for down in [true, false]:
+		var e := InputEventMouseButton.new()
+		e.button_index = MOUSE_BUTTON_LEFT
+		e.pressed = down
+		e.position = p
+		e.global_position = p
+		Input.parse_input_event(e)
+		await process_frame
+	await create_timer(.6).timeout
 
 func finish() -> void:
 	if had_preferences:

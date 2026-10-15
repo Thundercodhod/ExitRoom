@@ -36,6 +36,35 @@ func idle() -> void:
 	while chapter.busy and Time.get_ticks_msec()<deadline: await process_frame
 	check(not chapter.busy,"cinematic releases control")
 
+func press_key(code: Key) -> void:
+	for down in [true, false]:
+		var e := InputEventKey.new()
+		e.keycode = code
+		e.physical_keycode = code
+		e.pressed = down
+		Input.parse_input_event(e)
+		await process_frame
+	await create_timer(.5).timeout
+
+# A real mouse click on the button's centre, so a paused UI would be caught.
+func click(button: Control) -> void:
+	# Input events are in window pixels; the stretched 1280x720 view is scaled on HiDPI screens.
+	var p: Vector2 = root.get_final_transform() * button.get_global_rect().get_center()
+	var move := InputEventMouseMotion.new()
+	move.position = p
+	move.global_position = p
+	Input.parse_input_event(move)
+	await process_frame
+	for down in [true, false]:
+		var e := InputEventMouseButton.new()
+		e.button_index = MOUSE_BUTTON_LEFT
+		e.pressed = down
+		e.position = p
+		e.global_position = p
+		Input.parse_input_event(e)
+		await process_frame
+	await create_timer(.6).timeout
+
 func run() -> void:
 	had_preferences = FileAccess.file_exists("user://anthology.cfg")
 	if had_preferences: original_preferences = FileAccess.get_file_as_string("user://anthology.cfg")
@@ -69,6 +98,10 @@ func run() -> void:
 	check(paused and not chapter.playing and chapter.player.position==paused_position,"pause freezes gameplay")
 	chapter.panel_continue()
 	check(not paused and chapter.playing,"pause resumes gameplay")
+	await press_key(KEY_ESCAPE)
+	check(paused and chapter.panel.visible,"Esc opens the pause screen")
+	await click(chapter.panel_button)
+	check(not paused and not chapter.panel.visible and chapter.playing,"clicking 'เล่นต่อ' resumes gameplay")
 	await aim(Vector3(0,.05,-7),Vector3(0,1.7,-31))
 	await shot("approach")
 	# Real collision sweep through front door and hallway, not just teleport assertions.
