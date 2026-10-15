@@ -124,7 +124,9 @@ func run() -> void:
 	await chapter.look_at_point(chapter.player.global_position + Vector3(0, 1.5, -10), .2)
 	check(not shoulder.is_showing(), "Pladuk is not in view between leans")
 	shoulder.lean_in()
-	check(shoulder.voice.playing and shoulder.voice.stream.resource_path.ends_with("pladuk_hello.wav"), "Pladuk's sound plays as it leans in")
+	check(shoulder.voice.playing and shoulder.voice.stream.resource_path.ends_with("pladuk_voice.wav"), "Pladuk's sound plays as it leans in")
+	check(absf(shoulder.voice.stream.get_length() - 4.86) < .05, "its sound is Pladuk_1 (first 2 s) then Pladuk_2")
+	check(shoulder._hold >= shoulder.voice.stream.get_length() - shoulder.LEAN_IN_TIME - .01, "it stays at the shoulder until the sound ends")
 	check(shoulder.voice.position.x > 0.0, "the sound comes from the right side, beside his ear")
 	await create_timer(1.8).timeout
 	check(shoulder.is_showing() and shoulder.lean > .99, "Pladuk leans in at the right shoulder in first person")

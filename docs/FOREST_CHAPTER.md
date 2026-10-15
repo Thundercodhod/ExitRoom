@@ -18,7 +18,7 @@
 
 ## ปลาดุกบนไหล่ (Pladuk)
 
-`levels/05_realization/scripts/pladuk_shoulder.gd` เกาะอยู่กับกล้องมุมมองบุคคลที่หนึ่ง ทุก 15–40 วินาที หน้ามันค่อย ๆ โผล่ที่ขอบขวาของจอ พร้อมเสียง `pladuk_hello.wav` ข้างหู ค้าง 1–2 วินาทีแล้วหลบ (ถี่ขึ้นเมื่อออกนอกทาง) กด V เป็นมุมบุคคลที่สาม มันหายทันที ไม่มีเงา ตอนนี้ใช้โมเดล `levels/05_realization/assets/pladuk.glb` ท่า Idle_Crawl ไปก่อน รอทำท่า Cling_Idle / Lean_In / Lean_Out และลดโพลีใน Blender
+`levels/05_realization/scripts/pladuk_shoulder.gd` เกาะอยู่กับกล้องมุมมองบุคคลที่หนึ่ง ทุก 15–40 วินาที หน้ามันค่อย ๆ โผล่ที่ขอบขวาของจอ พร้อมเสียง `pladuk_voice.wav` ข้างหู (Pladuk_1 ช่วง 2 วินาทีแรก ต่อด้วย Pladuk_2) ค้างอยู่จนเสียงจบแล้วจึงหลบ (ถี่ขึ้นเมื่อออกนอกทาง) กด V เป็นมุมบุคคลที่สาม มันหายทันที ไม่มีเงา ตอนนี้ใช้โมเดล `levels/05_realization/assets/pladuk.glb` ท่า Idle_Crawl ไปก่อน รอทำท่า Cling_Idle / Lean_In / Lean_Out และลดโพลีใน Blender
 
 ## ไฟล์
 

@@ -4,7 +4,8 @@ extends Node3D
 ## Add as a child of the player's camera, then call setup(player).
 
 const PladukScene = preload("res://levels/05_realization/assets/pladuk.glb")
-const HelloSound = preload("res://levels/05_realization/audio/pladuk_hello.wav")
+# Pladuk_1 (its first 2 s) followed straight by Pladuk_2, joined into one clip.
+const VoiceSound = preload("res://levels/05_realization/audio/pladuk_voice.wav")
 
 signal leaned_in
 signal leaned_out
@@ -56,7 +57,7 @@ func setup(p: CharacterBody3D) -> void:
 	# Its sound comes from right beside his ear, where the face slides in.
 	voice = AudioStreamPlayer3D.new()
 	voice.name = "Voice"
-	voice.stream = HelloSound
+	voice.stream = VoiceSound
 	voice.position = FACE_SHOWN
 	voice.unit_size = 2.0
 	voice.volume_db = -3.0
@@ -79,7 +80,8 @@ func next_wait() -> float:
 func lean_in() -> void:
 	if leaning or not enabled: return
 	leaning = true
-	_hold = rng.randf_range(1.2, 2.0)
+	# Stay at the shoulder until it has finished making its sound.
+	_hold = maxf(rng.randf_range(1.2, 2.0), VoiceSound.get_length() - LEAN_IN_TIME)
 	_tween_to(1.0, LEAN_IN_TIME)
 	voice.play()
 	leaned_in.emit()

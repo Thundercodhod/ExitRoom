@@ -74,4 +74,4 @@ def pant(t):
 save("pant", 8, pant)
 
 print("Created 4 original forest sounds")
-# player_gasp, pladuk_hello, campfire and wind_gust are recorded effects (Epidemic Sound), not generated here.
+# player_gasp, pladuk_voice, campfire and wind_gust are recorded effects (Epidemic Sound), not generated here.

@@ -31,6 +31,10 @@ func verify() -> void:
 	if music==null or music.get_length()<=0:
 		push_error("Missing audio: menu_music")
 		failures += 1
+	var pladuk_voice := load("res://levels/05_realization/audio/pladuk_voice.wav") as AudioStream
+	if pladuk_voice==null or pladuk_voice.get_length()<4.5:
+		push_error("Missing audio: pladuk_voice")
+		failures += 1
 	var field_music := load("res://levels/06_dream_field/audio/field_music.mp3") as AudioStream
 	if field_music==null or field_music.get_length()<=0:
 		push_error("Missing audio: field_music")
