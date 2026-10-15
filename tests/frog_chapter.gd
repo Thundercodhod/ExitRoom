@@ -102,6 +102,21 @@ func run() -> void:
 	check(paused and chapter.panel.visible,"Esc opens the pause screen")
 	await click(chapter.panel_button)
 	check(not paused and not chapter.panel.visible and chapter.playing,"clicking 'เล่นต่อ' resumes gameplay")
+	# Stamina wave: always shown while playing, black creeps in from the right as he runs.
+	var wave = chapter.player.stamina_wave
+	await create_timer(.3).timeout
+	check(wave.visible and wave.fraction() > .99,"stamina wave is on screen and full (all white) while walking")
+	Input.action_press("forward")
+	Input.action_press("sprint")
+	await create_timer(2.0).timeout
+	check(chapter.player.sprinting and wave.fraction() < .75,"running turns the wave black from the right (%.2f left)" % wave.fraction())
+	var spent: float = wave.fraction()
+	await shot("stamina-running")
+	Input.action_release("sprint")
+	Input.action_release("forward")
+	await create_timer(1.5).timeout
+	check(wave.fraction() > spent and wave.visible,"resting brings the white back")
+	chapter.player.stamina = 100
 	await aim(Vector3(0,.05,-7),Vector3(0,1.7,-31))
 	await shot("approach")
 	# Real collision sweep through front door and hallway, not just teleport assertions.

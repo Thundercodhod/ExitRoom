@@ -33,6 +33,8 @@ var current_anim := &""
 var third_person := THIRD_PERSON_DEFAULT
 var torch: SpotLight3D
 var stamina := 100.0
+const StaminaWave = preload("res://scripts/stamina_wave.gd")
+var stamina_wave: Control
 var hiding := false
 # Set by a cinematic that moves the player directly (e.g. the frog's choke):
 # no input, no gravity, no animation changes until it is cleared.
@@ -143,6 +145,22 @@ func _ready() -> void:
 	vignette_material.shader = preload("res://assets/shaders/retro_horror.gdshader")
 	vignette.material = vignette_material
 	darkness.add_child(vignette)
+	# Stamina, always on screen while playing: above the subtitles, under the
+	# episode panels (layer 5), so pause/intro screens cover it.
+	var hud := CanvasLayer.new()
+	hud.name = "StaminaHUD"
+	hud.layer = 4
+	hud.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(hud)
+	stamina_wave = StaminaWave.new()
+	stamina_wave.name = "StaminaWave"
+	stamina_wave.player = self
+	stamina_wave.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
+	stamina_wave.offset_left = -StaminaWave.WIDTH * .5
+	stamina_wave.offset_right = StaminaWave.WIDTH * .5
+	stamina_wave.offset_top = -244
+	stamina_wave.offset_bottom = -244 + StaminaWave.HEIGHT
+	hud.add_child(stamina_wave)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not game.playing or held:
