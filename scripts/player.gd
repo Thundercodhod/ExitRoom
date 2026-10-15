@@ -145,7 +145,7 @@ func _ready() -> void:
 	vignette_material.shader = preload("res://assets/shaders/retro_horror.gdshader")
 	vignette.material = vignette_material
 	darkness.add_child(vignette)
-	# Stamina, always on screen while playing: above the subtitles, under the
+	# Stamina, always on screen while playing: along the bottom edge, under the
 	# episode panels (layer 5), so pause/intro screens cover it.
 	var hud := CanvasLayer.new()
 	hud.name = "StaminaHUD"
@@ -158,8 +158,8 @@ func _ready() -> void:
 	stamina_wave.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	stamina_wave.offset_left = -StaminaWave.WIDTH * .5
 	stamina_wave.offset_right = StaminaWave.WIDTH * .5
-	stamina_wave.offset_top = -244
-	stamina_wave.offset_bottom = -244 + StaminaWave.HEIGHT
+	stamina_wave.offset_top = -52
+	stamina_wave.offset_bottom = -52 + StaminaWave.HEIGHT
 	hud.add_child(stamina_wave)
 
 func _unhandled_input(event: InputEvent) -> void:
