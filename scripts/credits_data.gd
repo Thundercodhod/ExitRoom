@@ -2,7 +2,7 @@ extends RefCounted
 ## One list of credits for the menu's credits page and the end roll after Level 06.
 ## Keep in step with ASSET_CREDITS.md and Room407/ASSET_CREDITS.md.
 
-const CLOSING_LINE := "ที่บางที่ยังคงเก็บบางส่วนของเราไว้เสมอ"
+const CLOSING_LINE := "เรามักทิ้งบางสิ่งไว้ในแต่ละสถานที่เสมอ"
 
 const TEAM := [
 	"นายศรัณยู เจริญผล   673380532-1",

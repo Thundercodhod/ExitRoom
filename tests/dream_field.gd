@@ -148,7 +148,7 @@ func run()->void:
 	var roll_text:=""
 	for item in credits.roll.get_children():
 		if item is Label: roll_text+=item.text+"\n"
-	check(roll_text.contains("ที่บางที่ยังคงเก็บบางส่วนของเราไว้เสมอ"),"credits open with the closing line")
+	check(roll_text.contains("เรามักทิ้งบางสิ่งไว้ในแต่ละสถานที่เสมอ"),"credits open with the closing line")
 	check(roll_text.contains("นายศรัณยู เจริญผล   673380532-1") and roll_text.contains("นายธันว์ สว่างศรี") and roll_text.contains("นายทีฆานนท์ อัศวะภูมิ"),"credits list the team with student IDs")
 	check(roll_text.contains("CP 410844") and roll_text.contains("ผศ.ดร.วชิราวุธ ธรรมวิเศษ"),"credits name the course and advisor")
 	check(roll_text.contains("heyheythere") and roll_text.contains("Stylized Station") and roll_text.contains("Epidemic Sound"),"credits carry the required attributions")
